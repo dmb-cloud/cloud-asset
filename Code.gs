@@ -16,6 +16,7 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+// 1. ตรวจสอบใน doPost(e) ว่ามี case "getSsoLoginUrl" แล้วหรือยัง
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
@@ -32,8 +33,11 @@ function doPost(e) {
       case "verifyOTP": result = verifyOTP(payload.email, payload.userOtp); break;
       case "generateAndSaveOTP": result = generateAndSaveOTP(payload.email, payload.fullname); break;
       case "getIndexPage": result = getIndexPage(); break;
+      
+      // 🟢 บรรทัดนี้ต้องมีเพื่อให้เรียก SSO Login ได้
       case "getSsoLoginUrl": result = getSsoLoginUrl(); break;
       case "handleSsoCallback": result = handleSsoCallback(payload.code); break;
+      
       default: result = { success: false, message: "Unrecognized Action: " + action };
     }
 
@@ -42,6 +46,24 @@ function doPost(e) {
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ success: false, message: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// 2. ตรวจสอบว่ามีฟังก์ชัน getSsoLoginUrl() นี้อยู่ในไฟล์ Code.gs
+function getSsoLoginUrl() {
+  try {
+    const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const authUrl = SSO_CONFIG.authority + "auth?" +
+      "client_id=" + encodeURIComponent(SSO_CONFIG.clientId) +
+      "&response_type=code" +
+      "&scope=" + encodeURIComponent("openid profile cid") +
+      "&redirect_uri=" + encodeURIComponent(SSO_CONFIG.redirectUri) +
+      "&state=" + state +
+      "&nonce=" + state;
+      
+    return { success: true, url: authUrl, state: state };
+  } catch (error) {
+    return { success: false, message: error.toString() };
   }
 }
 
