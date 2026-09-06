@@ -653,12 +653,12 @@
             // เงื่อนไข 1: เผื่ออนาคตสำหรับ Super Admin (เห็นทั้งหมด)
             const isSuperAdmin = false; 
             if (isSuperAdmin) return true;
-
+/*
             // เงื่อนไข 2: สำนักดิจิทัลการแพทย์ -> ต้องตรงกันทั้ง Agency และ Assessor
             if (targetAgency === 'สำนักดิจิทัลการแพทย์') {
                 return (itemAgency === targetAgency) && (itemAssessor === targetUserName);
             }
-
+/*
             // เงื่อนไข 3: เผื่ออนาคตสำหรับหน่วยงานอื่นๆ (เลือกเปิดใช้งานตามต้องการ)
             /*
             else if (targetAgency === 'สำนักอื่น_1') {
