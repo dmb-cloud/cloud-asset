@@ -30,7 +30,7 @@
     <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
         <div>
             <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-            <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 1.0.1</span>
+            <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 1.0.2</span>
         </div>
         <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
             <a href="docs/manual.pdf" target="_blank" class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition">
@@ -1155,15 +1155,21 @@
             XLSX.utils.book_append_sheet(wb, ws, "Risk_Assessment");
             XLSX.writeFile(wb, `Risk_Assessment_${userAgency}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
-
-async function submitToDatabase() {
+  // โค้ดดักจับว่ามีการแก้ไขข้อมูลหรือกดเปลี่ยน Checkbox ในตาราง
+  document.getElementById('mainTableBody').addEventListener('change', function(e) {
+      const row = e.target.closest('tr.asset-row');
+      if (row) {
+          row.classList.add('is-changed'); // แปะป้ายบอกว่าแถวนี้โดนแก้แล้วนะ
+      }
+  });
+        async function submitToDatabase() {
     const payloadData = [];
     document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
         const id = row.getAttribute('data-id');
         
-        // 🟢 ปรับเงื่อนไขใหม่: บันทึก "ทุกแถว" ที่มี ID เพื่อให้ส่งค่าทั้ง "ใช้งาน" และ "ไม่ใช้งาน" ไปอัปเดต
-        if (id) {
+        // 🟢 ปรับเงื่อนไขใหม่: บันทึกเฉพาะแถวที่ "ติ๊กใช้งานอยู่" หรือ "เพิ่งถูกคลิกแก้ไข" เท่านั้น
+        if (id && (isActive || row.classList.contains('is-changed'))) {
             payloadData.push({
                 id: id,
                 resourceName: row.querySelector('.name-input').value,
@@ -1173,16 +1179,14 @@ async function submitToDatabase() {
                 c: row.querySelector('.c-select').value,
                 i: row.querySelector('.i-select').value,
                 a: row.querySelector('.a-select').value,
-                impact: parseInt(row.querySelector('.impact-badge').textContent) || 0, // กันค่า NaN
-                // 🟢 กำหนดสถานะตามการติ๊ก Checkbox
+                impact: parseInt(row.querySelector('.impact-badge').textContent) || 0,
                 status: isActive ? "ใช้งาน" : "ไม่ใช้งาน"
             });
         }
     });
 
-    // ปรับเงื่อนไขการแจ้งเตือน (กรณีตารางว่างเปล่าจริงๆ)
     if (payloadData.length === 0) {
-        alert("ไม่พบข้อมูลรายการสำหรับบันทึก");
+        alert("โปรดเลือก หรือแก้ไขอย่างน้อย 1 รายการเพื่อบันทึก");
         return;
     }
 
@@ -1199,6 +1203,9 @@ async function submitToDatabase() {
 
         if (res && res.success) {
             document.getElementById('successPopup').classList.remove('hidden');
+            
+            // 🟢 ลบเครื่องหมาย is-changed ออกให้หมดเมื่อบันทึกสำเร็จ เพื่อเริ่มจับใหม่ในการบันทึกครั้งหน้า
+            document.querySelectorAll('.is-changed').forEach(el => el.classList.remove('is-changed'));
         } else {
             alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
         }
@@ -1206,7 +1213,6 @@ async function submitToDatabase() {
         console.error("Error saving data:", error);
         alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
     } finally {
-        // คืนค่าปุ่มกลับมาเหมือนเดิมเสมอ
         btn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> ยืนยันบันทึกข้อมูล';
         btn.disabled = false;
     }
