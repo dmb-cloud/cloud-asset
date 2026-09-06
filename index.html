@@ -1,520 +1,593 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMS Cloud Registry</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
-        :root { --theme-primary: #122e5a; }
-        .bg-theme { background-color: var(--theme-primary) !important; }
-        .text-theme { color: var(--theme-primary) !important; }
-        tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
-        .th-sortable { cursor: pointer; user-select: none; }
-        .th-sortable:hover { background-color: #334155; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DMS Cloud Registry</title>
+  <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    :root {
+      --theme-primary: #122e5a;
+    }
+
+    .bg-theme {
+      background-color: var(--theme-primary) !important;
+    }
+
+    .text-theme {
+      color: var(--theme-primary) !important;
+    }
+
+    tr.row-disabled {
+      background-color: #f1f5f9 !important;
+      opacity: 0.5;
+    }
+
+    .th-sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .th-sortable:hover {
+      background-color: #334155;
+    }
+  </style>
 </head>
+
 <body class="relative min-h-screen pb-10">
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
-        <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#122e5a] mb-4"></i>
-        <h2 class="text-lg font-bold text-slate-800">กำลังโหลดข้อมูล...</h2>
-    </div>
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay"
+    class="fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#122e5a] mb-4"></i>
+    <h2 class="text-lg font-bold text-slate-800">กำลังโหลดข้อมูล...</h2>
+  </div>
 
-    <!-- Header / Navbar -->
-    <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
-        <div>
-            <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-            <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 1.0.2</span>
-        </div>
-        <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
-            <a href="docs/manual.pdf" target="_blank" class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition">
-                <i class="fa-solid fa-book mr-2"></i> คู่มือ
-            </a> 
-            <span class="text-slate-400">|</span>
-            <div class="flex items-center"><i class="fa-solid fa-user text-sm mr-2"></i><span id="profileName" class="text-sm font-medium">ผู้ใช้งาน</span></div>
-            <span class="text-slate-400">|</span>
-            <div class="flex items-center"><i class="fa-solid fa-building text-sm mr-2"></i><span id="displayAgency" class="text-sm font-medium">หน่วยงาน</span></div>
-            <span class="text-slate-400">|</span>
-            <button onclick="openLogoutModal()"
+  <!-- Header / Navbar -->
+  <div
+    class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
+    <div>
+      <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 1.0.2</span>
+    </div>
+    <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
+      <a href="docs/manual.pdf" target="_blank"
+        class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition">
+        <i class="fa-solid fa-book mr-2"></i> คู่มือ
+      </a>
+      <span class="text-slate-400">|</span>
+      <div class="flex items-center">
+        <i class="fa-solid fa-user text-sm mr-2"></i><span id="profileName" class="text-sm font-medium">ผู้ใช้งาน</span>
+      </div>
+      <span class="text-slate-400">|</span>
+      <div class="flex items-center">
+        <i class="fa-solid fa-building text-sm mr-2"></i><span id="displayAgency" class="text-sm font-medium">หน่วยงาน</span>
+      </div>
+      <span class="text-slate-400">|</span>
+      <button onclick="openLogoutModal()"
                 class="flex items-center text-sm font-medium text-rose-300 hover:text-rose-100 transition">
                 <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
             </button>
-        </div>
     </div>
+  </div>
 
-    <div class="max-w-full mx-auto space-y-6 p-4 md:p-8">
+  <div class="max-w-full mx-auto space-y-6 p-4 md:p-8">
 
-        <!-- Dashboard Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั้งหมด (Total)</p>
-                        <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
-                    </div>
-                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex gap-3 text-xs font-semibold text-slate-500">
-                    <span id="cardTotalDomain"><i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: 0</span>
-                    <span id="cardTotalServer"><i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: 0</span>
-                </div>
-            </div>
+    <!-- Dashboard Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั้งหมด (Total)</p>
+            <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-lg">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex gap-3 text-xs font-semibold text-slate-500">
+          <span id="cardTotalDomain"><i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: 0</span>
+          <span id="cardTotalServer"><i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: 0</span>
+        </div>
+      </div>
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
-                        <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
-                    </div>
-                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-power-off"></i>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-                    <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
-                    <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
-                </div>
-            </div>
+      <div
+        class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
+            <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
+            <i class="fa-solid fa-power-off"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
+          <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
+          <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
+        </div>
+      </div>
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ประเมินแล้ว (Assessed)</p>
-                        <h3 id="cardAssessed" class="text-3xl font-black text-sky-600 mt-1">0</h3>
-                    </div>
-                    <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-clipboard-check"></i>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-                    <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded">ประเมินแล้ว: <span id="cardAssessedSub">0</span></span>
-                    <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded">รอประเมิน: <span id="cardPending">0</span></span>
-                </div>
-            </div>
+      <div
+        class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ประเมินแล้ว (Assessed)</p>
+            <h3 id="cardAssessed" class="text-3xl font-black text-sky-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-lg flex items-center justify-center text-lg">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
+          <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded">ประเมินแล้ว: <span id="cardAssessedSub">0</span></span>
+          <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded">รอประเมิน: <span id="cardPending">0</span></span>
+        </div>
+      </div>
 
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
-                <div class="flex justify-between items-start relative z-10">
-                    <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่มี PDPA</p>
-                        <h3 id="cardPdpa" class="text-3xl font-black text-rose-600 mt-1">0</h3>
-                    </div>
-                    <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">
-                        <i class="fa-solid fa-fingerprint"></i>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
-                    <span class="text-rose-600 flex items-center">
+      <div
+        class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
+        <div class="flex justify-between items-start relative z-10">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่มี PDPA</p>
+            <h3 id="cardPdpa" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">
+            <i class="fa-solid fa-fingerprint"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
+          <span class="text-rose-600 flex items-center">
                         <i class="fa-solid fa-shield-halved mr-1.5"></i> ตรวจพบข้อมูลส่วนบุคคล
                     </span>
-                </div>
-            </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: MAIN TABLE -->
+    <div id="step1" class="space-y-4">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 mb-1"><i class="fa-solid fa-layer-group text-blue-600 mr-2"></i>
+              รายการระบบสารสนเทศทั้งหมด (Domain & Server)</h2>
+            <p class="text-xs text-slate-500">เลือกเปิดใช้งานและประเมินผลกระทบของระบบ (ขั้นตอนที่ 1/2)</p>
+          </div>
         </div>
 
-        <!-- STEP 1: MAIN TABLE -->
-        <div id="step1" class="space-y-4">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 mb-1"><i class="fa-solid fa-layer-group text-blue-600 mr-2"></i> รายการระบบสารสนเทศทั้งหมด (Domain & Server)</h2>
-                        <p class="text-xs text-slate-500">เลือกเปิดใช้งานและประเมินผลกระทบของระบบ (ขั้นตอนที่ 1/2)</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </div>
-                        <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Type..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-500 hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
-                        <div class="flex items-center gap-2 text-xs text-slate-600">
-                            <span>แสดง:</span>
-                            <select id="pageSizeSelect" onchange="changePageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <div class="relative w-full sm:w-64">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </div>
+            <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Type..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
+            <div class="flex items-center gap-2 text-xs text-slate-600">
+              <span>แสดง:</span>
+              <select id="pageSizeSelect" onchange="changePageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
                                 <option value="5">5 แถว</option>
                                 <option value="10" selected>10 แถว</option>
                                 <option value="20">20 แถว</option>
                                 <option value="all">ทั้งหมด</option>
                             </select>
-                        </div>
-                        <button onclick="resetFilters()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition" title="ล้างการค้นหา">
+            </div>
+            <button onclick="resetFilters()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition" title="ล้างการค้นหา">
                             <i class="fa-solid fa-rotate-right"></i>
                         </button>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
-                    <table id="mainTable" class="w-full text-xs text-center border-collapse">
-                        <thead>
-                            <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
-                                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
-                                        <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
-                                    </div>
-                                </th>
-                                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
-                                <th rowspan="2" class="py-3 px-2 min-w-[90px] border-r border-slate-700">สถานะ</th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[130px] border-r border-slate-700">ผู้บันทึกล่าสุด</th>
-                                <th rowspan="2" onclick="sortTable('type')" class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
-                                    ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortTable('ip')" class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
-                                    เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortTable('domain')" class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
-                                    โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortTable('name')" class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
-                                    ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
-                                
-                                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
-                                    <div class="flex items-center justify-center gap-1 text-white">
-                                        <span>ข้อมูล PDPA</span>
-                                        <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
-                                    </div>
-                                </th>
-                                
-                                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <span>ประเมินผลกระทบ (C-I-A)</span>
-                                        <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
-                                    </div>
-                                </th>
-                                
-                                <th rowspan="2" onclick="sortTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <span>ผลกระทบ</span>
-                                        <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
-                                    </div>
-                                </th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
-                            </tr>
-                            <tr class="bg-slate-700 text-slate-200">
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Confidentiality (C)</span>
-                                            <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
-                                    </div>
-                                </th>
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Integrity (I)</span>
-                                            <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
-                                    </div>
-                                </th>
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Availability (A)</span>
-                                            <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Downtime)</span>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="mainTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
-                    </table>
-                </div>
-
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
-                    <div id="paginationControls" class="flex items-center gap-1.5 text-xs">
-                        <button onclick="changePage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
-                        <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
-                        <button onclick="changePage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
-                    </div>
-                    <button onclick="goToStep(2)" class="w-full sm:w-auto px-6 py-2.5 bg-theme text-white text-xs font-bold rounded-lg shadow-md hover:opacity-90 transition">
-                        ถัดไป (สรุปข้อมูล) <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </div>
+          </div>
         </div>
 
-        <!-- STEP 2: SUMMARY TABLE -->
-        <div id="step2" class="space-y-4 hidden">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800 mb-1"><i class="fa-solid fa-clipboard-check text-emerald-600 mr-2"></i> สรุปผลการประเมินความเสี่ยงทั้งหมด</h2>
-                        <p class="text-xs text-slate-500">ตรวจสอบความถูกต้องก่อนส่งออกไฟล์ Excel หรืออัปเดตลงฐานข้อมูล (ขั้นตอนที่ 2/2)</p>
-                    </div>
-                </div>
+        <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
+          <table id="mainTable" class="w-full text-xs text-center border-collapse">
+            <thead>
+              <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
+                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
+                    <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
+                  </div>
+                </th>
+                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
+                <th rowspan="2" class="py-3 px-2 min-w-[90px] border-r border-slate-700">สถานะ</th>
+                <th rowspan="2" class="py-3 px-3 min-w-[130px] border-r border-slate-700">ผู้บันทึกล่าสุด</th>
+                <th rowspan="2" onclick="sortTable('type')"
+                  class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
+                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortTable('ip')"
+                  class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
+                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortTable('domain')"
+                  class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
+                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortTable('name')"
+                  class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
+                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
 
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </div>
-                        <input type="text" id="summarySearchInput" onkeyup="applySummaryFilterAndPagination(true)" placeholder="ค้นหาชื่อระบบ, IP, Domain..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
+                  <div class="flex items-center justify-center gap-1 text-white">
+                    <span>ข้อมูล PDPA</span>
+                    <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
+                  </div>
+                </th>
+
+                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <span>ประเมินผลกระทบ (C-I-A)</span>
+                    <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
+                  </div>
+                </th>
+
+                <th rowspan="2" onclick="sortTable('impact')"
+                  class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <span>ผลกระทบ</span>
+                    <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
+                  </div>
+                </th>
+                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
+              </tr>
+              <tr class="bg-slate-700 text-slate-200">
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Confidentiality (C)</span>
+                      <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
-                    <div class="flex items-center gap-2 text-xs text-slate-600">
-                        <span>แสดง:</span>
-                        <select id="summaryPageSizeSelect" onchange="changeSummaryPageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+                    <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
+                  </div>
+                </th>
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Integrity (I)</span>
+                      <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
+                  </div>
+                </th>
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Availability (A)</span>
+                      <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">(Downtime)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="mainTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
+          <div id="paginationControls" class="flex items-center gap-1.5 text-xs">
+            <button onclick="changePage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
+            <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
+            <button onclick="changePage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
+          </div>
+          <button onclick="goToStep(2)" class="w-full sm:w-auto px-6 py-2.5 bg-theme text-white text-xs font-bold rounded-lg shadow-md hover:opacity-90 transition">
+                        ถัดไป (สรุปข้อมูล) <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: SUMMARY TABLE -->
+    <div id="step2" class="space-y-4 hidden">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800 mb-1">
+              <i class="fa-solid fa-clipboard-check text-emerald-600 mr-2"></i> สรุปผลการประเมินความเสี่ยงทั้งหมด
+            </h2>
+            <p class="text-xs text-slate-500">ตรวจสอบความถูกต้องก่อนส่งออกไฟล์ Excel หรืออัปเดตลงฐานข้อมูล (ขั้นตอนที่
+              2/2)</p>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <div class="relative w-full sm:w-64">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+            </div>
+            <input type="text" id="summarySearchInput" onkeyup="applySummaryFilterAndPagination(true)" placeholder="ค้นหาชื่อระบบ, IP, Domain..." class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-600">
+            <span>แสดง:</span>
+            <select id="summaryPageSizeSelect" onchange="changeSummaryPageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
                             <option value="5">5 แถว</option>
                             <option value="10" selected>10 แถว</option>
                             <option value="20">20 แถว</option>
                             <option value="all">ทั้งหมด (All)</option>
                         </select>
-                    </div>
-                </div>
-                
-                <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
-                    <table class="w-full text-xs text-center border-collapse">
-                        <thead>
-                            <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
-                                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
-                                        <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
-                                    </div>
-                                </th>
-                                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
-                                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700">สถานะ</th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[130px] border-r border-slate-700">ผู้บันทึกล่าสุด</th>
-                                <th rowspan="2" onclick="sortSummaryTable('type')" class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
-                                    ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortSummaryTable('ip')" class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
-                                    เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortSummaryTable('domain')" class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
-                                    โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" onclick="sortSummaryTable('name')" class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
-                                    ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
-                                </th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
-                                
-                                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
-                                    <div class="flex items-center justify-center gap-1 text-white">
-                                        <span>ข้อมูล PDPA</span>
-                                        <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
-                                    </div>
-                                </th>
-                                
-                                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <span>ประเมินผลกระทบ (C-I-A)</span>
-                                        <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
-                                    </div>
-                                </th>
-                                
-                                <th rowspan="2" onclick="sortSummaryTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
-                                    <div class="flex items-center justify-center gap-1.5">
-                                        <span>ผลกระทบ</span>
-                                        <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
-                                    </div>
-                                </th>
-                                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
-                            </tr>
-                            <tr class="bg-slate-700 text-slate-200">
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Confidentiality (C)</span>
-                                            <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
-                                    </div>
-                                </th>
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Integrity (I)</span>
-                                            <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
-                                    </div>
-                                </th>
-                                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
-                                    <div class="flex flex-col items-center justify-center gap-0.5">
-                                        <div class="flex items-center gap-1 text-sm font-semibold text-white">
-                                            <span>Availability (A)</span>
-                                            <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
-                                        </div>
-                                        <span class="text-xs text-slate-400 font-medium">(Downtime)</span>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
+          </div>
+        </div>
 
-                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
-                    <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                        <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+        <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
+          <table class="w-full text-xs text-center border-collapse">
+            <thead>
+              <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
+                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
+                    <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
+                  </div>
+                </th>
+                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
+                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700">สถานะ</th>
+                <th rowspan="2" class="py-3 px-3 min-w-[130px] border-r border-slate-700">ผู้บันทึกล่าสุด</th>
+                <th rowspan="2" onclick="sortSummaryTable('type')"
+                  class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
+                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortSummaryTable('ip')"
+                  class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
+                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortSummaryTable('domain')"
+                  class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
+                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" onclick="sortSummaryTable('name')"
+                  class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
+                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                </th>
+                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
+
+                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
+                  <div class="flex items-center justify-center gap-1 text-white">
+                    <span>ข้อมูล PDPA</span>
+                    <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
+                  </div>
+                </th>
+
+                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <span>ประเมินผลกระทบ (C-I-A)</span>
+                    <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
+                  </div>
+                </th>
+
+                <th rowspan="2" onclick="sortSummaryTable('impact')"
+                  class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
+                  <div class="flex items-center justify-center gap-1.5">
+                    <span>ผลกระทบ</span>
+                    <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
+                  </div>
+                </th>
+                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
+              </tr>
+              <tr class="bg-slate-700 text-slate-200">
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Confidentiality (C)</span>
+                      <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
+                  </div>
+                </th>
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Integrity (I)</span>
+                      <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
+                  </div>
+                </th>
+                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                  <div class="flex flex-col items-center justify-center gap-0.5">
+                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                      <span>Availability (A)</span>
+                      <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">(Downtime)</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
+          <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
                             <i class="fa-solid fa-file-excel mr-2 text-base"></i> ดาวน์โหลด Excel
                         </button>
-                        
-                        <div id="summaryPaginationControls" class="flex items-center gap-1.5 text-xs">
-                            <button onclick="changeSummaryPage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
-                            <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
-                            <button onclick="changeSummaryPage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
-                        </div>
-                    </div>
-                    
-                    <div class="flex gap-3 w-full sm:w-auto">
-                        <button onclick="goToStep(1)" class="w-1/2 sm:w-auto px-5 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300 transition">
+
+            <div id="summaryPaginationControls" class="flex items-center gap-1.5 text-xs">
+              <button onclick="changeSummaryPage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
+              <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
+              <button onclick="changeSummaryPage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
+            </div>
+          </div>
+
+          <div class="flex gap-3 w-full sm:w-auto">
+            <button onclick="goToStep(1)" class="w-1/2 sm:w-auto px-5 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300 transition">
                             <i class="fa-solid fa-arrow-left mr-1"></i> ย้อนกลับไปแก้ไข
                         </button>
-                        <button id="btnSaveFinal" onclick="submitToDatabase()" class="w-1/2 sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-md">
+            <button id="btnSaveFinal" onclick="submitToDatabase()" class="w-1/2 sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-md">
                             <i class="fa-solid fa-save mr-1"></i> ยืนยันบันทึกข้อมูล
                         </button>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-
+      </div>
     </div>
 
-    <!-- Announcement Modal -->
-    <div id="announcementPopup" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-3xl overflow-hidden flex flex-col max-h-[90vh] transform scale-100 transition-transform">
-            
-            <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-3 text-white">
-                    <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
-                        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-                    </div>
-                    <div>
-                        <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
-                        <h2 class="text-lg md:text-xl font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
-                    </div>
-                </div>
-            </div>
+  </div>
 
-            <div class="p-6 overflow-y-auto text-sm text-slate-700 space-y-5 leading-relaxed bg-slate-50/50">
-                <div class="bg-white border-l-4 border-[#122e5a] p-4 rounded-r-lg shadow-sm">
-                  <p class="font-bold text-[#122e5a]">
-                      <a href="https://drive.google.com/file/d/1ZmGmwWtDEY29vJaHtQrIgfctnI_FD0Th/view?usp=sharing" target="_blank" rel="noopener">
-                          <i class="fa-solid fa-file-lines mr-2 text-slate-400"></i>
-                      </a>
-                      อ้างอิง: หนังสือ สธ 0212.07/ว7009 ลงวันที่ 13 สิงหาคม 2569
-                  </p>
-                    <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน 3 ประการ</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                        <p class="font-bold text-rose-800 text-base flex items-center"><i class="fa-solid fa-key w-6 text-center mr-1"></i> 1. การบังคับเปลี่ยนรหัสผ่าน (Force Reset Password)</p>
-                        <p class="mt-2 ml-7 text-slate-600">ให้หน่วยงานแจ้งผู้ดูแลระบบดำเนินการ <strong class="text-rose-600">บังคับให้ผู้ใช้งานทุกรายทำการเปลี่ยนรหัสผ่านใหม่ทั้งหมดในทุกระดับสิทธิ์ทันที</strong> เพื่อเป็นการตัดวงจรภัยคุกคาม</p>
-                    </div>
+  <!-- Announcement Modal -->
+  <div id="announcementPopup"
+    class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-opacity duration-300">
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-3xl overflow-hidden flex flex-col max-h-[90vh] transform scale-100 transition-transform">
 
-                    <div class="bg-white p-4 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                        <p class="font-bold text-amber-800 text-base flex items-center"><i class="fa-solid fa-broom w-6 text-center mr-1"></i> 2. การทำความสะอาดระบบ (System Cleansing)</p>
-                        <p class="mt-2 ml-7 text-slate-600">เร่งตรวจสอบระบบสารสนเทศ หากพบ <strong class="text-amber-600">"ระบบเก่า" หรือ "ระบบร้าง"</strong> ที่ไม่มีการใช้งานแล้ว ให้ดำเนินการ <strong>ปิดการเข้าถึงในระดับโครงสร้างระบบ (Back-end) อย่างถาวร ภายใน 15 วัน</strong></p>
-                    </div>
+      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3 text-white">
+          <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
+            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+          </div>
+          <div>
+            <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
+            <h2 class="text-lg md:text-xl font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
+          </div>
+        </div>
+      </div>
 
-                    <div class="bg-white p-4 rounded-xl border border-sky-100 shadow-sm relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-                        <p class="font-bold text-sky-800 text-base flex items-center"><i class="fa-solid fa-shield-halved w-6 text-center mr-1"></i> 3. การยกระดับการยืนยันตัวตน (MFA) และการควบคุมการเข้าถึง</p>
-                        <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA) เช่น Digital Identity (ThaID) มาใช้</p>
-                    </div>
-                </div>
+      <div class="p-6 overflow-y-auto text-sm text-slate-700 space-y-5 leading-relaxed bg-slate-50/50">
+        <div class="bg-white border-l-4 border-[#122e5a] p-4 rounded-r-lg shadow-sm">
+          <p class="font-bold text-[#122e5a]">
+            <a href="https://drive.google.com/file/d/1ZmGmwWtDEY29vJaHtQrIgfctnI_FD0Th/view?usp=sharing" target="_blank"
+              rel="noopener">
+              <i class="fa-solid fa-file-lines mr-2 text-slate-400"></i>
+            </a>
+            อ้างอิง: หนังสือ สธ 0212.07/ว7009 ลงวันที่ 13 สิงหาคม 2569
+          </p>
+          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข
+            ดำเนินการตามมาตรการเร่งด่วน 3 ประการ</p>
+        </div>
 
-            </div>
+        <div class="space-y-4">
+          <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+            <p class="font-bold text-rose-800 text-base flex items-center">
+              <i class="fa-solid fa-key w-6 text-center mr-1"></i> 1. การบังคับเปลี่ยนรหัสผ่าน (Force Reset Password)
+            </p>
+            <p class="mt-2 ml-7 text-slate-600">ให้หน่วยงานแจ้งผู้ดูแลระบบดำเนินการ
+              <strong class="text-rose-600">บังคับให้ผู้ใช้งานทุกรายทำการเปลี่ยนรหัสผ่านใหม่ทั้งหมดในทุกระดับสิทธิ์ทันที</strong>
+              เพื่อเป็นการตัดวงจรภัยคุกคาม
+            </p>
+          </div>
 
-            <div class="bg-white px-6 py-4 border-t border-slate-200 flex justify-end shrink-0">
-                <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-8 py-3 bg-[#122e5a] hover:bg-blue-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition flex items-center justify-center">
+          <div class="bg-white p-4 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+            <p class="font-bold text-amber-800 text-base flex items-center">
+              <i class="fa-solid fa-broom w-6 text-center mr-1"></i> 2. การทำความสะอาดระบบ (System Cleansing)
+            </p>
+            <p class="mt-2 ml-7 text-slate-600">เร่งตรวจสอบระบบสารสนเทศ หากพบ
+              <strong class="text-amber-600">"ระบบเก่า" หรือ "ระบบร้าง"</strong> ที่ไม่มีการใช้งานแล้ว ให้ดำเนินการ
+              <strong>ปิดการเข้าถึงในระดับโครงสร้างระบบ (Back-end) อย่างถาวร ภายใน 15 วัน</strong>
+            </p>
+          </div>
+
+          <div class="bg-white p-4 rounded-xl border border-sky-100 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
+            <p class="font-bold text-sky-800 text-base flex items-center">
+              <i class="fa-solid fa-shield-halved w-6 text-center mr-1"></i> 3. การยกระดับการยืนยันตัวตน (MFA)
+              และการควบคุมการเข้าถึง
+            </p>
+            <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA)
+              เช่น Digital Identity (ThaID) มาใช้</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bg-white px-6 py-4 border-t border-slate-200 flex justify-end shrink-0">
+        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-8 py-3 bg-[#122e5a] hover:bg-blue-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition flex items-center justify-center">
                     <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
                 </button>
-            </div>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Info Modal -->
-    <div id="infoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 transform transition-all">
-            <div class="bg-slate-800 px-6 py-4 flex items-center justify-between">
-                <h3 id="modalTitle" class="text-base font-bold text-white flex items-center gap-2"></h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl leading-none font-bold">&times;</button>
-            </div>
-            <div id="modalBody" class="p-6 text-sm text-slate-600 leading-relaxed space-y-3"></div>
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end">
-                <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition">เข้าใจแล้ว / ปิด</button>
-            </div>
-        </div>
+  <!-- Info Modal -->
+  <div id="infoModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+    <div
+      class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 transform transition-all">
+      <div class="bg-slate-800 px-6 py-4 flex items-center justify-between">
+        <h3 id="modalTitle" class="text-base font-bold text-white flex items-center gap-2"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl leading-none font-bold">&times;</button>
+      </div>
+      <div id="modalBody" class="p-6 text-sm text-slate-600 leading-relaxed space-y-3"></div>
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition">เข้าใจแล้ว / ปิด</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Success Popup -->
-    <div id="successPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
-            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-check text-4xl text-green-500"></i>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-2">บันทึกเสร็จสิ้น!</h3>
-            <p class="text-sm text-gray-600 mb-6">บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว</p>
-            <button onclick="reloadDashboard()" class="w-full py-2 bg-theme text-white rounded-lg font-bold text-sm">ตกลง</button>
-        </div>
+  <!-- Success Popup -->
+  <div id="successPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
+      <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fa-solid fa-check text-4xl text-green-500"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">บันทึกเสร็จสิ้น!</h3>
+      <p class="text-sm text-gray-600 mb-6">บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว</p>
+      <button onclick="reloadDashboard()" class="w-full py-2 bg-theme text-white rounded-lg font-bold text-sm">ตกลง</button>
     </div>
+  </div>
 
-    <!-- Logout Modal -->
-<div id="logoutModal"
+  <!-- Logout Modal -->
+  <div id="logoutModal"
     class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
 
     <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
 
-        <!-- Header -->
-        <div class="bg-rose-600 px-6 py-4 flex items-center justify-between">
-            <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                ยืนยันการออกจากระบบ
-            </h3>
+      <!-- Header -->
+      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          ยืนยันการออกจากระบบ
+        </h3>
 
-            <button onclick="closeLogoutModal()"
+        <button onclick="closeLogoutModal()"
                 class="text-rose-200 hover:text-white text-xl leading-none font-bold">
                 &times;
             </button>
-        </div>
+      </div>
 
-        <!-- Body -->
-        <div class="p-6 text-sm text-slate-600 text-center">
-            คุณต้องการออกจากระบบใช่หรือไม่?
-        </div>
+      <!-- Body -->
+      <div class="p-6 text-sm text-slate-600 text-center">
+        คุณต้องการออกจากระบบใช่หรือไม่?
+      </div>
 
-        <!-- Footer -->
-        <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
+      <!-- Footer -->
+      <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
 
-            <button onclick="closeLogoutModal()"
+        <button onclick="closeLogoutModal()"
                 class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">
                 ยกเลิก
             </button>
 
-            <button onclick="logout()"
+        <button onclick="logout()"
                 class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition">
                 <i class="fa-solid fa-right-from-bracket mr-1"></i>
                 ออกจากระบบ
             </button>
 
-        </div>
+      </div>
     </div>
-</div>
-    <script>
-        // Web App Backend URL
+  </div>
+  <script>
+    // Web App Backend URL
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
         let userAgency = "";
@@ -1217,6 +1290,7 @@
         btn.disabled = false;
     }
 }
-    </script>
+  </script>
 </body>
+
 </html>
