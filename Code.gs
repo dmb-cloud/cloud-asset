@@ -7,11 +7,11 @@ const scriptProps = PropertiesService.getScriptProperties();
 const SSO_CONFIG = {
   authority: "https://sso.dms.go.th/keycloak/realms/dms/protocol/openid-connect/",
   profileUrl: "https://sso.dms.go.th/dms-sso-api/api/Authen/Verify/Profile",
-  
+
   // 🟢 ดึงค่าจากตัวแปรที่ซ่อนไว้ (ไม่ฮาร์ดโค้ดในนี้แล้ว)
   clientId: scriptProps.getProperty("CLIENT_ID"),
-  clientSecret: scriptProps.getProperty("CLIENT_SECRET"), 
-  
+  clientSecret: scriptProps.getProperty("CLIENT_SECRET"),
+
   redirectUri: "https://cloud.dms.go.th/sso-callback.html"
 };
 
@@ -27,6 +27,12 @@ function doPost(e) {
     const data = JSON.parse(e.postData.contents);
     const action = data.action;
     const payload = data.payload || {};
+
+    // 🟢 clientInfo: ข้อมูล IP/Device ที่ฝั่ง frontend แนบมาด้วย (ดู getClientInfo() ฝั่ง HTML)
+    // หมายเหตุ: MAC address ดึงไม่ได้จากเว็บเบราว์เซอร์ (ข้อจำกัดด้าน privacy ของทุกเบราว์เซอร์)
+    // และ remote port ไม่มีความหมายในการระบุตัวตน + Apps Script ไม่ได้รับค่านี้มาให้ใช้งาน
+    const clientInfo = payload.clientInfo || { ip: '-', device: '-' };
+
     let result = {};
 
     switch (action) {
@@ -43,10 +49,10 @@ function doPost(e) {
         result = registerUser(payload.agency, payload.email, payload.phone, payload.fullname);
         break;
       case "verifyUser":
-        result = verifyUser(payload.agency, payload.email, payload.phone);
+        result = verifyUser(payload.agency, payload.email, payload.phone, clientInfo); // 🟢 ส่ง clientInfo
         break;
       case "verifyOTP":
-        result = verifyOTP(payload.email, payload.userOtp);
+        result = verifyOTP(payload.email, payload.userOtp, clientInfo); // 🟢 ส่ง clientInfo
         break;
       case "generateAndSaveOTP":
         result = generateAndSaveOTP(payload.email, payload.fullname);
@@ -54,13 +60,13 @@ function doPost(e) {
       case "getIndexPage":
         result = getIndexPage();
         break;
-        
+
       // 🟢 Action สำหรับ DMS SSO
       case "getSsoLoginUrl":
         result = getSsoLoginUrl();
         break;
       case "handleSsoCallback":
-        result = handleSsoCallback(payload.code);
+        result = handleSsoCallback(payload.code, clientInfo); // 🟢 ส่ง clientInfo
         break;
 
       default:
@@ -90,14 +96,14 @@ function getSsoLoginUrl() {
       "&redirect_uri=" + encodeURIComponent(SSO_CONFIG.redirectUri) +
       "&state=" + state +
       "&nonce=" + state;
-      
+
     return { success: true, url: authUrl, state: state };
   } catch (error) {
     return { success: false, message: error.toString() };
   }
 }
 
-function handleSsoCallback(code) {
+function handleSsoCallback(code, clientInfo) { // 🟢 รับ clientInfo
   try {
     if (!code) return { success: false, message: "ไม่พบ Authorization Code" };
 
@@ -140,8 +146,10 @@ function handleSsoCallback(code) {
 
     if (profileData && profileData.data && profileData.data.userSsoInfo) {
       const p = profileData.data.userSsoInfo;
-      
-      const isThai = (str) => /[\u0E00-\u0E7F]/.test(str);
+
+      // 🟢 ฟังก์ชันเช็กตัวอักษรเพื่อแยก ไทย/อังกฤษ ชัดเจน
+      const isThai = (str) => /[\u0E00-\u0E7F]/.test(str || '');
+      const isEng = (str) => /[a-zA-Z]/.test(str || '') && !isThai(str);
 
       const possibleFirsts = [p.firstNameTh, p.thFirstName, p.nameTh, p.firstName, p.firstname, p.givenName, p.given_name, p.firstNameEn, p.enFirstName, p.name];
       const possibleLasts = [p.lastNameTh, p.thLastName, p.surnameTh, p.lastName, p.lastname, p.familyName, p.family_name, p.surname, p.lastNameEn, p.enLastName];
@@ -149,23 +157,19 @@ function handleSsoCallback(code) {
       const pFirsts = possibleFirsts.filter(Boolean).map(s => s.toString().trim());
       const pLasts = possibleLasts.filter(Boolean).map(s => s.toString().trim());
 
+      // แยกภาษาไทย-อังกฤษ อย่างแม่นยำ
       const thFirst = pFirsts.find(isThai) || '';
       const thLast = pLasts.find(isThai) || '';
-      const enFirst = pFirsts.find(s => !isThai(s)) || '';
-      const enLast = pLasts.find(s => !isThai(s)) || '';
+      const enFirst = pFirsts.find(isEng) || '';
+      const enLast = pLasts.find(isEng) || '';
 
+      // ประกอบร่างชื่อ-สกุล เป็นภาษาไทยให้แสดงผลที่เว็บ (หากไม่มีใช้ภาษาอังกฤษแทน)
       let fullname = "";
-      if (thFirst && thLast) {
-        fullname = thFirst + " " + thLast;
-      } else if (thFirst) {
-        fullname = thFirst;
-      } else if (enFirst && enLast) {
-        fullname = enFirst + " " + enLast;
-      } else {
-        fullname = p.username || "ผู้ใช้งาน DMS SSO";
-      }
+      if (thFirst && thLast) fullname = thFirst + " " + thLast;
+      else if (thFirst) fullname = thFirst;
+      else if (enFirst && enLast) fullname = enFirst + " " + enLast;
+      else fullname = p.username || "ผู้ใช้งาน DMS SSO";
 
-      // ❌ ลบการดึงข้อมูล CID ออกทั้งหมด
       const ssoProfile = {
         username: p.username || p.userName || p.preferred_username || '',
         title: p.titleName || p.title || p.ttl || p.prefix || '',
@@ -173,21 +177,23 @@ function handleSsoCallback(code) {
         thLastName: thLast,
         enFirstName: enFirst,
         enLastName: enLast,
-        email: p.email || p.mail || '', 
+        email: p.email || p.mail || p.cid || '',
         phone: p.mobile || p.phoneNumber || p.telephone || '',
+        cid: p.cid || p.citizenId || p.personalId || '',
         position: p.position || p.positionName || p.jobTitle || '',
-        fullname: fullname 
+        fullname: fullname
       };
 
-      const dbUser = saveSsoUserToSheet(ssoProfile);
+      // ส่งไปบันทึกลง UserDB และ Log พร้อมข้อมูล IP/Device
+      const dbUser = saveSsoUserToSheet(ssoProfile, clientInfo); // 🟢 ส่ง clientInfo
 
       return {
         success: true,
         user: {
-          cid: "", // ส่งค่าว่างไปให้หน้าเว็บเพื่อไม่ให้เกิด Error
+          cid: ssoProfile.cid,
           fullname: dbUser.fullname,
           email: ssoProfile.email,
-          agency: dbUser.agency 
+          agency: dbUser.agency
         }
       };
     } else {
@@ -199,68 +205,73 @@ function handleSsoCallback(code) {
   }
 }
 
-// 🟢 ฟังก์ชันบันทึกและจับคู่ข้อมูล (เวอร์ชันไม่มี CID)
-function saveSsoUserToSheet(profile) {
-  let mappedAgency = "เข้าสู่ระบบครั้งแรก (SSO)"; 
+// 🟢 ฟังก์ชันบันทึกและจับคู่ข้อมูล (อัปเดตให้บันทึกข้อมูลครบถ้วนลง UserDB พร้อม IP/Device)
+function saveSsoUserToSheet(profile, clientInfo) { // 🟢 รับ clientInfo
+  let mappedAgency = "เข้าสู่ระบบครั้งแรก (SSO)";
   let mappedFullname = profile.fullname;
-  let dbPhone = "";
+  const ip = clientInfo ? (clientInfo.ip || '-') : '-';
+  const device = clientInfo ? (clientInfo.device || '-') : '-';
 
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName('UserDB');
-    
+
     if (!sheet) {
       sheet = ss.insertSheet('UserDB');
-      sheet.appendRow(['Agency', 'Email', 'Phone', 'FullName', 'LastLogin', 'IsActive']);
+      // 🟢 เพิ่มคอลัมน์ IP Address, Device ต่อท้าย
+      sheet.appendRow(['Agency', 'Email', 'Phone/CID', 'FullName', 'LastLogin', 'IsActive', 'Username', 'Title', 'ThFirstName', 'ThLastName', 'EnFirstName', 'EnLastName', 'CID', 'Position', 'IP Address', 'Device']);
     }
 
     const data = sheet.getDataRange().getValues();
     let userFound = false;
     let rowIndex = -1;
 
-    // 📍 ค้นหาและจับคู่ด้วย "อีเมล" เพียงอย่างเดียว (เพราะไม่มี CID แล้ว)
     for (let i = 1; i < data.length; i++) {
       const dbEmail = data[i][1] ? data[i][1].toString().trim() : '';
+      const dbPhoneCid = data[i][2] ? data[i][2].toString().replace(/^'/, '').trim() : '';
 
-      if (profile.email && dbEmail === profile.email) {
+      if ((profile.email && dbEmail === profile.email) || (profile.cid && dbPhoneCid === profile.cid.toString())) {
         userFound = true;
         rowIndex = i + 1;
-        
+
         mappedAgency = data[i][0] ? data[i][0].toString() : mappedAgency;
-        mappedFullname = profile.fullname;
-        dbPhone = data[i][2] ? data[i][2].toString().replace(/^'/, '').trim() : '';
+        mappedFullname = profile.fullname; // อัปเดตชื่อเป็นแบบล่าสุด
         break;
       }
     }
 
-    // รวมเบอร์โทร
-    const finalPhone = profile.phone || dbPhone || "";
-
     if (userFound) {
-      sheet.getRange(rowIndex, 3).setValue("'" + finalPhone); // บันทึกเฉพาะเบอร์
-      sheet.getRange(rowIndex, 4).setValue(mappedFullname); 
-      sheet.getRange(rowIndex, 5).setValue(new Date()); 
-      sheet.getRange(rowIndex, 6).setValue(true); 
+      // 📍 อัปเดตข้อมูลของผู้ใช้เดิม ลงใน UserDB
+      sheet.getRange(rowIndex, 3).setValue("'" + profile.cid);
+      sheet.getRange(rowIndex, 4).setValue(mappedFullname);
+      sheet.getRange(rowIndex, 5).setValue(new Date());
+      sheet.getRange(rowIndex, 6).setValue(true);
+      sheet.getRange(rowIndex, 7).setValue(profile.username);
+      sheet.getRange(rowIndex, 8).setValue(profile.title);
+      sheet.getRange(rowIndex, 9).setValue(profile.thFirstName);
+      sheet.getRange(rowIndex, 10).setValue(profile.thLastName);
+      sheet.getRange(rowIndex, 11).setValue(profile.enFirstName);
+      sheet.getRange(rowIndex, 12).setValue(profile.enLastName);
+      sheet.getRange(rowIndex, 13).setValue("'" + profile.cid);
+      sheet.getRange(rowIndex, 14).setValue(profile.position);
+      sheet.getRange(rowIndex, 15).setValue(ip);     // 🟢 IP Address
+      sheet.getRange(rowIndex, 16).setValue(device); // 🟢 Device
     } else {
-      sheet.appendRow([mappedAgency, profile.email, "'" + finalPhone, profile.fullname, new Date(), true]);
+      // 📍 สร้างผู้ใช้ใหม่ พร้อมข้อมูลครบถ้วน ลงใน UserDB
+      sheet.appendRow([
+        mappedAgency, profile.email, "'" + profile.cid, profile.fullname, new Date(), true,
+        profile.username, profile.title, profile.thFirstName, profile.thLastName, profile.enFirstName, profile.enLastName, "'" + profile.cid, profile.position,
+        ip, device // 🟢
+      ]);
     }
 
-    // 📍 บันทึกลง Log โดยไม่มี CID มาแทรก
+    // 📍 บันทึกลง Log ด้วยเช่นกัน (พร้อม IP/Device)
     const logSheet = ss.getSheetByName('Log');
     if (logSheet) {
       logSheet.appendRow([
-        new Date(),                       // คอลัมน์ A: Timestamp
-        mappedAgency,                     // คอลัมน์ B: agency
-        profile.email,                    // คอลัมน์ C: email
-        "'" + finalPhone,                 // คอลัมน์ D: phone (เฉพาะเบอร์โทร)
-        "SUCCESS (SSO Login)",            // คอลัมน์ E: note (สถานะ)
-        profile.username,                 // คอลัมน์ F: ชื่อผู้ใช้งาน
-        profile.title,                    // คอลัมน์ G: คำนำหน้านาม
-        profile.thFirstName,              // คอลัมน์ H: ชื่อ ภาษาไทย 
-        profile.thLastName,               // คอลัมน์ I: นามสกุล ภาษาไทย 
-        profile.enFirstName,              // คอลัมน์ J: ชื่อ ภาษาอังกฤษ
-        profile.enLastName,               // คอลัมน์ K: นามสกุล ภาษาอังกฤษ
-        profile.position                  // คอลัมน์ L: ตำแหน่ง (แทนที่ CID เก่า)
+        new Date(), mappedAgency, profile.email, profile.phone || profile.cid, "SUCCESS (SSO Login)",
+        profile.username, profile.title, profile.thFirstName, profile.thLastName, profile.enFirstName, profile.enLastName, "'" + profile.cid, profile.position,
+        ip, device // 🟢
       ]);
     }
 
@@ -279,32 +290,35 @@ function registerUser(agency, email, phone, fullname) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('UserDB');
   if (!sheet) return { success: false, message: "ไม่พบฐานข้อมูล UserDB" };
-  
+
   const data = sheet.getDataRange().getValues();
-  
+
   for (let i = 1; i < data.length; i++) {
     if (data[i][1] === email) {
       return { success: false, message: "อีเมลนี้มีอยู่ในระบบแล้ว" };
     }
   }
-  
+
   sheet.appendRow([agency, email, "'" + phone, fullname, new Date(), false]);
   return { success: true, message: "สมัครเสร็จบันทึกเรียบร้อย โปรดติดต่อเจ้าหน้าที่เพื่อนุมัติ" };
 }
 
-function verifyUser(agency, email, phone) {
+function verifyUser(agency, email, phone, clientInfo) { // 🟢 รับ clientInfo
   const cache = CacheService.getScriptCache();
   const lockKey = "lock_" + email;
   const attemptKey = "attempt_" + email;
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ip = clientInfo ? (clientInfo.ip || '-') : '-';       // 🟢
+  const device = clientInfo ? (clientInfo.device || '-') : '-'; // 🟢
 
   function writeLog(statusMsg) {
     const logSheet = ss.getSheetByName('Log');
     if (logSheet) {
-      logSheet.appendRow([new Date(), agency, email, phone, statusMsg]);
+      // 🟢 เพิ่ม IP Address, Device ต่อท้ายบรรทัด log
+      logSheet.appendRow([new Date(), agency, email, phone, statusMsg, ip, device]);
     }
   }
-  
+
   if (cache.get(lockKey)) {
     writeLog("LOCKED (บัญชีถูกระงับอยู่)");
     return { success: false, locked: true, message: "บัญชีนี้ถูกระงับชั่วคราวเป็นเวลา 3 นาที" };
@@ -312,9 +326,9 @@ function verifyUser(agency, email, phone) {
 
   const sheet = ss.getSheetByName('UserDB');
   if (!sheet) return { success: false, locked: false, message: "ไม่พบฐานข้อมูล UserDB" };
-  
+
   const data = sheet.getDataRange().getValues();
-  
+
   let emailFound = false;
   let isMatch = false;
   let fullname = "";
@@ -323,17 +337,17 @@ function verifyUser(agency, email, phone) {
   for (let i = 1; i < data.length; i++) {
     if (data[i][1] == email) {
       emailFound = true;
-      let dbPhone = data[i][2].toString().replace(/^'/, ''); 
-      
+      let dbPhone = data[i][2].toString().replace(/^'/, '');
+
       if (data[i][0] == agency && dbPhone == phone) {
         isMatch = true;
         fullname = data[i][3];
         isActive = (data[i][5] === true || data[i][5] === 'TRUE' || data[i][5] === 'true');
-        break; 
+        break;
       }
     }
   }
-  
+
   if (!emailFound) {
     writeLog("FAILED (ไม่มีอีเมลในระบบ)");
     return { success: false, locked: false, message: "ไม่พบข้อมูลบัญชีนี้ในระบบ" };
@@ -342,14 +356,14 @@ function verifyUser(agency, email, phone) {
   if (!isMatch) {
     let attempts = parseInt(cache.get(attemptKey) || "0");
     attempts++;
-    
+
     if (attempts >= 5) {
       cache.put(lockKey, "true", 180);
       cache.remove(attemptKey);
-      
+
       const otpSheet = ss.getSheetByName('OtpDB');
       if (otpSheet) otpSheet.appendRow([email, "LOCKED", new Date(), "locked_3mins"]);
-      
+
       writeLog("LOCKED (กรอกผิดครบ 5 ครั้ง)");
       return { success: false, locked: true, message: "ข้อมูลไม่ถูกต้องครบ 5 ครั้ง บัญชีถูกระงับชั่วคราว (3 นาที)" };
     } else {
@@ -358,7 +372,7 @@ function verifyUser(agency, email, phone) {
       return { success: false, locked: false, message: `หน่วยงานหรือเบอร์โทรศัพท์ไม่ถูกต้อง (ผิดพลาด ${attempts}/5 ครั้ง)` };
     }
   }
-  
+
   if (!isActive) {
     writeLog("FAILED (รออนุมัติ)");
     return { success: false, locked: false, inactive: true, message: "โปรดติดต่อเจ้าหน้าที่เพื่อนุมัติ" };
@@ -366,36 +380,45 @@ function verifyUser(agency, email, phone) {
 
   cache.remove(attemptKey);
   writeLog("SUCCESS (ขอ OTP สำเร็จ)");
-  return generateAndSaveOTP(email, fullname); 
+  return generateAndSaveOTP(email, fullname);
 }
 
 function generateAndSaveOTP(email, fullname) {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 5 * 60000);
-  
+
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OtpDB');
   if (sheet) sheet.appendRow([email, otp, expiresAt, "pending"]);
-  
+
   const body = `สวัสดีคุณ ${fullname}\n\nรหัส OTP สำหรับเข้าสู่ระบบคลาวด์ของคุณคือ: ${otp}\nรหัสนี้จะหมดอายุในอีก 5 นาที\n\nหากคุณไม่ได้ทำรายการนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้`;
   MailApp.sendEmail(email, "รหัส OTP ยืนยันการเข้าสู่ระบบ", body);
-  
+
   return { success: true, message: "ระบบได้ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว", fullname: fullname };
 }
 
-function verifyOTP(email, userOtp) {
+function verifyOTP(email, userOtp, clientInfo) { // 🟢 รับ clientInfo
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OtpDB');
   if (!sheet) return { success: false, message: "ไม่พบฐานข้อมูล OtpDB" };
-  
+
   const data = sheet.getDataRange().getValues();
   const now = new Date();
-  
+  const ip = clientInfo ? (clientInfo.ip || '-') : '-';         // 🟢
+  const device = clientInfo ? (clientInfo.device || '-') : '-'; // 🟢
+
+  function writeLoginLog(statusMsg) {
+    const logSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Log');
+    if (logSheet) {
+      logSheet.appendRow([new Date(), '-', email, '-', statusMsg, ip, device]); // 🟢
+    }
+  }
+
   for (let i = data.length - 1; i >= 1; i--) {
     if (data[i][0] == email) {
       const dbOtp = data[i][1].toString();
       const expiresAt = new Date(data[i][2]);
       const status = data[i][3];
-      
+
       if (status !== "pending") return { success: false, message: "รหัสนี้ถูกใช้งานไปแล้ว หรือถูกยกเลิก" };
       if (now > expiresAt) {
         sheet.getRange(i + 1, 4).setValue("expired");
@@ -403,8 +426,10 @@ function verifyOTP(email, userOtp) {
       }
       if (dbOtp === userOtp.toString().trim()) {
         sheet.getRange(i + 1, 4).setValue("used");
+        writeLoginLog("SUCCESS (OTP Verified - Login)"); // 🟢 log ตอนเข้าระบบสำเร็จจริง
         return { success: true, message: "ยืนยันตัวตนสำเร็จ" };
       } else {
+        writeLoginLog("FAILED (OTP ไม่ถูกต้อง)"); // 🟢
         return { success: false, message: "รหัส OTP ไม่ถูกต้อง" };
       }
     }
@@ -441,17 +466,17 @@ function getAgencies() {
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('risk_cloud');
     if (!sheet) return [];
-    
-    const data = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues(); 
+
+    const data = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues();
     const uniqueAgencies = new Set();
-    
+
     for (let i = 0; i < data.length; i++) {
       if (data[i][0]) uniqueAgencies.add(data[i][0].toString().trim());
     }
-    
+
     const agencies = Array.from(uniqueAgencies).filter(Boolean);
     try { cache.put("cache_agencies", JSON.stringify(agencies), 1800); } catch (e) {}
-    
+
     return agencies;
   } catch (error) {
     return [];
@@ -459,44 +484,50 @@ function getAgencies() {
 }
 
 function getAllRiskCloudData() {
-  // 🟢 ลบ Cache ออกก่อนดึงข้อมูล เพื่อให้ได้ข้อมูลที่เป็นปัจจุบันเสมอ
-  CacheService.getScriptCache().remove("all_risk_cloud_data");
+  const cache = CacheService.getScriptCache();
+  const cachedData = cache.get("all_risk_cloud_data");
+  if (cachedData) return JSON.parse(cachedData);
 
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('risk_cloud');
     if (!sheet) return [];
-    
+
     const data = sheet.getDataRange().getValues();
     const assets = [];
-    
+
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      if(row[1]) {
+      if (row[1]) {
         const hasSaved = (row[8] && row[8].toString().trim() !== "") || (row[10] && row[10].toString().trim() !== "");
+
         assets.push({
-          id: row[0] ? row[0].toString() : '', 
-          agency: row[1] ? row[1].toString().trim() : '', // 🟢 ลบเว้นวรรคส่วนเกิน
-          typeFilter: row[2] ? row[2].toString() : '', 
-          name: row[3] ? row[3].toString() : '', 
-          ip: row[4] ? row[4].toString() : '', 
-          privateIp: row[5] ? row[5].toString() : '', 
-          projectId: row[6] ? row[6].toString() : '', 
-          domain: row[7] ? row[7].toString() : '', 
+          id: row[0] ? row[0].toString() : '',
+          agency: row[1] ? row[1].toString() : '',
+          typeFilter: row[2] ? row[2].toString() : '',
+          name: row[3] ? row[3].toString() : '',
+          ip: row[4] ? row[4].toString() : '',
+          privateIp: row[5] ? row[5].toString() : '',
+          projectId: row[6] ? row[6].toString() : '',
+          domain: row[7] ? row[7].toString() : '',
           contact: row[8] ? row[8].toString() : '',
-          note: row[9] ? row[9].toString() : '', 
+          note: row[9] ? row[9].toString() : '',
           sysType: row[10] ? row[10].toString() : 'ระบบบริการ (Web Services)',
           pdpa: (row[11] === true || row[11] === 'TRUE' || row[11] === 'ใช่'),
-          c: parseInt(row[12]) || 1, 
-          i: parseInt(row[13]) || 1, 
-          a: parseInt(row[14]) || 1, 
+          c: parseInt(row[12]) || 1,
+          i: parseInt(row[13]) || 1,
+          a: parseInt(row[14]) || 1,
           impact: parseInt(row[15]) || 1,
           status: (row[16] && row[16].toString().trim() !== '') ? row[16].toString().trim() : 'ไม่ใช้งาน',
           isSaved: hasSaved
         });
       }
     }
+
+    try { cache.put("all_risk_cloud_data", JSON.stringify(assets), 1800); } catch (e) {}
     return assets;
-  } catch (error) { return []; }
+  } catch (error) {
+    return [];
+  }
 }
 
 function saveAssessmentData(payload) {
@@ -512,44 +543,58 @@ function saveAssessmentData(payload) {
 
     const fullRange = sheet.getDataRange();
     const data = fullRange.getValues();
-    
+
     const updates = new Map();
     payload.assets.forEach(asset => {
-      if (asset.id) updates.set(asset.id.toString().trim(), asset);
+      // 🟢 เดิมใช้ if (asset.id) ซึ่งจะข้าม id ที่เป็น "0" ไปโดยไม่ตั้งใจ (falsy) แก้เป็นเช็คแบบชัดเจน
+      if (asset.id !== undefined && asset.id !== null && asset.id.toString().trim() !== '') {
+        updates.set(asset.id.toString().trim(), asset);
+      }
     });
 
-    let isModified = false;
+    let updatedCount = 0; // 🟢 นับจำนวนแถวที่อัปเดตจริง เพื่อ debug และแจ้งผลตามจริง
 
     for (let i = 1; i < data.length; i++) {
-      const rowId = data[i][0] ? data[i][0].toString().trim() : null;
-      
+      const rowId = (data[i][0] !== '' && data[i][0] != null) ? data[i][0].toString().trim() : null;
+
       if (rowId && updates.has(rowId)) {
         const update = updates.get(rowId);
-        
-        data[i][3]  = update.resourceName || '';               
-        data[i][8]  = payload.assessor || '';                  
-        data[i][9]  = update.note || '';                       
-        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)'; 
-        data[i][11] = update.pdpa ? "TRUE" : "FALSE";         
-        data[i][12] = parseInt(update.c) || 1;               
-        data[i][13] = parseInt(update.i) || 1;               
-        data[i][14] = parseInt(update.a) || 1;               
-        data[i][15] = parseInt(update.impact) || 1;          
-        data[i][16] = (update.status && update.status.toString().trim() !== '') ? update.status.toString().trim() : 'ไม่ใช้งาน'; 
-        
-        // 🟢 บันทึกเวลาลงในคอลัมน์ที่ 18 (Index 17) โดยตรง
-        data[i][17] = new Date(); 
-        
-        isModified = true;
+
+        data[i][3]  = update.resourceName || '';
+        data[i][8]  = payload.assessor || '';
+        data[i][9]  = update.note || '';
+        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)';
+        data[i][11] = update.pdpa ? "TRUE" : "FALSE";
+        data[i][12] = parseInt(update.c) || 1;
+        data[i][13] = parseInt(update.i) || 1;
+        data[i][14] = parseInt(update.a) || 1;
+        data[i][15] = parseInt(update.impact) || 1;
+        data[i][16] = (update.status && update.status.toString().trim() !== '') ? update.status.toString().trim() : 'ไม่ใช้งาน';
+
+        updatedCount++;
+        updates.delete(rowId);
       }
     }
 
-    if (isModified) {
+    if (updatedCount > 0) {
       fullRange.setValues(data);
+      SpreadsheetApp.flush(); // 🟢 บังคับให้เขียนค่าลงชีตทันที ป้องกันปัญหา execution ถูกตัดก่อนเขียนเสร็จ
     }
-    
+
     CacheService.getScriptCache().remove("all_risk_cloud_data");
-    return { success: true, message: "บันทึกการประเมินลงฐานข้อมูลเรียบร้อยแล้ว!" };
+
+    // 🟢 ถ้าไม่มี ID ไหนตรงกับชีตเลย ให้แจ้งตามจริงแทนที่จะบอกว่าสำเร็จเฉย ๆ (เดิมเป็นจุดบั๊กที่ทำให้ดูเหมือนบันทึกได้แต่จริง ๆ ไม่ได้บันทึก)
+    if (updatedCount === 0) {
+      return {
+        success: false,
+        message: "ไม่พบ ID ที่ตรงกันในชีต risk_cloud เลย (ส่งมาทั้งหมด " + payload.assets.length + " รายการ) กรุณาตรวจสอบคอลัมน์ A ของชีต risk_cloud ว่ารูปแบบ ID ตรงกับที่ระบบส่งมาหรือไม่"
+      };
+    }
+
+    return {
+      success: true,
+      message: `บันทึกการประเมินลงฐานข้อมูลเรียบร้อยแล้ว! (อัปเดต ${updatedCount}/${payload.assets.length} รายการ)`
+    };
 
   } catch (error) {
     return { success: false, message: error.toString() };
