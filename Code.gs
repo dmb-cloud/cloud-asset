@@ -1,13 +1,17 @@
 // ==========================================
 // CONFIGURATION
 // ==========================================
+// ดึงค่า Secret จาก Project Settings (ตั้งค่าโปรเจกต์ > คุณสมบัติของสคริปต์)
 const scriptProps = PropertiesService.getScriptProperties();
 
 const SSO_CONFIG = {
   authority: "https://sso.dms.go.th/keycloak/realms/dms/protocol/openid-connect/",
   profileUrl: "https://sso.dms.go.th/dms-sso-api/api/Authen/Verify/Profile",
-  clientId: scriptProps.getProperty("CLIENT_ID") || "dmscloudmanagement",
+  
+  // 🟢 ดึงค่าจากตัวแปรที่ซ่อนไว้ (ไม่ฮาร์ดโค้ดในนี้แล้ว)
+  clientId: scriptProps.getProperty("CLIENT_ID"),
   clientSecret: scriptProps.getProperty("CLIENT_SECRET"), 
+  
   redirectUri: "https://cloud.dms.go.th/sso-callback.html"
 };
 
@@ -26,21 +30,46 @@ function doPost(e) {
     let result = {};
 
     switch (action) {
-      case "getAgencies": result = getAgencies(); break;
-      case "getAllRiskCloudData": result = getAllRiskCloudData(); break;
-      case "saveAssessmentData": result = saveAssessmentData(payload); break;
-      case "registerUser": result = registerUser(payload.agency, payload.email, payload.phone, payload.fullname); break;
-      case "verifyUser": result = verifyUser(payload.agency, payload.email, payload.phone); break;
-      case "verifyOTP": result = verifyOTP(payload.email, payload.userOtp); break;
-      case "generateAndSaveOTP": result = generateAndSaveOTP(payload.email, payload.fullname); break;
-      case "getIndexPage": result = getIndexPage(); break;
-      case "getSsoLoginUrl": result = getSsoLoginUrl(); break;
-      case "handleSsoCallback": result = handleSsoCallback(payload.code); break;
-      default: result = { success: false, message: "Unrecognized Action: " + action };
+      case "getAgencies":
+        result = getAgencies();
+        break;
+      case "getAllRiskCloudData":
+        result = getAllRiskCloudData();
+        break;
+      case "saveAssessmentData":
+        result = saveAssessmentData(payload);
+        break;
+      case "registerUser":
+        result = registerUser(payload.agency, payload.email, payload.phone, payload.fullname);
+        break;
+      case "verifyUser":
+        result = verifyUser(payload.agency, payload.email, payload.phone);
+        break;
+      case "verifyOTP":
+        result = verifyOTP(payload.email, payload.userOtp);
+        break;
+      case "generateAndSaveOTP":
+        result = generateAndSaveOTP(payload.email, payload.fullname);
+        break;
+      case "getIndexPage":
+        result = getIndexPage();
+        break;
+        
+      // 🟢 Action สำหรับ DMS SSO
+      case "getSsoLoginUrl":
+        result = getSsoLoginUrl();
+        break;
+      case "handleSsoCallback":
+        result = handleSsoCallback(payload.code);
+        break;
+
+      default:
+        result = { success: false, message: "Unrecognized Action: " + action };
     }
 
     return ContentService.createTextOutput(JSON.stringify({ success: true, data: result }))
       .setMimeType(ContentService.MimeType.JSON);
+
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ success: false, message: error.toString() }))
       .setMimeType(ContentService.MimeType.JSON);
@@ -48,15 +77,20 @@ function doPost(e) {
 }
 
 // ==========================================
-// DMS SSO LOGIC
+// DMS SSO LOGIC (Keycloak & Profile API)
 // ==========================================
+
 function getSsoLoginUrl() {
   try {
     const state = Math.random().toString(36).substring(2) + Date.now().toString(36);
-    const authUrl = SSO_CONFIG.authority + "auth?client_id=" + encodeURIComponent(SSO_CONFIG.clientId) +
-      "&response_type=code&scope=" + encodeURIComponent("openid profile cid") +
+    const authUrl = SSO_CONFIG.authority + "auth?" +
+      "client_id=" + encodeURIComponent(SSO_CONFIG.clientId) +
+      "&response_type=code" +
+      "&scope=" + encodeURIComponent("openid profile cid") +
       "&redirect_uri=" + encodeURIComponent(SSO_CONFIG.redirectUri) +
-      "&state=" + state + "&nonce=" + state;
+      "&state=" + state +
+      "&nonce=" + state;
+      
     return { success: true, url: authUrl, state: state };
   } catch (error) {
     return { success: false, message: error.toString() };
@@ -67,51 +101,105 @@ function handleSsoCallback(code) {
   try {
     if (!code) return { success: false, message: "ไม่พบ Authorization Code" };
 
-    const tokenPayload = { grant_type: "authorization_code", code: code, redirect_uri: SSO_CONFIG.redirectUri, client_id: SSO_CONFIG.clientId, client_secret: SSO_CONFIG.clientSecret };
-    const tokenOptions = { method: "post", payload: tokenPayload, muteHttpExceptions: true };
+    const tokenPayload = {
+      grant_type: "authorization_code",
+      code: code,
+      redirect_uri: SSO_CONFIG.redirectUri,
+      client_id: SSO_CONFIG.clientId,
+      client_secret: SSO_CONFIG.clientSecret
+    };
+
+    const tokenOptions = {
+      method: "post",
+      payload: tokenPayload,
+      muteHttpExceptions: true
+    };
+
     const tokenResponse = UrlFetchApp.fetch(SSO_CONFIG.authority + "token", tokenOptions);
     const tokenData = JSON.parse(tokenResponse.getContentText());
 
-    if (!tokenData.access_token) return { success: false, message: "ไม่สามารถแลก Access Token ได้" };
+    if (!tokenData.access_token) {
+      return { success: false, message: "ไม่สามารถแลก Access Token ได้: " + (tokenData.error_description || tokenData.error) };
+    }
 
-    const profileOptions = { method: "post", headers: { "AccessToken": tokenData.access_token, "Client-Id": SSO_CONFIG.clientId }, contentType: "application/json", payload: JSON.stringify({}), muteHttpExceptions: true };
+    const accessToken = tokenData.access_token;
+
+    const profileOptions = {
+      method: "post",
+      headers: {
+        "AccessToken": accessToken,
+        "Client-Id": SSO_CONFIG.clientId
+      },
+      contentType: "application/json",
+      payload: JSON.stringify({}),
+      muteHttpExceptions: true
+    };
+
     const profileResponse = UrlFetchApp.fetch(SSO_CONFIG.profileUrl, profileOptions);
     const profileData = JSON.parse(profileResponse.getContentText());
 
     if (profileData && profileData.data && profileData.data.userSsoInfo) {
       const p = profileData.data.userSsoInfo;
-      const isThai = (str) => /[\u0E00-\u0E7F]/.test(str || '');
+      
+      const isThai = (str) => /[\u0E00-\u0E7F]/.test(str);
+
       const possibleFirsts = [p.firstNameTh, p.thFirstName, p.nameTh, p.firstName, p.firstname, p.givenName, p.given_name, p.firstNameEn, p.enFirstName, p.name];
       const possibleLasts = [p.lastNameTh, p.thLastName, p.surnameTh, p.lastName, p.lastname, p.familyName, p.family_name, p.surname, p.lastNameEn, p.enLastName];
 
-      const thFirst = possibleFirsts.filter(Boolean).map(s => s.toString().trim()).find(isThai) || '';
-      const thLast = possibleLasts.filter(Boolean).map(s => s.toString().trim()).find(isThai) || '';
-      const enFirst = possibleFirsts.filter(Boolean).map(s => s.toString().trim()).find(s => !isThai(s)) || '';
-      const enLast = possibleLasts.filter(Boolean).map(s => s.toString().trim()).find(s => !isThai(s)) || '';
+      const pFirsts = possibleFirsts.filter(Boolean).map(s => s.toString().trim());
+      const pLasts = possibleLasts.filter(Boolean).map(s => s.toString().trim());
+
+      const thFirst = pFirsts.find(isThai) || '';
+      const thLast = pLasts.find(isThai) || '';
+      const enFirst = pFirsts.find(s => !isThai(s)) || '';
+      const enLast = pLasts.find(s => !isThai(s)) || '';
 
       let fullname = "";
-      if (thFirst && thLast) fullname = thFirst + " " + thLast;
-      else if (thFirst) fullname = thFirst;
-      else if (enFirst && enLast) fullname = enFirst + " " + enLast;
-      else fullname = p.username || "ผู้ใช้งาน DMS SSO";
+      if (thFirst && thLast) {
+        fullname = thFirst + " " + thLast;
+      } else if (thFirst) {
+        fullname = thFirst;
+      } else if (enFirst && enLast) {
+        fullname = enFirst + " " + enLast;
+      } else {
+        fullname = p.username || "ผู้ใช้งาน DMS SSO";
+      }
 
+      // ❌ ลบการดึงข้อมูล CID ออกทั้งหมด
       const ssoProfile = {
-        username: p.username || p.userName || p.preferred_username || '', title: p.titleName || p.title || p.ttl || p.prefix || '',
-        thFirstName: thFirst, thLastName: thLast, enFirstName: enFirst, enLastName: enLast,
-        email: p.email || p.mail || '', phone: p.mobile || p.phoneNumber || p.telephone || '',
-        position: p.position || p.positionName || p.jobTitle || '', fullname: fullname 
+        username: p.username || p.userName || p.preferred_username || '',
+        title: p.titleName || p.title || p.ttl || p.prefix || '',
+        thFirstName: thFirst,
+        thLastName: thLast,
+        enFirstName: enFirst,
+        enLastName: enLast,
+        email: p.email || p.mail || '', 
+        phone: p.mobile || p.phoneNumber || p.telephone || '',
+        position: p.position || p.positionName || p.jobTitle || '',
+        fullname: fullname 
       };
 
       const dbUser = saveSsoUserToSheet(ssoProfile);
-      return { success: true, user: { cid: "", fullname: dbUser.fullname, email: ssoProfile.email, agency: dbUser.agency } };
+
+      return {
+        success: true,
+        user: {
+          cid: "", // ส่งค่าว่างไปให้หน้าเว็บเพื่อไม่ให้เกิด Error
+          fullname: dbUser.fullname,
+          email: ssoProfile.email,
+          agency: dbUser.agency 
+        }
+      };
     } else {
-      return { success: false, message: "ไม่พบข้อมูลจากระบบ DMS SSO" };
+      return { success: false, message: "ไม่พบข้อมูล userSsoInfo จากระบบ DMS SSO" };
     }
+
   } catch (error) {
     return { success: false, message: error.toString() };
   }
 }
 
+// 🟢 ฟังก์ชันบันทึกและจับคู่ข้อมูล (เวอร์ชันไม่มี CID)
 function saveSsoUserToSheet(profile) {
   let mappedAgency = "เข้าสู่ระบบครั้งแรก (SSO)"; 
   let mappedFullname = profile.fullname;
@@ -120,15 +208,24 @@ function saveSsoUserToSheet(profile) {
   try {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     let sheet = ss.getSheetByName('UserDB');
-    if (!sheet) { sheet = ss.insertSheet('UserDB'); sheet.appendRow(['Agency', 'Email', 'Phone', 'FullName', 'LastLogin', 'IsActive']); }
+    
+    if (!sheet) {
+      sheet = ss.insertSheet('UserDB');
+      sheet.appendRow(['Agency', 'Email', 'Phone', 'FullName', 'LastLogin', 'IsActive']);
+    }
 
     const data = sheet.getDataRange().getValues();
-    let userFound = false; let rowIndex = -1;
+    let userFound = false;
+    let rowIndex = -1;
 
+    // 📍 ค้นหาและจับคู่ด้วย "อีเมล" เพียงอย่างเดียว (เพราะไม่มี CID แล้ว)
     for (let i = 1; i < data.length; i++) {
       const dbEmail = data[i][1] ? data[i][1].toString().trim() : '';
+
       if (profile.email && dbEmail === profile.email) {
-        userFound = true; rowIndex = i + 1; 
+        userFound = true;
+        rowIndex = i + 1;
+        
         mappedAgency = data[i][0] ? data[i][0].toString() : mappedAgency;
         mappedFullname = profile.fullname;
         dbPhone = data[i][2] ? data[i][2].toString().replace(/^'/, '').trim() : '';
@@ -136,77 +233,276 @@ function saveSsoUserToSheet(profile) {
       }
     }
 
+    // รวมเบอร์โทร
     const finalPhone = profile.phone || dbPhone || "";
+
     if (userFound) {
-      sheet.getRange(rowIndex, 3).setValue("'" + finalPhone); sheet.getRange(rowIndex, 4).setValue(mappedFullname); 
-      sheet.getRange(rowIndex, 5).setValue(new Date()); sheet.getRange(rowIndex, 6).setValue(true); 
+      sheet.getRange(rowIndex, 3).setValue("'" + finalPhone); // บันทึกเฉพาะเบอร์
+      sheet.getRange(rowIndex, 4).setValue(mappedFullname); 
+      sheet.getRange(rowIndex, 5).setValue(new Date()); 
+      sheet.getRange(rowIndex, 6).setValue(true); 
     } else {
       sheet.appendRow([mappedAgency, profile.email, "'" + finalPhone, profile.fullname, new Date(), true]);
     }
 
+    // 📍 บันทึกลง Log โดยไม่มี CID มาแทรก
     const logSheet = ss.getSheetByName('Log');
     if (logSheet) {
-      logSheet.appendRow([new Date(), mappedAgency, profile.email, "'" + finalPhone, "SUCCESS (SSO Login)", profile.username, profile.title, profile.thFirstName, profile.thLastName, profile.enFirstName, profile.enLastName, profile.position]);
+      logSheet.appendRow([
+        new Date(),                       // คอลัมน์ A: Timestamp
+        mappedAgency,                     // คอลัมน์ B: agency
+        profile.email,                    // คอลัมน์ C: email
+        "'" + finalPhone,                 // คอลัมน์ D: phone (เฉพาะเบอร์โทร)
+        "SUCCESS (SSO Login)",            // คอลัมน์ E: note (สถานะ)
+        profile.username,                 // คอลัมน์ F: ชื่อผู้ใช้งาน
+        profile.title,                    // คอลัมน์ G: คำนำหน้านาม
+        profile.thFirstName,              // คอลัมน์ H: ชื่อ ภาษาไทย 
+        profile.thLastName,               // คอลัมน์ I: นามสกุล ภาษาไทย 
+        profile.enFirstName,              // คอลัมน์ J: ชื่อ ภาษาอังกฤษ
+        profile.enLastName,               // คอลัมน์ K: นามสกุล ภาษาอังกฤษ
+        profile.position                  // คอลัมน์ L: ตำแหน่ง (แทนที่ CID เก่า)
+      ]);
     }
-  } catch (err) {}
+
+  } catch (err) {
+    Logger.log("Error in saveSsoUserToSheet: " + err.toString());
+  }
+
   return { agency: mappedAgency, fullname: mappedFullname };
 }
 
 // ==========================================
-// DATA MANAGEMENT
+// AUTH LOGIC (OTP & REGISTER)
 // ==========================================
+
+function registerUser(agency, email, phone, fullname) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName('UserDB');
+  if (!sheet) return { success: false, message: "ไม่พบฐานข้อมูล UserDB" };
+  
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][1] === email) {
+      return { success: false, message: "อีเมลนี้มีอยู่ในระบบแล้ว" };
+    }
+  }
+  
+  sheet.appendRow([agency, email, "'" + phone, fullname, new Date(), false]);
+  return { success: true, message: "สมัครเสร็จบันทึกเรียบร้อย โปรดติดต่อเจ้าหน้าที่เพื่อนุมัติ" };
+}
+
+function verifyUser(agency, email, phone) {
+  const cache = CacheService.getScriptCache();
+  const lockKey = "lock_" + email;
+  const attemptKey = "attempt_" + email;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+  function writeLog(statusMsg) {
+    const logSheet = ss.getSheetByName('Log');
+    if (logSheet) {
+      logSheet.appendRow([new Date(), agency, email, phone, statusMsg]);
+    }
+  }
+  
+  if (cache.get(lockKey)) {
+    writeLog("LOCKED (บัญชีถูกระงับอยู่)");
+    return { success: false, locked: true, message: "บัญชีนี้ถูกระงับชั่วคราวเป็นเวลา 3 นาที" };
+  }
+
+  const sheet = ss.getSheetByName('UserDB');
+  if (!sheet) return { success: false, locked: false, message: "ไม่พบฐานข้อมูล UserDB" };
+  
+  const data = sheet.getDataRange().getValues();
+  
+  let emailFound = false;
+  let isMatch = false;
+  let fullname = "";
+  let isActive = false;
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][1] == email) {
+      emailFound = true;
+      let dbPhone = data[i][2].toString().replace(/^'/, ''); 
+      
+      if (data[i][0] == agency && dbPhone == phone) {
+        isMatch = true;
+        fullname = data[i][3];
+        isActive = (data[i][5] === true || data[i][5] === 'TRUE' || data[i][5] === 'true');
+        break; 
+      }
+    }
+  }
+  
+  if (!emailFound) {
+    writeLog("FAILED (ไม่มีอีเมลในระบบ)");
+    return { success: false, locked: false, message: "ไม่พบข้อมูลบัญชีนี้ในระบบ" };
+  }
+
+  if (!isMatch) {
+    let attempts = parseInt(cache.get(attemptKey) || "0");
+    attempts++;
+    
+    if (attempts >= 5) {
+      cache.put(lockKey, "true", 180);
+      cache.remove(attemptKey);
+      
+      const otpSheet = ss.getSheetByName('OtpDB');
+      if (otpSheet) otpSheet.appendRow([email, "LOCKED", new Date(), "locked_3mins"]);
+      
+      writeLog("LOCKED (กรอกผิดครบ 5 ครั้ง)");
+      return { success: false, locked: true, message: "ข้อมูลไม่ถูกต้องครบ 5 ครั้ง บัญชีถูกระงับชั่วคราว (3 นาที)" };
+    } else {
+      cache.put(attemptKey, attempts.toString(), 3600);
+      writeLog(`FAILED (ข้อมูลไม่ตรง - ครั้งที่ ${attempts})`);
+      return { success: false, locked: false, message: `หน่วยงานหรือเบอร์โทรศัพท์ไม่ถูกต้อง (ผิดพลาด ${attempts}/5 ครั้ง)` };
+    }
+  }
+  
+  if (!isActive) {
+    writeLog("FAILED (รออนุมัติ)");
+    return { success: false, locked: false, inactive: true, message: "โปรดติดต่อเจ้าหน้าที่เพื่อนุมัติ" };
+  }
+
+  cache.remove(attemptKey);
+  writeLog("SUCCESS (ขอ OTP สำเร็จ)");
+  return generateAndSaveOTP(email, fullname); 
+}
+
+function generateAndSaveOTP(email, fullname) {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 5 * 60000);
+  
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OtpDB');
+  if (sheet) sheet.appendRow([email, otp, expiresAt, "pending"]);
+  
+  const body = `สวัสดีคุณ ${fullname}\n\nรหัส OTP สำหรับเข้าสู่ระบบคลาวด์ของคุณคือ: ${otp}\nรหัสนี้จะหมดอายุในอีก 5 นาที\n\nหากคุณไม่ได้ทำรายการนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้`;
+  MailApp.sendEmail(email, "รหัส OTP ยืนยันการเข้าสู่ระบบ", body);
+  
+  return { success: true, message: "ระบบได้ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว", fullname: fullname };
+}
+
+function verifyOTP(email, userOtp) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OtpDB');
+  if (!sheet) return { success: false, message: "ไม่พบฐานข้อมูล OtpDB" };
+  
+  const data = sheet.getDataRange().getValues();
+  const now = new Date();
+  
+  for (let i = data.length - 1; i >= 1; i--) {
+    if (data[i][0] == email) {
+      const dbOtp = data[i][1].toString();
+      const expiresAt = new Date(data[i][2]);
+      const status = data[i][3];
+      
+      if (status !== "pending") return { success: false, message: "รหัสนี้ถูกใช้งานไปแล้ว หรือถูกยกเลิก" };
+      if (now > expiresAt) {
+        sheet.getRange(i + 1, 4).setValue("expired");
+        return { success: false, message: "รหัส OTP หมดอายุแล้ว กรุณาขอใหม่" };
+      }
+      if (dbOtp === userOtp.toString().trim()) {
+        sheet.getRange(i + 1, 4).setValue("used");
+        return { success: true, message: "ยืนยันตัวตนสำเร็จ" };
+      } else {
+        return { success: false, message: "รหัส OTP ไม่ถูกต้อง" };
+      }
+    }
+  }
+  return { success: false, message: "ไม่พบข้อมูลการขอ OTP" };
+}
+
+// ==========================================
+// OPTIMIZED DATA MANAGEMENT (FAST SPEED)
+// ==========================================
+
+function getIndexPage() {
+  try {
+    return HtmlService.createHtmlOutputFromFile('index').getContent();
+  } catch (error) {
+    return `<div style="text-align:center; padding: 50px;">
+              <h2 style="color: red;">เกิดข้อผิดพลาดในการโหลดหน้าเว็บ</h2>
+              <p>ไม่พบไฟล์ <b>index.html</b></p>
+            </div>`;
+  }
+}
+
+function testMailPermission() {
+  const myEmail = Session.getActiveUser().getEmail();
+  MailApp.sendEmail(myEmail, "ทดสอบสิทธิ์ส่งอีเมล", "ระบบสามารถส่งอีเมลได้เรียบร้อยแล้ว");
+  Logger.log("ส่งอีเมลสำเร็จไปยัง: " + myEmail);
+}
+
 function getAgencies() {
   const cache = CacheService.getScriptCache();
   const cachedAgencies = cache.get("cache_agencies");
   if (cachedAgencies) return JSON.parse(cachedAgencies);
+
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('risk_cloud');
     if (!sheet) return [];
+    
     const data = sheet.getRange(2, 2, sheet.getLastRow() - 1, 1).getValues(); 
     const uniqueAgencies = new Set();
-    for (let i = 0; i < data.length; i++) { if (data[i][0]) uniqueAgencies.add(data[i][0].toString().trim()); }
+    
+    for (let i = 0; i < data.length; i++) {
+      if (data[i][0]) uniqueAgencies.add(data[i][0].toString().trim());
+    }
+    
     const agencies = Array.from(uniqueAgencies).filter(Boolean);
     try { cache.put("cache_agencies", JSON.stringify(agencies), 1800); } catch (e) {}
+    
     return agencies;
-  } catch (error) { return []; }
+  } catch (error) {
+    return [];
+  }
 }
 
 function getAllRiskCloudData() {
-  CacheService.getScriptCache().remove("all_risk_cloud_data");
+  const cache = CacheService.getScriptCache();
+  const cachedData = cache.get("all_risk_cloud_data");
+  if (cachedData) return JSON.parse(cachedData);
 
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('risk_cloud');
     if (!sheet) return [];
+    
     const data = sheet.getDataRange().getValues();
     const assets = [];
+    
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       if(row[1]) {
         const hasSaved = (row[8] && row[8].toString().trim() !== "") || (row[10] && row[10].toString().trim() !== "");
+
         assets.push({
-          id: row[0] ? row[0].toString() : '', 
-          agency: row[1] ? row[1].toString().trim() : '', 
+          id: row[0] ? row[0].toString() : '',
+          agency: row[1] ? row[1].toString() : '',
           typeFilter: row[2] ? row[2].toString() : '', 
-          name: row[3] ? row[3].toString() : '', 
-          ip: row[4] ? row[4].toString() : '', 
-          privateIp: row[5] ? row[5].toString() : '', 
-          projectId: row[6] ? row[6].toString() : '', 
-          domain: row[7] ? row[7].toString() : '', 
+          name: row[3] ? row[3].toString() : '',       
+          ip: row[4] ? row[4].toString() : '',          
+          privateIp: row[5] ? row[5].toString() : '',   
+          projectId: row[6] ? row[6].toString() : '',
+          domain: row[7] ? row[7].toString() : '',      
           contact: row[8] ? row[8].toString() : '',
-          note: row[9] ? row[9].toString() : '', 
+          note: row[9] ? row[9].toString() : '',         
           sysType: row[10] ? row[10].toString() : 'ระบบบริการ (Web Services)',
           pdpa: (row[11] === true || row[11] === 'TRUE' || row[11] === 'ใช่'),
-          c: parseInt(row[12]) || 1, 
-          i: parseInt(row[13]) || 1, 
-          a: parseInt(row[14]) || 1, 
+          c: parseInt(row[12]) || 1,
+          i: parseInt(row[13]) || 1,
+          a: parseInt(row[14]) || 1,
           impact: parseInt(row[15]) || 1,
           status: (row[16] && row[16].toString().trim() !== '') ? row[16].toString().trim() : 'ไม่ใช้งาน',
           isSaved: hasSaved
         });
       }
     }
+    
+    try { cache.put("all_risk_cloud_data", JSON.stringify(assets), 1800); } catch(e) {}
     return assets;
-  } catch (error) { return []; }
+  } catch (error) {
+    return [];
+  }
 }
 
 function saveAssessmentData(payload) {
@@ -223,49 +519,40 @@ function saveAssessmentData(payload) {
     const fullRange = sheet.getDataRange();
     const data = fullRange.getValues();
     
-    // 🟢 แมปข้อมูลที่ส่งมาจากหน้าบ้าน แปลง ID เป็น String และตัดช่องว่างออก
     const updates = new Map();
     payload.assets.forEach(asset => {
-      if (asset.id !== undefined && asset.id !== null) {
-        updates.set(String(asset.id).trim(), asset);
-      }
+      if (asset.id) updates.set(asset.id.toString(), asset);
     });
 
     let isModified = false;
-    let modifiedCount = 0;
 
     for (let i = 1; i < data.length; i++) {
-      // 🟢 อ่านค่า ID จากคอลัมน์ A (Index 0) และแปลงเป็น String ชัดเจน
-      const rowId = data[i][0] !== undefined && data[i][0] !== null ? String(data[i][0]).trim() : "";
+      const rowId = data[i][0] ? data[i][0].toString() : null;
       
       if (rowId && updates.has(rowId)) {
         const update = updates.get(rowId);
         
-        data[i][3]  = update.resourceName || '';               // คอลัมน์ D: Resource_Name
-        data[i][8]  = payload.assessor || '';                  // คอลัมน์ I: Assessor
-        data[i][9]  = update.note || '';                       // คอลัมน์ J: Note
-        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)'; // คอลัมน์ K: Sys_Type
-        data[i][11] = update.pdpa ? "TRUE" : "FALSE";          // คอลัมน์ L: PDPA
-        data[i][12] = parseInt(update.c) || 1;                // คอลัมน์ M: C
-        data[i][13] = parseInt(update.i) || 1;                // คอลัมน์ N: I
-        data[i][14] = parseInt(update.a) || 1;                // คอลัมน์ O: A
-        data[i][15] = parseInt(update.impact) || 1;           // คอลัมน์ P: Impact
-        data[i][16] = (update.status && String(update.status).trim() !== '') ? String(update.status).trim() : 'ไม่ใช้งาน'; // คอลัมน์ Q: Status
-        data[i][17] = new Date();                              // คอลัมน์ R: Last_Update
-        
+        data[i][3]  = update.resourceName || '';               
+        data[i][8]  = payload.assessor || '';                  
+        data[i][9]  = update.note || '';                       
+        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)'; 
+        data[i][11] = update.pdpa ? "TRUE" : "FALSE";         
+        data[i][12] = parseInt(update.c) || 1;               
+        data[i][13] = parseInt(update.i) || 1;               
+        data[i][14] = parseInt(update.a) || 1;               
+        data[i][15] = parseInt(update.impact) || 1;          
+        data[i][16] = (update.status && update.status.toString().trim() !== '') ? update.status.toString().trim() : 'ไม่ใช้งาน'; 
+        data[i][17] = new Date();
         isModified = true;
-        modifiedCount++;
       }
     }
 
     if (isModified) {
       fullRange.setValues(data);
-      CacheService.getScriptCache().remove("all_risk_cloud_data");
-      return { success: true, message: `อัปเดตข้อมูลสำเร็จทั้งหมด ${modifiedCount} รายการ` };
-    } else {
-      // 🔴 หากหา ID ไม่เจอเลย ให้ส่งแจ้งเตือนกลับไปที่หน้าบ้าน
-      return { success: false, message: "ไม่พบ ID สินทรัพย์ที่ตรงกับในฐานข้อมูล risk_cloud" };
     }
+    
+    CacheService.getScriptCache().remove("all_risk_cloud_data");
+    return { success: true, message: "บันทึกการประเมินลงฐานข้อมูลเรียบร้อยแล้ว!" };
 
   } catch (error) {
     return { success: false, message: error.toString() };
