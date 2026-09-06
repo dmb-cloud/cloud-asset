@@ -40,7 +40,8 @@
             <span class="text-slate-400">|</span>
             <div class="flex items-center"><i class="fa-solid fa-building text-sm mr-2"></i><span id="displayAgency" class="text-sm font-medium">หน่วยงาน</span></div>
             <span class="text-slate-400">|</span>
-            <button onclick="openLogoutModal()" class="flex items-center text-sm font-medium text-rose-300 hover:text-rose-100 transition">
+            <button onclick="openLogoutModal()"
+                class="flex items-center text-sm font-medium text-rose-300 hover:text-rose-100 transition">
                 <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
             </button>
         </div>
@@ -178,18 +179,21 @@
                                     ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
                                 </th>
                                 <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
+                                
                                 <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
                                     <div class="flex items-center justify-center gap-1 text-white">
                                         <span>ข้อมูล PDPA</span>
                                         <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
                                     </div>
                                 </th>
+                                
                                 <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
                                     <div class="flex items-center justify-center gap-1.5">
                                         <span>ประเมินผลกระทบ (C-I-A)</span>
                                         <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
                                     </div>
                                 </th>
+                                
                                 <th rowspan="2" onclick="sortTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
                                     <div class="flex items-center justify-center gap-1.5">
                                         <span>ผลกระทบ</span>
@@ -300,18 +304,21 @@
                                     ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
                                 </th>
                                 <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
+                                
                                 <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
                                     <div class="flex items-center justify-center gap-1 text-white">
                                         <span>ข้อมูล PDPA</span>
                                         <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
                                     </div>
                                 </th>
+                                
                                 <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
                                     <div class="flex items-center justify-center gap-1.5">
                                         <span>ประเมินผลกระทบ (C-I-A)</span>
                                         <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
                                     </div>
                                 </th>
+                                
                                 <th rowspan="2" onclick="sortSummaryTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
                                     <div class="flex items-center justify-center gap-1.5">
                                         <span>ผลกระทบ</span>
@@ -384,6 +391,7 @@
     <!-- Announcement Modal -->
     <div id="announcementPopup" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-3xl overflow-hidden flex flex-col max-h-[90vh] transform scale-100 transition-transform">
+            
             <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-3 text-white">
                     <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
@@ -426,6 +434,7 @@
                         <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA) เช่น Digital Identity (ThaID) มาใช้</p>
                     </div>
                 </div>
+
             </div>
 
             <div class="bg-white px-6 py-4 border-t border-slate-200 flex justify-end shrink-0">
@@ -463,26 +472,46 @@
     </div>
 
     <!-- Logout Modal -->
-    <div id="logoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
-            <div class="bg-rose-600 px-6 py-4 flex items-center justify-between">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-right-from-bracket"></i> ยืนยันการออกจากระบบ
-                </h3>
-                <button onclick="closeLogoutModal()" class="text-rose-200 hover:text-white text-xl leading-none font-bold">&times;</button>
-            </div>
-            <div class="p-6 text-sm text-slate-600 text-center">
-                คุณต้องการออกจากระบบใช่หรือไม่?
-            </div>
-            <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
-                <button onclick="closeLogoutModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">ยกเลิก</button>
-                <button onclick="logout()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition">
-                    <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
-                </button>
-            </div>
+<div id="logoutModal"
+    class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
+
+    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
+
+        <!-- Header -->
+        <div class="bg-rose-600 px-6 py-4 flex items-center justify-between">
+            <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                ยืนยันการออกจากระบบ
+            </h3>
+
+            <button onclick="closeLogoutModal()"
+                class="text-rose-200 hover:text-white text-xl leading-none font-bold">
+                &times;
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 text-sm text-slate-600 text-center">
+            คุณต้องการออกจากระบบใช่หรือไม่?
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
+
+            <button onclick="closeLogoutModal()"
+                class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">
+                ยกเลิก
+            </button>
+
+            <button onclick="logout()"
+                class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition">
+                <i class="fa-solid fa-right-from-bracket mr-1"></i>
+                ออกจากระบบ
+            </button>
+
         </div>
     </div>
-
+</div>
     <script>
         // Web App Backend URL
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
@@ -524,6 +553,7 @@
             userName = sessionStorage.getItem('mfa_name');
 
             if (!userAgency || !userEmail) {
+                //alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
                 window.location.href = "auth.html";
                 return;
             }
@@ -554,11 +584,8 @@
                 clearTimeout(timeoutTimer);
 
                 if (res && res.success && Array.isArray(res.data)) {
-                    const cleanUserAgency = userAgency ? userAgency.toString().trim().toLowerCase() : '';
-                    
                     allAssets = res.data.filter(item => {
-                        const itemAgency = item.agency ? item.agency.toString().trim().toLowerCase() : '';
-                        return itemAgency === cleanUserAgency;
+                        return item.agency && item.agency.toString().trim() === userAgency.toString().trim();
                     });
 
                     renderMainTable();
@@ -586,18 +613,18 @@
             }
         }
 
-        function logout() {
-            sessionStorage.clear();
-            window.location.href = "auth.html";
-        }
+          function logout() {
+              sessionStorage.clear();
+              window.location.href = "auth.html";
+          }
 
-        function openLogoutModal() {
-            document.getElementById('logoutModal').classList.remove('hidden');
-        }
+          function openLogoutModal() {
+              document.getElementById('logoutModal').classList.remove('hidden');
+          }
 
-        function closeLogoutModal() {
-            document.getElementById('logoutModal').classList.add('hidden');
-        }
+          function closeLogoutModal() {
+              document.getElementById('logoutModal').classList.add('hidden');
+          }
 
         const modalInfoData = {
             pdpa: {
@@ -644,63 +671,70 @@
         }
 
         function updateCardDashboard() {
-            const total = allAssets.length;
-            const totalDomain = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() === 'domain').length;
-            const totalServer = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() !== 'domain').length;
+    // 1. ดึงจำนวนระบบทั้งหมดของหน่วยงานจากข้อมูลหลัก
+    const total = allAssets.length;
+    const totalDomain = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() === 'domain').length;
+    const totalServer = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() !== 'domain').length;
 
-            let activeCount = 0;
-            let assessedCount = 0;
-            let pdpaCount = 0;
+    let activeCount = 0;
+    let assessedCount = 0;
+    let pdpaCount = 0;
 
-            const allRows = document.querySelectorAll('#mainTableBody tr.asset-row');
-            
-            const domActiveState = {};
-            const domPdpaState = {};
-            allRows.forEach(row => {
-                const id = row.getAttribute('data-id');
-                if (id) {
-                    domActiveState[id] = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
-                    domPdpaState[id] = row.querySelector('.pdpa-cb') ? row.querySelector('.pdpa-cb').checked : false;
-                }
-            });
-
-            allAssets.forEach(item => {
-                const idStr = item.id.toString();
-                
-                let isActive = item.status === 'ยืนยันใช้งาน' || item.isSaved;
-                if (domActiveState.hasOwnProperty(idStr)) {
-                    isActive = domActiveState[idStr];
-                }
-
-                let hasPdpa = item.pdpa;
-                if (domPdpaState.hasOwnProperty(idStr)) {
-                    hasPdpa = domPdpaState[idStr];
-                }
-
-                if (isActive) {
-                    activeCount++;
-                    if (hasPdpa) pdpaCount++;
-                    if (item.isSaved) assessedCount++;
-                }
-            });
-
-            const inactiveCount = total - activeCount;
-            const pendingCount = activeCount - assessedCount;
-
-            if (document.getElementById('cardTotal')) document.getElementById('cardTotal').innerText = total;
-            if (document.getElementById('cardTotalDomain')) document.getElementById('cardTotalDomain').innerHTML = `<i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: ${totalDomain}`;
-            if (document.getElementById('cardTotalServer')) document.getElementById('cardTotalServer').innerHTML = `<i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: ${totalServer}`;
-            
-            if (document.getElementById('cardActive')) document.getElementById('cardActive').innerText = activeCount;
-            if (document.getElementById('cardActiveSub')) document.getElementById('cardActiveSub').innerText = activeCount;
-            if (document.getElementById('cardInactive')) document.getElementById('cardInactive').innerText = inactiveCount < 0 ? 0 : inactiveCount;
-
-            if (document.getElementById('cardAssessed')) document.getElementById('cardAssessed').innerText = assessedCount;
-            if (document.getElementById('cardAssessedSub')) document.getElementById('cardAssessedSub').innerText = assessedCount;
-            if (document.getElementById('cardPending')) document.getElementById('cardPending').innerText = pendingCount < 0 ? 0 : pendingCount;
-
-            if (document.getElementById('cardPdpa')) document.getElementById('cardPdpa').innerText = pdpaCount;
+    // 2. ดึงสถานะการกด Checkbox จากตารางทั้งหมด (รวมทุกหน้า Pagination)
+    const allRows = document.querySelectorAll('#mainTableBody tr.asset-row');
+    
+    // สร้าง Map เพื่อจำค่าจาก DOM หน้าที่กำลังแสดงผลอยู่
+    const domActiveState = {};
+    const domPdpaState = {};
+    allRows.forEach(row => {
+        const id = row.getAttribute('data-id');
+        if (id) {
+            domActiveState[id] = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+            domPdpaState[id] = row.querySelector('.pdpa-cb') ? row.querySelector('.pdpa-cb').checked : false;
         }
+    });
+
+    // 3. วนลูปคำนวณจากอาร์เรย์หลัก allAssets เพื่อให้ครอบคลุมทุกรายการ
+    allAssets.forEach(item => {
+        const idStr = item.id.toString();
+        
+        // เช็กว่ามีการเปลี่ยนค่าบนหน้าจอหรือไม่ ถ้าไม่มีให้ใช้ค่าเริ่มต้นจากฐานข้อมูล
+        let isActive = item.status === 'ยืนยันใช้งาน' || item.isSaved;
+        if (domActiveState.hasOwnProperty(idStr)) {
+            isActive = domActiveState[idStr];
+        }
+
+        let hasPdpa = item.pdpa;
+        if (domPdpaState.hasOwnProperty(idStr)) {
+            hasPdpa = domPdpaState[idStr];
+        }
+
+        if (isActive) {
+            activeCount++;
+            if (hasPdpa) pdpaCount++;
+            if (item.isSaved) assessedCount++;
+        }
+    });
+
+    // 4. คำนวณตัวเลข ไม่ใช้งาน และ รอประเมิน
+    const inactiveCount = total - activeCount;
+    const pendingCount = activeCount - assessedCount;
+
+    // 5. แสดงผลบน Cards
+    if (document.getElementById('cardTotal')) document.getElementById('cardTotal').innerText = total;
+    if (document.getElementById('cardTotalDomain')) document.getElementById('cardTotalDomain').innerHTML = `<i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: ${totalDomain}`;
+    if (document.getElementById('cardTotalServer')) document.getElementById('cardTotalServer').innerHTML = `<i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: ${totalServer}`;
+    
+    if (document.getElementById('cardActive')) document.getElementById('cardActive').innerText = activeCount;
+    if (document.getElementById('cardActiveSub')) document.getElementById('cardActiveSub').innerText = activeCount;
+    if (document.getElementById('cardInactive')) document.getElementById('cardInactive').innerText = inactiveCount < 0 ? 0 : inactiveCount;
+
+    if (document.getElementById('cardAssessed')) document.getElementById('cardAssessed').innerText = assessedCount;
+    if (document.getElementById('cardAssessedSub')) document.getElementById('cardAssessedSub').innerText = assessedCount;
+    if (document.getElementById('cardPending')) document.getElementById('cardPending').innerText = pendingCount < 0 ? 0 : pendingCount;
+
+    if (document.getElementById('cardPdpa')) document.getElementById('cardPdpa').innerText = pdpaCount;
+}
 
         function renderMainTable() {
             const tbody = document.getElementById('mainTableBody');
@@ -794,7 +828,6 @@
             const masterCb = document.getElementById('selectAllCb');
             if (masterCb) masterCb.checked = false;
         }
-
         function handleStatusChange(selectElement) {
             const row = selectElement.closest('tr');
             const cb = row.querySelector('.active-cb');
@@ -805,7 +838,6 @@
                 toggleRowActive(cb, true);
             }
         }
-
         function sortTable(column) {
             const tbody = document.getElementById('mainTableBody');
             const rows = Array.from(tbody.querySelectorAll('.asset-row'));
@@ -829,24 +861,26 @@
             applyFilterAndPagination();
         }
 
-        function toggleSelectAll(masterCb) {
-            const isChecked = masterCb.checked;
-            document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-                if (row.style.display !== 'none') {
-                    const cb = row.querySelector('.active-cb');
-                    if (cb) {
-                        cb.checked = isChecked;
-                        toggleRowActive(cb, false);
-                    }
-                }
-            });
-            updateCardDashboard();
-        }
+          function toggleSelectAll(masterCb) {
+              const isChecked = masterCb.checked;
+              // เลือก/ยกเลิก เฉพาะแถวที่กำลังแสดงผลอยู่ตามการค้นหาหรือ Pagination
+              document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
+                  if (row.style.display !== 'none') {
+                      const cb = row.querySelector('.active-cb');
+                      if (cb) {
+                          cb.checked = isChecked;
+                          toggleRowActive(cb, false);
+                      }
+                  }
+              });
+              updateCardDashboard();
+          }
 
         function toggleRowActive(cb, shouldUpdateDash = true) {
             const row = cb.closest('tr');
             const isActive = cb.checked;
             
+            // 🟢 1. ยกเว้น .status-select เพื่อไม่ให้โดนสั่งปิดการใช้งาน (Disabled)
             const elements = row.querySelectorAll('input:not(.active-cb), select:not(.status-select)');
             const statusSelect = row.querySelector('.status-select');
 
@@ -854,6 +888,7 @@
                 row.classList.remove('row-disabled');
                 elements.forEach(el => el.disabled = false);
                 
+                // 🟢 2. อัปเดตค่าและสี Dropdown เป็น "ยืนยันใช้งาน" (เขียว)
                 if (statusSelect) {
                     statusSelect.value = 'ยืนยันใช้งาน';
                     statusSelect.className = "status-select bg-emerald-100 text-emerald-800 border-emerald-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
@@ -862,6 +897,7 @@
                 row.classList.add('row-disabled');
                 elements.forEach(el => el.disabled = true);
                 
+                // 🟢 3. อัปเดตค่าและสี Dropdown เป็น "ไม่ใช้งาน" (ส้ม)
                 if (statusSelect) {
                     statusSelect.value = 'ไม่ใช้งาน';
                     statusSelect.className = "status-select bg-amber-100 text-amber-800 border-amber-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
@@ -943,41 +979,40 @@
         }
 
         function prepareSummaryData() {
-            summaryDataList = [];
-            const allRows = document.querySelectorAll('#mainTableBody tr.asset-row');
-            
-            allRows.forEach(row => {
-                const statusSelect = row.querySelector('.status-select');
-                const currentStatus = statusSelect ? statusSelect.value : (row.querySelector('.active-cb')?.checked ? 'ยืนยันใช้งาน' : 'ไม่ใช้งาน');
-                
-                if (currentStatus === 'ยืนยันใช้งาน') {
-                    const id = row.getAttribute('data-id');
-                    const asset = allAssets.find(a => a.id.toString() === id.toString());
-                    if (asset) {
-                        summaryDataList.push({
-                            id: asset.id,
-                            isSaved: asset.isSaved,
-                            contact: asset.contact,
-                            ip: asset.ip,
-                            privateIp: asset.privateIp,
-                            domain: asset.domain,
-                            typeFilter: asset.typeFilter,
-                            nameVal: row.querySelector('.name-input').value,
-                            typeVal: row.querySelector('.type-select').value,
-                            noteVal: row.querySelector('.note-input').value,
-                            hasPdpa: row.querySelector('.pdpa-cb').checked,
-                            c: row.querySelector('.c-select').value,
-                            i: row.querySelector('.i-select').value,
-                            a: row.querySelector('.a-select').value,
-                            impact: row.querySelector('.impact-badge').textContent,
-                            status: currentStatus
-                        });
-                    }
-                }
-            });
-
-            applySummaryFilterAndPagination(true);
+    summaryDataList = [];
+    const allRows = document.querySelectorAll('#mainTableBody tr.asset-row');
+    
+    allRows.forEach(row => {
+        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+        
+        // 🟢 ดึงไปแสดงในหน้าสรุปเฉพาะรายการที่ติ๊ก "ยืนยันใช้งาน" เท่านั้น
+        if (isActive) {
+            const id = row.getAttribute('data-id');
+            const asset = allAssets.find(a => a.id.toString() === id.toString());
+            if (asset) {
+                summaryDataList.push({
+                    id: asset.id,
+                    isSaved: asset.isSaved,
+                    contact: asset.contact,
+                    ip: asset.ip,
+                    privateIp: asset.privateIp,
+                    domain: asset.domain,
+                    typeFilter: asset.typeFilter,
+                    nameVal: row.querySelector('.name-input').value,
+                    typeVal: row.querySelector('.type-select').value,
+                    noteVal: row.querySelector('.note-input').value,
+                    hasPdpa: row.querySelector('.pdpa-cb').checked,
+                    c: row.querySelector('.c-select').value,
+                    i: row.querySelector('.i-select').value,
+                    a: row.querySelector('.a-select').value,
+                    impact: row.querySelector('.impact-badge').textContent
+                });
+            }
         }
+    });
+
+    applySummaryFilterAndPagination(true);
+}
 
         function applySummaryFilterAndPagination(resetPage = false) {
             if (resetPage) summaryCurrentPage = 1;
@@ -1121,51 +1156,47 @@
         }
 
         async function submitToDatabase() {
-            const payloadData = [];
-            
-            document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-                const id = row.getAttribute('data-id');
-                const statusSelect = row.querySelector('.status-select');
-                
-                const currentStatus = statusSelect 
-                    ? statusSelect.value 
-                    : (row.querySelector('.active-cb')?.checked ? 'ยืนยันใช้งาน' : 'ไม่ใช้งาน');
-                
-                if (id) {
-                    payloadData.push({
-                        id: id,
-                        resourceName: row.querySelector('.name-input').value,
-                        sysType: row.querySelector('.type-select').value,
-                        note: row.querySelector('.note-input').value,
-                        pdpa: row.querySelector('.pdpa-cb').checked,
-                        c: row.querySelector('.c-select').value,
-                        i: row.querySelector('.i-select').value,
-                        a: row.querySelector('.a-select').value,
-                        impact: parseInt(row.querySelector('.impact-badge').textContent),
-                        status: currentStatus
-                    });
-                }
+    const payloadData = [];
+    document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
+        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+        const id = row.getAttribute('data-id');
+        
+        // 🟢 ปรับเงื่อนไข: บันทึกเฉพาะแถวที่มี ID และถูกกด "ยืนยันใช้งาน (isActive === true)" เท่านั้น
+        if (id && isActive) {
+            payloadData.push({
+                id: id,
+                resourceName: row.querySelector('.name-input').value,
+                sysType: row.querySelector('.type-select').value,
+                note: row.querySelector('.note-input').value,
+                pdpa: row.querySelector('.pdpa-cb').checked,
+                c: row.querySelector('.c-select').value,
+                i: row.querySelector('.i-select').value,
+                a: row.querySelector('.a-select').value,
+                impact: parseInt(row.querySelector('.impact-badge').textContent),
+                status: "ยืนยันใช้งาน"
             });
-
-            if (payloadData.length === 0) {
-                alert("ไม่พบรายการที่ต้องการบันทึก");
-                return;
-            }
-
-            const btn = document.getElementById('btnSaveFinal');
-            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> กำลังบันทึก...';
-            btn.disabled = true;
-
-            const res = await callBackend("saveAssessmentData", { agency: userAgency, assessor: userName, assets: payloadData });
-
-            if (res && res.success) {
-                document.getElementById('successPopup').classList.remove('hidden');
-            } else {
-                alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
-            }
-            btn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> ยืนยันบันทึกข้อมูล';
-            btn.disabled = false;
         }
+    });
+
+    if (payloadData.length === 0) {
+        alert("โปรดเลือกอย่างน้อย 1 รายการที่ต้องการยืนยันใช้งานเพื่อบันทึก");
+        return;
+    }
+
+    const btn = document.getElementById('btnSaveFinal');
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> กำลังบันทึก...';
+    btn.disabled = true;
+
+    const res = await callBackend("saveAssessmentData", { agency: userAgency, assessor: userName, assets: payloadData });
+
+    if (res && res.success) {
+        document.getElementById('successPopup').classList.remove('hidden');
+    } else {
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
+    }
+    btn.innerHTML = '<i class="fa-solid fa-save mr-1"></i> ยืนยันบันทึกข้อมูล';
+    btn.disabled = false;
+}
     </script>
 </body>
 </html>

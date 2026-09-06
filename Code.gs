@@ -223,43 +223,49 @@ function saveAssessmentData(payload) {
     const fullRange = sheet.getDataRange();
     const data = fullRange.getValues();
     
+    // 🟢 แมปข้อมูลที่ส่งมาจากหน้าบ้าน แปลง ID เป็น String และตัดช่องว่างออก
     const updates = new Map();
     payload.assets.forEach(asset => {
-      if (asset.id) updates.set(asset.id.toString().trim(), asset);
+      if (asset.id !== undefined && asset.id !== null) {
+        updates.set(String(asset.id).trim(), asset);
+      }
     });
 
     let isModified = false;
+    let modifiedCount = 0;
 
     for (let i = 1; i < data.length; i++) {
-      const rowId = data[i][0] ? data[i][0].toString().trim() : null;
+      // 🟢 อ่านค่า ID จากคอลัมน์ A (Index 0) และแปลงเป็น String ชัดเจน
+      const rowId = data[i][0] !== undefined && data[i][0] !== null ? String(data[i][0]).trim() : "";
       
       if (rowId && updates.has(rowId)) {
         const update = updates.get(rowId);
         
-        data[i][3]  = update.resourceName || '';               
-        data[i][8]  = payload.assessor || '';                  
-        data[i][9]  = update.note || '';                       
-        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)'; 
-        data[i][11] = update.pdpa ? "TRUE" : "FALSE";         
-        data[i][12] = parseInt(update.c) || 1;               
-        data[i][13] = parseInt(update.i) || 1;               
-        data[i][14] = parseInt(update.a) || 1;               
-        data[i][15] = parseInt(update.impact) || 1;          
-        data[i][16] = (update.status && update.status.toString().trim() !== '') ? update.status.toString().trim() : 'ไม่ใช้งาน'; 
-        
-        // 🟢 บันทึกเวลาประทับลงคอลัมน์ที่ 18 (Index 17) โดยตรง
-        data[i][17] = new Date(); 
+        data[i][3]  = update.resourceName || '';               // คอลัมน์ D: Resource_Name
+        data[i][8]  = payload.assessor || '';                  // คอลัมน์ I: Assessor
+        data[i][9]  = update.note || '';                       // คอลัมน์ J: Note
+        data[i][10] = update.sysType || 'ระบบบริการ (Web Services)'; // คอลัมน์ K: Sys_Type
+        data[i][11] = update.pdpa ? "TRUE" : "FALSE";          // คอลัมน์ L: PDPA
+        data[i][12] = parseInt(update.c) || 1;                // คอลัมน์ M: C
+        data[i][13] = parseInt(update.i) || 1;                // คอลัมน์ N: I
+        data[i][14] = parseInt(update.a) || 1;                // คอลัมน์ O: A
+        data[i][15] = parseInt(update.impact) || 1;           // คอลัมน์ P: Impact
+        data[i][16] = (update.status && String(update.status).trim() !== '') ? String(update.status).trim() : 'ไม่ใช้งาน'; // คอลัมน์ Q: Status
+        data[i][17] = new Date();                              // คอลัมน์ R: Last_Update
         
         isModified = true;
+        modifiedCount++;
       }
     }
 
     if (isModified) {
       fullRange.setValues(data);
+      CacheService.getScriptCache().remove("all_risk_cloud_data");
+      return { success: true, message: `อัปเดตข้อมูลสำเร็จทั้งหมด ${modifiedCount} รายการ` };
+    } else {
+      // 🔴 หากหา ID ไม่เจอเลย ให้ส่งแจ้งเตือนกลับไปที่หน้าบ้าน
+      return { success: false, message: "ไม่พบ ID สินทรัพย์ที่ตรงกับในฐานข้อมูล risk_cloud" };
     }
-    
-    CacheService.getScriptCache().remove("all_risk_cloud_data");
-    return { success: true, message: "บันทึกการประเมินลงฐานข้อมูลเรียบร้อยแล้ว!" };
 
   } catch (error) {
     return { success: false, message: error.toString() };
