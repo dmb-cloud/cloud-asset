@@ -196,24 +196,6 @@
     let sessionUser = { agency: "", email: "", phone: "", fullname: "" };
     let countdownInterval;
 
-    // 🟢 ดึงข้อมูล IP Address (public IP ของเครื่องผู้ใช้) และ Device/Browser (User-Agent)
-    // หมายเหตุ: MAC address ดึงไม่ได้จากเว็บเบราว์เซอร์เด็ดขาด (ข้อจำกัดด้าน privacy ของทุกเบราว์เซอร์)
-    // และ remote port ไม่มีความหมายในการระบุตัวตน (สุ่มใหม่ทุกครั้ง) จึงไม่ถูกเก็บ
-    let cachedClientInfo = null; // แคชไว้ในหน้าเดียวกัน ไม่ต้องยิงถาม IP ซ้ำหลายรอบ
-    async function getClientInfo() {
-      if (cachedClientInfo) return cachedClientInfo;
-      let ip = '-';
-      try {
-        const res = await fetch('https://api.ipify.org?format=json');
-        const data = await res.json();
-        if (data && data.ip) ip = data.ip;
-      } catch (e) {
-        console.warn('ไม่สามารถดึง IP Address ได้ (จะบันทึกเป็น "-" แทน):', e);
-      }
-      cachedClientInfo = { ip: ip, device: navigator.userAgent || '-' };
-      return cachedClientInfo;
-    }
-
     // ฟังก์ชันสำหรับเรียก API สื่อสารกับ Apps Script (แทน google.script.run)
     async function callBackend(action, payload = {}) {
       try {
@@ -252,9 +234,6 @@
       if (savedAgency && savedName) {
         window.location.href = "index.html";
       }
-
-      // 🟢 เริ่มดึง IP/Device ไว้ล่วงหน้าตั้งแต่เปิดหน้า จะได้ไม่หน่วงตอนกดปุ่ม
-      getClientInfo();
     });
 
     function showStaffPopup() { document.getElementById('staffPopup').classList.remove('hidden'); }
@@ -322,8 +301,7 @@
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...'; 
       btn.disabled = true; err.classList.add('hidden');
 
-      const clientInfo = await getClientInfo(); // 🟢 ดึง IP/Device ก่อนส่งไป backend
-      const res = await callBackend("verifyUser", { agency: sessionUser.agency, email: sessionUser.email, phone: sessionUser.phone, clientInfo }); // 🟢 แนบ clientInfo
+      const res = await callBackend("verifyUser", { agency: sessionUser.agency, email: sessionUser.email, phone: sessionUser.phone });
 
       if (res.success) {
         sessionUser.fullname = res.fullname;
@@ -369,15 +347,14 @@
       const err = document.getElementById('otpError');
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...'; btn.disabled = true; err.classList.add('hidden');
 
-      const clientInfo = await getClientInfo(); // 🟢 ดึง IP/Device ก่อนส่งไป backend (ตอนนี้คือจุด login สำเร็จจริง)
-      const res = await callBackend("verifyOTP", { email: sessionUser.email, userOtp: otpCode, clientInfo }); // 🟢 แนบ clientInfo
+      const res = await callBackend("verifyOTP", { email: sessionUser.email, userOtp: otpCode });
 
       if (res.success) {
         sessionStorage.setItem('mfa_agency', sessionUser.agency);
         sessionStorage.setItem('mfa_email', sessionUser.email);
         sessionStorage.setItem('mfa_name', sessionUser.fullname);
         
-        document.getElementById('authContainer').innerHTML = '<div class="p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a] mb-5"></i><h2 class="text-xl font-bold text-gray-800">ยืนยันตัวตนสำเร็จ</h2><p class="text-sm text-gray-600 mt-2">กำลังเข้าสู่ระบบปDMS Cloud Risk...</p></div>';
+        document.getElementById('authContainer').innerHTML = '<div class="p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a] mb-5"></i><h2 class="text-xl font-bold text-gray-800">ยืนยันตัวตนสำเร็จ</h2><p class="text-sm text-gray-600 mt-2">กำลังเข้าสู่ระบบประเมินความเสี่ยง...</p></div>';
         
         // สลับไปหน้า Index.html บน GitHub Pages
         setTimeout(() => {
