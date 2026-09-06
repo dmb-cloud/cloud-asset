@@ -13,7 +13,7 @@
         :root { --theme-primary: #122e5a; }
         .bg-theme { background-color: var(--theme-primary) !important; }
         .text-theme { color: var(--theme-primary) !important; }
-        tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
+        tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.6; }
         .th-sortable { cursor: pointer; user-select: none; }
         .th-sortable:hover { background-color: #334155; }
     </style>
@@ -69,7 +69,7 @@
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ยืนยันใช้งาน (Active)</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
                         <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
@@ -157,7 +157,7 @@
                             <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
                                 <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
                                     <div class="flex flex-col items-center">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ยืนยันใช้งาน</span>
+                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
                                         <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
                                         <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
                                     </div>
@@ -279,7 +279,7 @@
                             <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
                                 <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
                                     <div class="flex flex-col items-center">
-                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ยืนยันใช้งาน</span>
+                                        <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
                                         <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
                                         <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
                                     </div>
@@ -486,6 +486,7 @@
     <script>
         // Web App Backend URL
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+        // 🟢 ตั้งค่าเงื่อนไขการกรองข้อมูลหน่วยงาน (Configuration)
 
         let userAgency = "";
         let userEmail = "";
@@ -545,7 +546,7 @@
                 alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
                 sessionStorage.clear();
                 window.location.href = "auth.html";
-            }, 12000);
+            }, 36000);
 
             try {
                 const res = await callBackend("getAllRiskCloudData");
@@ -667,7 +668,8 @@
             allAssets.forEach(item => {
                 const idStr = item.id.toString();
                 
-                let isActive = item.status === 'ยืนยันใช้งาน' || item.isSaved;
+                // 🟢 รองรับคำว่า "ใช้งาน" และ "ยืนยันใช้งาน"
+                let isActive = item.status === 'ใช้งาน' || item.status === 'ยืนยันใช้งาน' || item.isSaved;
                 if (domActiveState.hasOwnProperty(idStr)) {
                     isActive = domActiveState[idStr];
                 }
@@ -713,22 +715,23 @@
                     ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Domain</span>`
                     : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Server</span>`;
 
-                const currentStatus = item.status || (item.isSaved ? 'ยืนยันใช้งาน' : 'ไม่ใช้งาน');
-                const selectColorClass = (currentStatus === 'ยืนยันใช้งาน')
+                // 🟢 ปรับเปลี่ยนข้อความให้เหลือแค่คำว่า "ใช้งาน"
+                const currentStatus = (item.status === 'ใช้งาน' || item.status === 'ยืนยันใช้งาน' || item.isSaved) ? 'ใช้งาน' : 'ไม่ใช้งาน';
+                const selectColorClass = (currentStatus === 'ใช้งาน')
                     ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                     : 'bg-amber-100 text-amber-800 border-amber-200';
 
                 const statusSelectHtml = `
                     <select onchange="handleStatusChange(this)" class="status-select ${selectColorClass} px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer">
-                        <option value="ยืนยันใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ยืนยันใช้งาน' ? 'selected' : ''}>ยืนยันใช้งาน</option>
+                        <option value="ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
                         <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
                     </select>
                 `;
 
-                const isChecked = (currentStatus === 'ยืนยันใช้งาน' || item.isSaved) ? 'checked' : '';
+                const isChecked = currentStatus === 'ใช้งาน' ? 'checked' : '';
                 const rowDisabledClass = isChecked ? '' : 'row-disabled';
-                const fieldDisabled = isChecked ? '' : 'disabled';
-
+                
+                // 🟢 ลบแอตทริบิวต์ disabled ออก เพื่อให้ช่องเก็บค่าพร้อมถูกอ่านตอนกดเซฟเสมอ
                 const rowHtml = `
                     <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50 transition" data-id="${item.id}" data-type="${item.typeFilter}">
                         <td class="py-2 px-2 border-r border-slate-100">
@@ -741,10 +744,10 @@
                         <td class="py-2 px-2 text-slate-700 font-mono cell-ip border-r border-slate-100">${item.ip || item.privateIp || '-'}</td>
                         <td class="py-2 px-2 text-slate-600 font-semibold cell-domain border-r border-slate-100">${item.domain || '-'}</td>
                         <td class="py-2 px-2 border-r border-slate-100">
-                            <input type="text" value="${item.name || ''}" ${fieldDisabled} class="name-input cell-name w-full px-2 py-1 border border-slate-300 rounded text-slate-800 font-semibold focus:ring-1 focus:ring-blue-500">
+                            <input type="text" value="${item.name || ''}" class="name-input cell-name w-full px-2 py-1 border border-slate-300 rounded text-slate-800 font-semibold focus:ring-1 focus:ring-blue-500">
                         </td>
                         <td class="py-2 px-2 border-r border-slate-100">
-                            <select ${fieldDisabled} class="type-select w-full px-1.5 py-1 border border-slate-300 rounded">
+                            <select class="type-select w-full px-1.5 py-1 border border-slate-300 rounded">
                                 <option value="ระบบบริการ (Web Services)" ${(item.sysType && item.sysType.includes('Web Services')) ? 'selected' : ''}>ระบบบริการ (Web Services)</option>
                                 <option value="ระบบประมวลผลและแลกเปลี่ยนข้อมูล (API)" ${(item.sysType && item.sysType.includes('API')) ? 'selected' : ''}>ระบบประมวลผลและแลกเปลี่ยนข้อมูล (API)</option>
                                 <option value="ระบบจัดเก็บและสำรองข้อมูล (Data Storage)" ${(item.sysType && item.sysType.includes('Storage')) ? 'selected' : ''}>ระบบจัดเก็บและสำรองข้อมูล (Data Storage)</option>
@@ -753,24 +756,24 @@
                             </select>
                         </td>
                         <td class="py-2 px-1 border-r border-slate-100">
-                            <input type="checkbox" ${fieldDisabled} onchange="updateImpact(this)" class="pdpa-cb w-4 h-4 text-sky-600 rounded" ${item.pdpa ? 'checked' : ''}>
+                            <input type="checkbox" onchange="updateImpact(this)" class="pdpa-cb w-4 h-4 text-sky-600 rounded" ${item.pdpa ? 'checked' : ''}>
                         </td>
                         <td class="py-2 px-1 border-r border-slate-100">
-                            <select ${fieldDisabled} onchange="updateImpact(this)" class="c-select px-1 py-1 border rounded w-full">
+                            <select onchange="updateImpact(this)" class="c-select px-1 py-1 border rounded w-full">
                                 <option value="1" ${item.c == 1 ? 'selected' : ''}>LOW: ข้อมูลสาธารณะ</option>
                                 <option value="2" ${item.c == 2 ? 'selected' : ''}>MEDIUM: ข้อมูลใช้งานภายใน</option>
                                 <option value="3" ${item.c == 3 ? 'selected' : ''}>HIGH: ข้อมูลส่วนบุคคล</option>
                             </select>
                         </td>
                         <td class="py-2 px-1 border-r border-slate-100">
-                            <select ${fieldDisabled} onchange="updateImpact(this)" class="i-select px-1 py-1 border rounded w-full">
+                            <select onchange="updateImpact(this)" class="i-select px-1 py-1 border rounded w-full">
                                 <option value="1" ${item.i == 1 ? 'selected' : ''}>LOW: ข้อมูลคลาดเคลื่อนเล็กน้อย</option>
                                 <option value="2" ${item.i == 2 ? 'selected' : ''}>MEDIUM: ข้อมูลสำคัญถูกดัดแปลง</option>
                                 <option value="3" ${item.i == 3 ? 'selected' : ''}>HIGH: ข้อมูลหลักถูกลบหรือแก้ไข</option>
                             </select>
                         </td>
                         <td class="py-2 px-1 border-r border-slate-100">
-                            <select ${fieldDisabled} onchange="updateImpact(this)" class="a-select px-1 py-1 border rounded w-full">
+                            <select onchange="updateImpact(this)" class="a-select px-1 py-1 border rounded w-full">
                                 <option value="1" ${item.a == 1 ? 'selected' : ''}>LOW: ระบบหยุดชะงักชั่วคราว</option>
                                 <option value="2" ${item.a == 2 ? 'selected' : ''}>MEDIUM: ระบบล่มหลายชั่วโมง</option>
                                 <option value="3" ${item.a == 3 ? 'selected' : ''}>HIGH: ระบบล่มถาวร</option>
@@ -780,7 +783,7 @@
                             <span class="impact-badge inline-flex items-center justify-center w-6 h-6 rounded-full font-bold bg-amber-400">${item.impact || 1}</span>
                         </td>
                         <td class="py-2 px-2">
-                            <input type="text" ${fieldDisabled} value="${item.note || ''}" placeholder="ระบุเพิ่ม" class="note-input w-full px-2 py-1 border border-slate-300 rounded">
+                            <input type="text" value="${item.note || ''}" placeholder="ระบุเพิ่ม" class="note-input w-full px-2 py-1 border border-slate-300 rounded">
                         </td>
                     </tr>`;
                 tbody.insertAdjacentHTML('beforeend', rowHtml);
@@ -798,7 +801,7 @@
         function handleStatusChange(selectElement) {
             const row = selectElement.closest('tr');
             const cb = row.querySelector('.active-cb');
-            const isConfirmed = selectElement.value === 'ยืนยันใช้งาน';
+            const isConfirmed = selectElement.value === 'ใช้งาน';
 
             if (cb && cb.checked !== isConfirmed) {
                 cb.checked = isConfirmed;
@@ -846,22 +849,16 @@
         function toggleRowActive(cb, shouldUpdateDash = true) {
             const row = cb.closest('tr');
             const isActive = cb.checked;
-            
-            const elements = row.querySelectorAll('input:not(.active-cb), select:not(.status-select)');
             const statusSelect = row.querySelector('.status-select');
 
             if (isActive) {
                 row.classList.remove('row-disabled');
-                elements.forEach(el => el.disabled = false);
-                
                 if (statusSelect) {
-                    statusSelect.value = 'ยืนยันใช้งาน';
+                    statusSelect.value = 'ใช้งาน';
                     statusSelect.className = "status-select bg-emerald-100 text-emerald-800 border-emerald-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
                 }
             } else {
                 row.classList.add('row-disabled');
-                elements.forEach(el => el.disabled = true);
-                
                 if (statusSelect) {
                     statusSelect.value = 'ไม่ใช้งาน';
                     statusSelect.className = "status-select bg-amber-100 text-amber-800 border-amber-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
@@ -948,9 +945,9 @@
             
             allRows.forEach(row => {
                 const statusSelect = row.querySelector('.status-select');
-                const currentStatus = statusSelect ? statusSelect.value : (row.querySelector('.active-cb')?.checked ? 'ยืนยันใช้งาน' : 'ไม่ใช้งาน');
+                const currentStatus = statusSelect ? statusSelect.value : (row.querySelector('.active-cb')?.checked ? 'ใช้งาน' : 'ไม่ใช้งาน');
                 
-                if (currentStatus === 'ยืนยันใช้งาน') {
+                if (currentStatus === 'ใช้งาน') {
                     const id = row.getAttribute('data-id');
                     const asset = allAssets.find(a => a.id.toString() === id.toString());
                     if (asset) {
@@ -1045,7 +1042,7 @@
                     ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Domain</span>`
                     : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Server</span>`;
 
-                const statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ยืนยันใช้งาน</span>`;
+                const statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ใช้งาน</span>`;
 
                 summaryBody.insertAdjacentHTML('beforeend', `
                     <tr class="hover:bg-slate-50 transition">
@@ -1103,7 +1100,7 @@
                         'Integrity (I)': row.querySelector('.i-select').value,
                         'Availability (A)': row.querySelector('.a-select').value,
                         'ระดับผลกระทบรวม': parseInt(row.querySelector('.impact-badge').textContent),
-                        'สถานะ': 'ยืนยันใช้งาน',
+                        'สถานะ': 'ใช้งาน',
                         'หมายเหตุ': row.querySelector('.note-input').value || '-'
                     });
                 }
@@ -1120,6 +1117,7 @@
             XLSX.writeFile(wb, `Risk_Assessment_${userAgency}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
+        // 🟢 อ่านค่าจากทุกแถวโดยตรง เพื่อให้สามารถกดบันทึกสถานะ "ไม่ใช้งาน" ได้อย่างสมบูรณ์
         async function submitToDatabase() {
             const payloadData = [];
             
@@ -1129,7 +1127,7 @@
                 
                 const currentStatus = statusSelect 
                     ? statusSelect.value 
-                    : (row.querySelector('.active-cb')?.checked ? 'ยืนยันใช้งาน' : 'ไม่ใช้งาน');
+                    : (row.querySelector('.active-cb')?.checked ? 'ใช้งาน' : 'ไม่ใช้งาน');
                 
                 if (id) {
                     payloadData.push({
