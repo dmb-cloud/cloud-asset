@@ -47,51 +47,56 @@
 
     <div class="px-8 pb-8 pt-3">
       
-      <form id="loginForm" onsubmit="requestOTP(event)">
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <select id="agency" required class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-            <option value="" disabled selected>-- กำลังโหลดข้อมูล --</option>
-          </select>
-        </div>
+    <form id="loginForm" onsubmit="requestOTP(event)">
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
+        <select id="agency" required class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+          <option value="" disabled selected>-- กำลังโหลดข้อมูล --</option>
+        </select>
+      </div>
 
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-          <input type="email" id="email" required placeholder="name@domain.go.th" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
+        <input type="email" id="email" required placeholder="name@domain.go.th" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+      </div>
 
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
-          <input type="tel" id="phone" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
+      <div class="mb-4">
+        <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
+        <input type="tel" id="phone" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+      </div>
 
-        <div id="loginError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium leading-relaxed"></div>
-        
-        <button type="submit" id="btnAuth" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition flex justify-center items-center shadow-md">
-          <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
+      <div id="loginError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium leading-relaxed"></div>
+      
+      <button type="submit" id="btnAuth" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition flex justify-center items-center shadow-md">
+        <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
+      </button>
+
+      <div class="flex items-center my-4">
+        <div class="flex-grow border-t border-gray-300"></div>
+        <span class="px-3 text-xs text-gray-500 font-medium">หรือ</span>
+        <div class="flex-grow border-t border-gray-300"></div>
+      </div>
+      
+      <div class="mt-5 flex flex-col gap-4">
+        <!-- ปุ่มเข้าสู่ระบบด้วย SSO กรมการแพทย์ (เต็มความกว้าง) -->
+        <button type="button" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
+          <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
+          <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
         </button>
 
-        <div class="flex items-center my-4">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <span class="px-3 text-xs text-gray-500 font-medium">หรือ</span>
-          <div class="flex-grow border-t border-gray-300"></div>
-        </div>
-        
-        <div class="mt-5 text-center flex flex-col gap-3">
-          <!-- <button type="button" onclick="toggleForm('registerForm')" class="text-sm text-[#122e5a] hover:underline font-bold">
+        <!-- จัดให้อยู่แถวเดียวกันและอยู่ตรงกลางหน้าจอ -->
+        <div class="flex justify-center items-center gap-4 flex-wrap">
+          <button type="button" onclick="toggleForm('registerForm')" class="text-xs text-[#122e5a] hover:underline font-bold">
             สมัครบัญชีผู้ใช้งานใหม่
-          </button> -->
-
-        <!-- ปุ่มเข้าสู่ระบบด้วย SSO กรมการแพทย์ (เรียกใช้ฟังก์ชัน OAuth) -->
-          <button type="button" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
-            <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
-            <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
-          </button>
+          </button> 
+          <span class="text-gray-300 text-xs">|</span> <!-- เส้นคั่นสั้นๆ เพื่อความชัดเจน -->
           <button type="button" onclick="showStaffPopup()" class="text-xs text-gray-500 hover:text-gray-800 hover:underline font-medium">
             มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
           </button>
         </div>
-      </form>
+      </div>
+    </form>
+
 
       <form id="registerForm" class="hidden" onsubmit="submitRegister(event)">
         <h2 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fa-solid fa-user-plus text-[#122e5a] mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
