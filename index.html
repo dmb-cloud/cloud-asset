@@ -833,7 +833,8 @@
                     </select>
                 `;
 
-                const isChecked = (currentStatus === 'ใช้งาน' || item.isSaved) ? 'checked' : '';
+                const isChecked = (currentStatus === 'ใช้งาน') ? 'checked' : '';
+
                 const rowDisabledClass = isChecked ? '' : 'row-disabled';
                 const fieldDisabled = isChecked ? '' : 'disabled';
 
@@ -1225,8 +1226,8 @@
 
             const ws = XLSX.utils.json_to_sheet(excelData);
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Risk_Assessment");
-            XLSX.writeFile(wb, `Risk_Assessment_${userAgency}_${new Date().toISOString().slice(0,10)}.xlsx`);
+            XLSX.utils.book_append_sheet(wb, ws, "DMS Cloud Registry");
+            XLSX.writeFile(wb, `DMS Cloud Registry${userAgency}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
   // โค้ดดักจับว่ามีการแก้ไขข้อมูลหรือกดเปลี่ยน Checkbox ในตาราง
   document.getElementById('mainTableBody').addEventListener('change', function(e) {

@@ -377,8 +377,8 @@ function generateAndSaveOTP(email, fullname) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('OtpDB');
   if (sheet) sheet.appendRow([email, otp, expiresAt, "pending"]);
   
-  const body = `สวัสดีคุณ ${fullname}\n\nรหัส OTP สำหรับเข้าสู่ระบบ DMS Cloud Registry ของคุณคือ: ${otp}\nรหัสนี้จะหมดอายุในอีก 5 นาที\n\nหากคุณไม่ได้ทำรายการนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้`;
-  MailApp.sendEmail(email, "รหัส OTP ยืนยันการเข้าสู่ระบบ", body);
+  const body = `เรียน ผู้ใช้งานระบบ DMS Cloud Registry \nท่านได้ระบุอีเมล ${email} กรุณายืนยันว่าท่านเป็นเจ้าของอีเมลนี้ โดยกรอกรหัส OTP ด้านล่าง\n\nรหัส OTP คือ: ${otp}\n\nรหัส OTP จะหมดอายุภายใน 5 นาที หากรหัสหมดอายุแล้วท่านสามารถขอรหัสใหม่ได้โดยกดปุ่มขอรหัส OTP อีกครั้ง`;
+  MailApp.sendEmail(email, "รหัส OTP ยืนยันการเข้าสู่ระบบ DMS Cloud Registry", body);
   
   return { success: true, message: "ระบบได้ส่งรหัส OTP ไปยังอีเมลของท่านแล้ว", fullname: fullname };
 }
