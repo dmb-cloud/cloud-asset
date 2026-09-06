@@ -544,53 +544,57 @@
         });
 
         async function loadDataFromCloud() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.classList.remove('hidden', 'opacity-0');
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.remove('hidden', 'opacity-0');
 
-            let isTimedOut = false;
-            const timeoutTimer = setTimeout(() => {
-                isTimedOut = true;
-                if (overlay) overlay.classList.add('hidden');
-                alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
-                sessionStorage.clear();
-                window.location.href = "auth.html";
-            }, 12000);
+    let isTimedOut = false;
+    const timeoutTimer = setTimeout(() => {
+        isTimedOut = true;
+        if (overlay) overlay.classList.add('hidden');
+        alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
+        sessionStorage.clear();
+        window.location.href = "auth.html";
+    }, 12000);
 
-            try {
-                const res = await callBackend("getAllRiskCloudData");
-                
-                if (isTimedOut) return;
-                clearTimeout(timeoutTimer);
+    try {
+        const res = await callBackend("getAllRiskCloudData");
+        
+        if (isTimedOut) return;
+        clearTimeout(timeoutTimer);
 
-                if (res && res.success && Array.isArray(res.data)) {
-                    allAssets = res.data.filter(item => {
-                        return item.agency && item.agency.toString().trim() === userAgency.toString().trim();
-                    });
+        if (res && res.success && Array.isArray(res.data)) {
+            // 🟢 ปรับการเปรียบเทียบชื่อหน่วยงานให้แม่นยำยิ่งขึ้น
+            const cleanUserAgency = userAgency ? userAgency.toString().trim().toLowerCase() : '';
+            
+            allAssets = res.data.filter(item => {
+                const itemAgency = item.agency ? item.agency.toString().trim().toLowerCase() : '';
+                return itemAgency === cleanUserAgency;
+            });
 
-                    renderMainTable();
-                    updateCardDashboard();
-                    applyFilterAndPagination(true);
+            renderMainTable();
+            updateCardDashboard();
+            applyFilterAndPagination(true);
 
-                    if (overlay) {
-                        overlay.classList.add('opacity-0');
-                        setTimeout(() => { 
-                            overlay.classList.add('hidden'); 
-                            const popup = document.getElementById('announcementPopup');
-                            if (popup) popup.classList.remove('hidden');
-                        }, 300);
-                    }
-                } else {
-                    if (overlay) overlay.classList.add('hidden');
-                    alert("ไม่พบข้อมูลสินทรัพย์ของหน่วยงานนี้ หรือระบบขัดข้อง: " + (res.message || ""));
-                }
-
-            } catch (err) {
-                if (isTimedOut) return;
-                clearTimeout(timeoutTimer);
-                if (overlay) overlay.classList.add('hidden');
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.toString());
+            if (overlay) {
+                overlay.classList.add('opacity-0');
+                setTimeout(() => { 
+                    overlay.classList.add('hidden'); 
+                    const popup = document.getElementById('announcementPopup');
+                    if (popup) popup.classList.remove('hidden');
+                }, 300);
             }
+        } else {
+            if (overlay) overlay.classList.add('hidden');
+            alert("ไม่พบข้อมูลสินทรัพย์ของหน่วยงานนี้ หรือระบบขัดข้อง: " + (res.message || ""));
         }
+
+    } catch (err) {
+        if (isTimedOut) return;
+        clearTimeout(timeoutTimer);
+        if (overlay) overlay.classList.add('hidden');
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.toString());
+    }
+}
 
         function logout() {
             sessionStorage.clear();

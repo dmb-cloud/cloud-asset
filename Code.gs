@@ -459,9 +459,8 @@ function getAgencies() {
 }
 
 function getAllRiskCloudData() {
-  const cache = CacheService.getScriptCache();
-  const cachedData = cache.get("all_risk_cloud_data");
-  if (cachedData) return JSON.parse(cachedData);
+  // 🟢 ลบ Cache ออกก่อนดึงข้อมูล เพื่อให้ได้ข้อมูลที่เป็นปัจจุบันเสมอ
+  CacheService.getScriptCache().remove("all_risk_cloud_data");
 
   try {
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('risk_cloud');
@@ -474,35 +473,30 @@ function getAllRiskCloudData() {
       const row = data[i];
       if(row[1]) {
         const hasSaved = (row[8] && row[8].toString().trim() !== "") || (row[10] && row[10].toString().trim() !== "");
-
         assets.push({
-          id: row[0] ? row[0].toString() : '',
-          agency: row[1] ? row[1].toString() : '',
+          id: row[0] ? row[0].toString() : '', 
+          agency: row[1] ? row[1].toString().trim() : '', // 🟢 ลบเว้นวรรคส่วนเกิน
           typeFilter: row[2] ? row[2].toString() : '', 
-          name: row[3] ? row[3].toString() : '',       
-          ip: row[4] ? row[4].toString() : '',          
-          privateIp: row[5] ? row[5].toString() : '',   
-          projectId: row[6] ? row[6].toString() : '',
-          domain: row[7] ? row[7].toString() : '',      
+          name: row[3] ? row[3].toString() : '', 
+          ip: row[4] ? row[4].toString() : '', 
+          privateIp: row[5] ? row[5].toString() : '', 
+          projectId: row[6] ? row[6].toString() : '', 
+          domain: row[7] ? row[7].toString() : '', 
           contact: row[8] ? row[8].toString() : '',
-          note: row[9] ? row[9].toString() : '',         
+          note: row[9] ? row[9].toString() : '', 
           sysType: row[10] ? row[10].toString() : 'ระบบบริการ (Web Services)',
           pdpa: (row[11] === true || row[11] === 'TRUE' || row[11] === 'ใช่'),
-          c: parseInt(row[12]) || 1,
-          i: parseInt(row[13]) || 1,
-          a: parseInt(row[14]) || 1,
+          c: parseInt(row[12]) || 1, 
+          i: parseInt(row[13]) || 1, 
+          a: parseInt(row[14]) || 1, 
           impact: parseInt(row[15]) || 1,
           status: (row[16] && row[16].toString().trim() !== '') ? row[16].toString().trim() : 'ไม่ใช้งาน',
           isSaved: hasSaved
         });
       }
     }
-    
-    try { cache.put("all_risk_cloud_data", JSON.stringify(assets), 1800); } catch(e) {}
     return assets;
-  } catch (error) {
-    return [];
-  }
+  } catch (error) { return []; }
 }
 
 function saveAssessmentData(payload) {
@@ -521,13 +515,13 @@ function saveAssessmentData(payload) {
     
     const updates = new Map();
     payload.assets.forEach(asset => {
-      if (asset.id) updates.set(asset.id.toString(), asset);
+      if (asset.id) updates.set(asset.id.toString().trim(), asset);
     });
 
     let isModified = false;
 
     for (let i = 1; i < data.length; i++) {
-      const rowId = data[i][0] ? data[i][0].toString() : null;
+      const rowId = data[i][0] ? data[i][0].toString().trim() : null;
       
       if (rowId && updates.has(rowId)) {
         const update = updates.get(rowId);
@@ -542,6 +536,9 @@ function saveAssessmentData(payload) {
         data[i][14] = parseInt(update.a) || 1;               
         data[i][15] = parseInt(update.impact) || 1;          
         data[i][16] = (update.status && update.status.toString().trim() !== '') ? update.status.toString().trim() : 'ไม่ใช้งาน'; 
+        
+        // 🟢 บันทึกเวลาลงในคอลัมน์ที่ 18 (Index 17) โดยตรง
+        data[i][17] = new Date(); 
         
         isModified = true;
       }
