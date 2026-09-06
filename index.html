@@ -13,7 +13,7 @@
         :root { --theme-primary: #122e5a; }
         .bg-theme { background-color: var(--theme-primary) !important; }
         .text-theme { color: var(--theme-primary) !important; }
-        tr.row-disabled { background-color: #f8fafc !important; opacity: 0.65; }
+        tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.6; }
         .th-sortable { cursor: pointer; user-select: none; }
         .th-sortable:hover { background-color: #334155; }
     </style>
@@ -69,7 +69,7 @@
             <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">สถานะการใช้งาน (Active)</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
                         <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
@@ -486,6 +486,7 @@
     <script>
         // Web App Backend URL
         const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+        // 🟢 ตั้งค่าเงื่อนไขการกรองข้อมูลหน่วยงาน (Configuration)
 
         let userAgency = "";
         let userEmail = "";
@@ -534,7 +535,6 @@
             await loadDataFromCloud();
         });
 
-        // 🟢 ข้อ 3: ฟังก์ชันดึงข้อมูลตามเงื่อนไข Agency + Assessor (พิเศษ: สำนักดิจิทัลการแพทย์ เห็นทั้งหมด)
         async function loadDataFromCloud() {
             const overlay = document.getElementById('loadingOverlay');
             if (overlay) overlay.classList.remove('hidden', 'opacity-0');
@@ -546,7 +546,7 @@
                 alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
                 sessionStorage.clear();
                 window.location.href = "auth.html";
-            }, 12000);
+            }, 36000);
 
             try {
                 const res = await callBackend("getAllRiskCloudData");
@@ -556,22 +556,10 @@
 
                 if (res && res.success && Array.isArray(res.data)) {
                     const cleanUserAgency = userAgency ? userAgency.toString().trim().toLowerCase() : '';
-                    const cleanUserName = userName ? userName.toString().trim().toLowerCase() : '';
-
-                    // 🟢 เงื่อนไขพิเศษ: หากผู้ใช้มาจาก "สำนักดิจิทัลการแพทย์" จะแสดงระบบทั้งหมด
-                    const isSuperAdmin = cleanUserAgency.includes("สำนักดิจิทัลการแพทย์");
-
+                    
                     allAssets = res.data.filter(item => {
-                        if (isSuperAdmin) return true; // เห็นทั้งหมด
-
                         const itemAgency = item.agency ? item.agency.toString().trim().toLowerCase() : '';
-                        const itemAssessor = item.contact ? item.contact.toString().trim().toLowerCase() : '';
-
-                        // 🟢 เงื่อนไขปกติสำหรับหน่วยงานอื่น: ต้องตรงกับ Agency และ Assessor ตรงกับผู้ใช้ (หรือยังไม่มี Assessor)
-                        const isAgencyMatch = itemAgency === cleanUserAgency;
-                        const isAssessorMatch = !itemAssessor || itemAssessor === cleanUserName;
-
-                        return isAgencyMatch && isAssessorMatch;
+                        return itemAgency === cleanUserAgency;
                     });
 
                     renderMainTable();
@@ -680,7 +668,7 @@
             allAssets.forEach(item => {
                 const idStr = item.id.toString();
                 
-                // 🟢 ข้อ 1: ตรวจเช็กสถานะ "ใช้งาน"
+                // 🟢 รองรับคำว่า "ใช้งาน" และ "ยืนยันใช้งาน"
                 let isActive = item.status === 'ใช้งาน' || item.status === 'ยืนยันใช้งาน' || item.isSaved;
                 if (domActiveState.hasOwnProperty(idStr)) {
                     isActive = domActiveState[idStr];
@@ -727,22 +715,23 @@
                     ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Domain</span>`
                     : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Server</span>`;
 
-                // 🟢 ข้อ 1: เปลี่ยนคำว่า "ยืนยันใช้งาน" เป็น "ใช้งาน"
-                const currentStatus = (item.status === 'ยืนยันใช้งาน' || item.status === 'ใช้งาน' || item.isSaved) ? 'ใช้งาน' : 'ไม่ใช้งาน';
+                // 🟢 ปรับเปลี่ยนข้อความให้เหลือแค่คำว่า "ใช้งาน"
+                const currentStatus = (item.status === 'ใช้งาน' || item.status === 'ยืนยันใช้งาน' || item.isSaved) ? 'ใช้งาน' : 'ไม่ใช้งาน';
                 const selectColorClass = (currentStatus === 'ใช้งาน')
                     ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                     : 'bg-amber-100 text-amber-800 border-amber-200';
 
                 const statusSelectHtml = `
-                    <select onchange="handleStatusChange(this)" class="status-select ${selectColorClass} px-1.5 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer">
+                    <select onchange="handleStatusChange(this)" class="status-select ${selectColorClass} px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer">
                         <option value="ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
                         <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
                     </select>
                 `;
 
-                const isChecked = (currentStatus === 'ใช้งาน') ? 'checked' : '';
+                const isChecked = currentStatus === 'ใช้งาน' ? 'checked' : '';
                 const rowDisabledClass = isChecked ? '' : 'row-disabled';
-
+                
+                // 🟢 ลบแอตทริบิวต์ disabled ออก เพื่อให้ช่องเก็บค่าพร้อมถูกอ่านตอนกดเซฟเสมอ
                 const rowHtml = `
                     <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50 transition" data-id="${item.id}" data-type="${item.typeFilter}">
                         <td class="py-2 px-2 border-r border-slate-100">
@@ -809,7 +798,6 @@
             if (masterCb) masterCb.checked = false;
         }
 
-        // 🟢 ข้อ 2: จัดการการเปลี่ยน Dropdown สถานะ มีผลเฉพาะแถวนั้นแถวเดียว
         function handleStatusChange(selectElement) {
             const row = selectElement.closest('tr');
             const cb = row.querySelector('.active-cb');
@@ -858,7 +846,6 @@
             updateCardDashboard();
         }
 
-        // 🟢 ข้อ 2: ปรับปรุงการสลับสี และปลดสิทธิ์ปิดปุ่ม (Disable) ออก เพื่อให้บันทึกสถานะ "ไม่ใช้งาน" ได้ราบรื่น
         function toggleRowActive(cb, shouldUpdateDash = true) {
             const row = cb.closest('tr');
             const isActive = cb.checked;
@@ -868,13 +855,13 @@
                 row.classList.remove('row-disabled');
                 if (statusSelect) {
                     statusSelect.value = 'ใช้งาน';
-                    statusSelect.className = "status-select bg-emerald-100 text-emerald-800 border-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
+                    statusSelect.className = "status-select bg-emerald-100 text-emerald-800 border-emerald-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
                 }
             } else {
                 row.classList.add('row-disabled');
                 if (statusSelect) {
                     statusSelect.value = 'ไม่ใช้งาน';
-                    statusSelect.className = "status-select bg-amber-100 text-amber-800 border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
+                    statusSelect.className = "status-select bg-amber-100 text-amber-800 border-amber-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
                 }
             }
 
@@ -1130,7 +1117,7 @@
             XLSX.writeFile(wb, `Risk_Assessment_${userAgency}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
 
-        // 🟢 ข้อ 2: บันทึกข้อมูลทุกแถวอย่างถูกต้องแม่นยำ ไม่ว่าจะเลือก "ใช้งาน" หรือ "ไม่ใช้งาน"
+        // 🟢 อ่านค่าจากทุกแถวโดยตรง เพื่อให้สามารถกดบันทึกสถานะ "ไม่ใช้งาน" ได้อย่างสมบูรณ์
         async function submitToDatabase() {
             const payloadData = [];
             
