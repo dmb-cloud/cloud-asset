@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>เข้าสู่ระบบ - DMS Cloud Registry</title>
 
-  <!-- 🔴 1. ไอคอนบนแท็บเบราว์เซอร์ (Favicon) จากโฟลเดอร์ img/ -->
+
   <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
   <style> 
     body { 
       font-family: 'Noto Sans Thai', sans-serif; 
-      /* 🔴 2. รูปพื้นหลัง ดึงจากโฟลเดอร์ img/bg.jpg ใน GitHub */
+
       background-image: url('img/cyber-claims.webp');
       background-size: cover;
       background-position: center;
@@ -78,18 +78,18 @@
       </div>
       
       <div class="mt-5 flex flex-col gap-4">
-        <!-- ปุ่มเข้าสู่ระบบด้วย SSO กรมการแพทย์ (เต็มความกว้าง) -->
+
         <button type="button" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
           <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
           <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
         </button>
 
-        <!-- จัดให้อยู่แถวเดียวกันและอยู่ตรงกลางหน้าจอ -->
+
         <div class="flex justify-center items-center gap-4 flex-wrap">
           <button type="button" onclick="toggleForm('registerForm')" class="text-xs text-[#122e5a] hover:underline font-bold">
             สมัครบัญชีผู้ใช้งานใหม่
           </button> 
-          <span class="text-gray-300 text-xs">|</span> <!-- เส้นคั่นสั้นๆ เพื่อความชัดเจน -->
+          <span class="text-gray-300 text-xs">|</span> 
           <button type="button" onclick="showStaffPopup()" class="text-xs text-gray-500 hover:text-gray-800 hover:underline font-medium">
             มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
           </button>
@@ -195,13 +195,13 @@
   </div>
 
   <script>
-    // 🔴 1. ใส่ Web App URL ของ Google Apps Script ที่ Deploy ไว้แล้วตรงนี้
+
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
     let sessionUser = { agency: "", email: "", phone: "", fullname: "" };
     let countdownInterval;
 
-    // ฟังก์ชันสำหรับเรียก API สื่อสารกับ Apps Script (แทน google.script.run)
+
     async function callBackend(action, payload = {}) {
       try {
         const response = await fetch(BACKEND_URL, {
@@ -233,7 +233,7 @@
         selectLogin.innerHTML = '<option value="" disabled selected>-- โหลดข้อมูลผิดพลาด --</option>';
       }
 
-      // 3. ตรวจสอบ Session หากล็อกอินอยู่แล้ว ให้เปลี่ยนหน้าไปยัง Index.html บน GitHub Pages
+
       const savedAgency = sessionStorage.getItem('mfa_agency');
       const savedName = sessionStorage.getItem('mfa_name');
       if (savedAgency && savedName) {
@@ -254,7 +254,7 @@
       document.getElementById('regSuccess').classList.add('hidden');
     }
 
-    // 4. สมัครสมาชิก
+
     async function submitRegister(e) {
       e.preventDefault();
       const agency = document.getElementById('regAgency').value;
@@ -288,7 +288,7 @@
       }
     }
 
-    // 5. ขอรหัส OTP
+
     async function requestOTP(e) {
       e.preventDefault();
       sessionUser.agency = document.getElementById('agency').value;
@@ -344,7 +344,7 @@
       toggleForm('loginForm');
     }
 
-    // 6. ยืนยัน OTP และนำทางไปหน้าหลัก
+
     async function submitOTP(e) {
       e.preventDefault();
       const otpCode = document.getElementById('otpCode').value.trim();
@@ -361,7 +361,7 @@
         
         document.getElementById('authContainer').innerHTML = '<div class="p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a] mb-5"></i><h2 class="text-xl font-bold text-gray-800">ยืนยันตัวตนสำเร็จ</h2><p class="text-sm text-gray-600 mt-2">กำลังเข้าสู่ระบบประเมินความเสี่ยง...</p></div>';
         
-        // สลับไปหน้า Index.html บน GitHub Pages
+
         setTimeout(() => {
           window.location.href = "index.html";
         }, 800);
@@ -370,7 +370,7 @@
         btn.innerHTML = 'ยืนยันเข้าสู่ระบบ'; btn.disabled = false;
       }
     }
-    // 7. ฟังก์ชันส่งผู้ใช้ไปยัง DMS SSO (OAuth 2.0 / OpenID Connect)
+
     async function loginWithDmsSso() {
       const btn = event.currentTarget;
       const originalText = btn.innerHTML;
@@ -380,9 +380,9 @@
       const res = await callBackend("getSsoLoginUrl");
 
       if (res && res.url) {
-        // เก็บบันทึก State สำหรับตรวจสอบเมื่อระบบ Redirect กลับมา
+
         sessionStorage.setItem('sso_state', res.state);
-        // เปลี่ยนหน้าไปยัง Keycloak DMS SSO
+
         window.location.href = res.url;
       } else {
         alert("ไม่สามารถเชื่อมต่อระบบ DMS SSO ได้ในขณะนี้: " + (res.message || "ไม่ทราบสาเหตุ"));
