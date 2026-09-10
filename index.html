@@ -855,6 +855,9 @@
                         <td class="py-2 px-2 border-r border-slate-100">
                             <select ${fieldDisabled} class="type-select w-full px-1.5 py-1 border border-slate-300 rounded">
                                 <option value="ระบบบริการ (Web Services)" ${(item.sysType && item.sysType.includes('Web Services')) ? 'selected' : ''}>ระบบบริการ (Web Services)</option>
+                                <option value="ระบบฐานข้อมูล (Database System)" ${(item.sysType && item.sysType.includes('Database System')) ? 'selected' : ''}>ระบบฐานข้อมูล (Database System)</option>
+                                <option value="ระบบให้บริการภายใน (Internal System)" ${(item.sysType && item.sysType.includes('Internal System')) ? 'selected' : ''}>ระบบให้บริการภายใน (Internal System)</option>
+                                <option value="ระบบประมวลผลข้อมูล (Data Processing)" ${(item.sysType && item.sysType.includes('Data Processing')) ? 'selected' : ''}>ระบบประมวลผลข้อมูล (Data Processing)</option>
                                 <option value="ระบบประมวลผลและแลกเปลี่ยนข้อมูล (API)" ${(item.sysType && item.sysType.includes('API')) ? 'selected' : ''}>ระบบประมวลผลและแลกเปลี่ยนข้อมูล (API)</option>
                                 <option value="ระบบจัดเก็บและสำรองข้อมูล (Data Storage)" ${(item.sysType && item.sysType.includes('Storage')) ? 'selected' : ''}>ระบบจัดเก็บและสำรองข้อมูล (Data Storage)</option>
                                 <option value="ระบบข้อมูลสารสนเทศ (HIS)" ${(item.sysType && item.sysType.includes('HIS')) ? 'selected' : ''}>ระบบข้อมูลสารสนเทศ (HIS)</option>
