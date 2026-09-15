@@ -49,9 +49,10 @@
       <form id="loginForm" onsubmit="requestOTP(event)" autocomplete="off">
         <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <input type="text" id="agency" list="agencyList" required maxlength="200" placeholder="พิมพ์ชื่อหน่วยงานของท่าน"
+          <select id="agency" required
             class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-          <datalist id="agencyList"></datalist>
+            <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+          </select>
         </div>
 
         <div class="mb-4">
@@ -103,8 +104,10 @@
 
         <div class="mb-3">
           <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <input type="text" id="regAgency" list="agencyList" required maxlength="200" placeholder="พิมพ์ชื่อหน่วยงานของท่าน"
+          <select id="regAgency" required
             class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+            <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -202,11 +205,80 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+        const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
-    // เก็บเฉพาะค่าที่จำเป็นระหว่างขั้นตอนล็อกอิน (agency/ชื่อจริงจะได้จาก server หลัง OTP ผ่าน)
+    
     let pendingLogin = { agency: "", email: "", phone: "" };
     let countdownInterval;
+
+    const AGENCY_LIST = [
+      "สำนักนิเทศระบบการแพทย์",
+      "สำนักดิจิทัลการแพทย์",
+      "สำนักงานเลขานุการกรม",
+      "สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน)",
+      "สำนักงานปลัดกระทรวงสาธารณสุข",
+      "สำนักงานที่ปรึกษากรมการแพทย์",
+      "สถาบันอาชีวเวชศาสตร์และเวชศาสตร์สิ่งแวดล้อม",
+      "สถาบันออร์โธปิดิกส์",
+      "สถาบันสุขภาพเด็กแห่งชาติมหาราชินี",
+      "สถาบันสิรินธรเพื่อการฟื้นฟูสมรรถภาพทางการแพทย์แห่งชาติ",
+      "สถาบันเวชศาสตร์ผู้สูงอายุ",
+      "สถาบันเวชศาสตร์การกีฬา",
+      "สถาบันวิจัยและประเมินเทคโนโลยีทางการแพทย์",
+      "สถาบันโรคผิวหนัง",
+      "สถาบันโรคทรวงอก",
+      "สถาบันมะเร็งแห่งชาติ",
+      "สถาบันพยาธิวิทยา",
+      "สถาบันประสาทวิทยา",
+      "สถาบันบำบัดรักษาและฟื้นฟูผู้ติดยาเสพติดแห่งชาติบรมราชชนนี",
+      "สถาบันทันตกรรม",
+      "สถาบันข้อมูลขนาดใหญ่",
+      "สถาบันการศึกษาทางการแพทย์ขั้นสูง",
+      "ศูนย์เทคโนโลยีอิเล็กทรอนิกส์และคอมพิวเตอร์แห่งชาติ",
+      "รพ.สมเด็จพระสังราชฯ ชลบุรี",
+      "โรงพยาบาลสงฆ์",
+      "โรงพยาบาลเวชชารักษ์ ลำปาง",
+      "โรงพยาบาลเลิดสิน",
+      "โรงพยาบาลโรคผิวหนังเขตร้อนภาคใต้ จังหวัดตรัง",
+      "โรงพยาบาลราชวิถี 2 (รังสิต)",
+      "โรงพยาบาลราชวิถี",
+      "โรงพยาบาลเมตตาประชารักษ์ (วัดไร่ขิง)",
+      "โรงพยาบาลมะเร็งอุบลราชธานี",
+      "โรงพยาบาลมะเร็งอุดรธานี",
+      "โรงพยาบาลมะเร็งสุราษฎร์ธานี",
+      "โรงพยาบาลมะเร็งลำปาง",
+      "โรงพยาบาลมะเร็งลพบุรี",
+      "โรงพยาบาลมะเร็งชลบุรี",
+      "โรงพยาบาลมหาวชิราลงกรณธัญบุรี",
+      "โรงพยาบาลประสาทเชียงใหม่",
+      "โรงพยาบาลนพรัตนราชธานี คุ้มเกล้า",
+      "โรงพยาบาลนพรัตนราชธานี",
+      "โรงพยาบาลธัญญารักษ์อุดรธานี",
+      "โรงพยาบาลธัญญารักษ์สงขลา",
+      "โรงพยาบาลธัญญารักษ์แม่ฮ่องสอน",
+      "โรงพยาบาลธัญญารักษ์ปัตตานี",
+      "โรงพยาบาลธัญญารักษ์เชียงใหม่",
+      "โรงพยาบาลธัญญารักษ์ขอนแก่น",
+      "มหาวิทยาลัยนเรศวร",
+      "คณะแพทยศาสตร์โรงพยาบาลรามาธิบดี",
+      "กองวิชาการแพทย์",
+      "กองยุทธศาสตร์และแผนงาน",
+      "กองบริหารทรัพยากรบุคคล",
+      "กองบริหารการคลัง",
+      "กองกฎหมายและกลุ่มคุ้มครองจริยธรรม",
+      "กลุ่มพัฒนาระบบราชการ",
+      "กลุ่มตรวจสอบภายใน",
+      "กรมการแพทย์"
+    ];
+
+    function populateAgencySelect(selectEl) {
+      AGENCY_LIST.forEach(name => {
+        const opt = document.createElement('option'); // createElement กัน HTML injection
+        opt.value = name;
+        opt.textContent = name;
+        selectEl.appendChild(opt);
+      });
+    }
 
     async function callBackend(action, payload = {}) {
       try {
@@ -233,19 +305,9 @@
       }
       sessionStorage.clear();
 
-      // รายชื่อหน่วยงานเป็นเพียง "ตัวช่วยพิมพ์" (datalist) ถ้าเซิร์ฟเวอร์ปิดไว้ก็ยังพิมพ์เองได้
-      const res = await callBackend("getPublicAgencies");
-      const list = (res && res.agencies) ? res.agencies : [];
-      if (Array.isArray(list) && list.length > 0) {
-        const dl = document.getElementById('agencyList');
-        const frag = document.createDocumentFragment();
-        list.forEach(name => {
-          const opt = document.createElement('option');
-          opt.value = name;               // ใช้ createElement กัน HTML injection
-          frag.appendChild(opt);
-        });
-        dl.appendChild(frag);
-      }
+      
+      populateAgencySelect(document.getElementById('agency'));
+      populateAgencySelect(document.getElementById('regAgency'));
     });
 
     function showStaffPopup() { document.getElementById('staffPopup').classList.remove('hidden'); }
