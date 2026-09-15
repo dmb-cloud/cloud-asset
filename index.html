@@ -667,53 +667,73 @@
         });
 
         async function loadDataFromCloud() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) overlay.classList.remove('hidden', 'opacity-0');
-
-            let isTimedOut = false;
-            const timeoutTimer = setTimeout(() => {
-                isTimedOut = true;
-                if (overlay) overlay.classList.add('hidden');
-                alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
-                sessionStorage.clear();
-                window.location.href = "auth.html";
-            }, 58000);
-
-            try {
-                const res = await callBackend("getAllRiskCloudData");
-                
-                if (isTimedOut) return;
-                clearTimeout(timeoutTimer);
-
-                if (res && res.success && Array.isArray(res.data)) {
-                    allAssets = res.data.filter(item => {
-                        return item.agency && item.agency.toString().trim() === userAgency.toString().trim();
-                    });
-
-                    renderMainTable();
-                    updateCardDashboard();
-                    applyFilterAndPagination(true);
-
-                    if (overlay) {
-                        overlay.classList.add('opacity-0');
-                        setTimeout(() => { 
-                            overlay.classList.add('hidden'); 
-                            const popup = document.getElementById('announcementPopup');
-                            if (popup) popup.classList.remove('hidden');
-                        }, 300);
-                    }
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.classList.remove('hidden', 'opacity-0');
+    
+        let isTimedOut = false;
+        const timeoutTimer = setTimeout(() => {
+            isTimedOut = true;
+            if (overlay) overlay.classList.add('hidden');
+            alert("การดึงข้อมูลใช้เวลานานเกินไป ระบบจะนำท่านกลับสู่หน้าเข้าสู่ระบบ");
+            sessionStorage.clear();
+            window.location.href = "auth.html";
+        }, 58000);
+    
+        try {
+            // 1. Fetch the token from sessionStorage
+            const myToken = sessionStorage.getItem('access_token');
+            
+            // 2. Call the backend, passing the token in the payload
+            const res = await callBackend("getAllRiskCloudData", { token: myToken });
+            
+            if (isTimedOut) return;
+            clearTimeout(timeoutTimer);
+    
+            if (res && res.success && Array.isArray(res.data)) {
+                // 3. Updated Filter Logic (Using includes and removing spaces)
+                allAssets = res.data.filter(item => {
+                    if (!item.agency || !userAgency) return false;
+                    
+                    const dbAgency = item.agency.toString().trim().replace(/\s+/g, '');
+                    const myAgency = userAgency.toString().trim().replace(/\s+/g, '');
+                    
+                    return dbAgency.includes(myAgency) || myAgency.includes(dbAgency);
+                });
+    
+                // If we successfully filtered data, render the table
+                if (allAssets.length > 0) {
+                     renderMainTable();
+                     updateCardDashboard();
+                     applyFilterAndPagination(true);
                 } else {
-                    if (overlay) overlay.classList.add('hidden');
-                    alert("ไม่พบข้อมูลสินทรัพย์ของหน่วยงานนี้ หรือระบบขัดข้อง: " + (res.message || ""));
+                     // In case the user has a valid token but their specific agency has 0 records
+                     document.getElementById('mainTableBody').innerHTML = '<tr><td colspan="15" class="py-6 text-slate-400">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
+                     updateCardDashboard(); 
                 }
-
-            } catch (err) {
-                if (isTimedOut) return;
-                clearTimeout(timeoutTimer);
+    
+                if (overlay) {
+                    overlay.classList.add('opacity-0');
+                    setTimeout(() => { 
+                        overlay.classList.add('hidden'); 
+                        const popup = document.getElementById('announcementPopup');
+                        if (popup) popup.classList.remove('hidden');
+                    }, 300);
+                }
+            } else {
                 if (overlay) overlay.classList.add('hidden');
-                alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.toString());
+                // Check if the backend sent a specific error message (like Unauthorized)
+                const errorMessage = res ? (res.message || "ไม่มีข้อมูลตอบกลับ") : "การเชื่อมต่อล้มเหลว";
+                alert("ไม่พบข้อมูลสินทรัพย์ของหน่วยงานนี้ หรือระบบขัดข้อง: " + errorMessage);
             }
+    
+        } catch (err) {
+            if (isTimedOut) return;
+            clearTimeout(timeoutTimer);
+            if (overlay) overlay.classList.add('hidden');
+            console.error("Cloud Fetch Error:", err);
+            alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + err.toString());
         }
+    }
 
           function logout() {
               sessionStorage.clear();
