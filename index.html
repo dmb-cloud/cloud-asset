@@ -607,18 +607,46 @@
         let summarySortDirection = {};
 
         // API Fetch Wrapper
+        
         async function callBackend(action, payload = {}) {
-            try {
-                const response = await fetch(BACKEND_URL, {
+          return new Promise((resolve, reject) => {
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        resolve(result); 
+                    })
+                    .withFailureHandler(function(error) {
+                        // If the Apps Script fails entirely (e.g., server down)
+                        resolve({ success: false, message: "เกิดปัญหาในการเชื่อมต่อกับเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง" });
+                    })
+                    .apiRouter(action, payload);
+            } else {
+                // Fallback for standalone/local testing (using fetch)
+                const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEznrk9bs3a6g7wWb-kB5guCPLuDnVh4R4dPI_Z9TjJD9Y7ViSjxv2YmUh98Qjq9XkTg/exec"; // Replace with your actual URL
+                
+                fetch(WEB_APP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: action, payload: payload })
+                })
+                .then(async response => {
+                    // Check if the response is actually JSON before parsing
+                    const contentType = response.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        return response.json();
+                    } else {
+                        // If it's not JSON (like HTML error page), throw a custom error
+                        throw new Error("ระบบตอบกลับข้อมูลผิดพลาด กรุณาตรวจสอบ URL หรือการเชื่อมต่อ");
+                    }
+                })
+                .then(data => resolve(data))
+                .catch(error => {
+                    console.error("Fetch Error:", error);
+                    // Return a professional error message to the user
+                    resolve({ success: false, message: "ไม่สามารถประมวลผลคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้ง" });
                 });
-                return await response.json();
-            } catch (err) {
-                console.error("Backend Call Error:", err);
-                return { success: false, message: err.toString() };
             }
+          });
         }
 
         document.addEventListener("DOMContentLoaded", async function() {
