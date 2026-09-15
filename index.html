@@ -522,7 +522,7 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+    const BACKEND_URL = "https://script.google.com/macros/s/PUT_YOUR_NEW_DEPLOYMENT_ID_HERE/exec";
 
     let userAgency = "";
     let userEmail = "";
@@ -576,8 +576,22 @@
         }
         return res.data || { success: false, message: "เกิดข้อผิดพลาด" };
       } catch (err) {
-        return { success: false, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
+        // ✅ แยกให้ชัดว่านี่คือ "เน็ต/เซิร์ฟเวอร์สะดุดชั่วคราว" ไม่ใช่ "token ไม่ถูกต้อง"
+        // เพื่อไม่ให้ bootstrap เข้าใจผิดแล้วเคลียร์ session ทิ้งทั้งที่ token ยังใช้ได้อยู่
+        return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
       }
+    }
+
+    // เรียก whoAmI พร้อม retry สั้นๆ กันเคส cold-start/เน็ตสะดุดตอนหน้าเพิ่งโหลด
+    // (พบบ่อยตอน redirect มาจาก auth.html รอบแรกทันที)
+    async function whoAmIWithRetry(retries = 2, delayMs = 700) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        const res = await callBackend("whoAmI");
+        if (res.success) return res;
+        if (!res.networkError) return res;   // ล้มเหลวแบบมีคำตอบจาก server แล้ว ไม่ต้อง retry
+        if (attempt < retries) await new Promise(r => setTimeout(r, delayMs));
+      }
+      return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
     }
 
     // ---------- bootstrap ----------
@@ -589,8 +603,25 @@
       }
 
       // ✅ ยืนยันตัวตนกับ server ก่อน แล้วใช้ค่าที่ server คืนมาแสดงผล
-      const me = await callBackend("whoAmI");
-      if (!me.success) { forceLogin(); return; }
+      // ถ้าล้มเหลวเพราะเน็ต/เซิร์ฟเวอร์สะดุดชั่วคราว จะไม่เคลียร์ token ทิ้ง (ป้องกันบั๊ก "ต้อง login 2 รอบ")
+      const me = await whoAmIWithRetry();
+
+      if (!me.success) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (me.networkError) {
+          if (overlay) {
+            overlay.innerHTML =
+              '<i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>' +
+              '<h2 class="text-lg font-bold text-slate-800 mb-2">เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ</h2>' +
+              '<p class="text-sm text-slate-500 mb-4">กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p>' +
+              '<button onclick="location.reload()" class="px-5 py-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
+          }
+          return; // ❗ ไม่ forceLogin เพราะ token อาจยังใช้ได้อยู่ แค่เน็ตสะดุด
+        }
+        // เหตุผลอื่น (token ไม่ถูกต้องจริง/ถูก revoke) — ค่อยเคลียร์แล้วกลับหน้า login
+        forceLogin(me.message || "เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
+        return;
+      }
 
       userAgency = me.user.agency || "";
       userEmail = me.user.email || "";
