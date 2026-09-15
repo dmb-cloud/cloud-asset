@@ -3,25 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>เข้าสู่ระบบ - DMS Cloud Registry</title>
-
 
   <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style> 
-    body { 
-      font-family: 'Noto Sans Thai', sans-serif; 
 
+  <style>
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
       background-image: url('img/cyber-claims.webp');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
-    } 
-    
+    }
     .glass-panel {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
@@ -36,7 +34,7 @@
   <div class="absolute inset-0 bg-black/50 z-0"></div>
 
   <div id="authContainer" class="glass-panel w-full max-w-md rounded-2xl overflow-hidden relative z-10 m-4 border-t-8 border-[#122e5a]">
-    
+
     <div class="pt-8 pb-5 px-6 flex items-center gap-5 border-b border-gray-200/60 mb-4">
       <img src="img/ico_logo@2x.png" alt="Logo" class="w-20 h-20 object-contain flex-shrink-0">
       <div class="flex flex-col border-l-2 border-[#122e5a]/20 pl-5 py-1.5">
@@ -46,86 +44,91 @@
     </div>
 
     <div class="px-8 pb-8 pt-3">
-      
-    <form id="loginForm" onsubmit="requestOTP(event)">
-      <div class="mb-4">
-        <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-        <select id="agency" required class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-          <option value="" disabled selected>-- กำลังโหลดข้อมูล --</option>
-        </select>
-      </div>
 
-      <div class="mb-4">
-        <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-        <input type="email" id="email" required placeholder="name@domain.go.th" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
-        <input type="tel" id="phone" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx" class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-      </div>
-
-      <div id="loginError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium leading-relaxed"></div>
-      
-      <button type="submit" id="btnAuth" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition flex justify-center items-center shadow-md">
-        <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
-      </button>
-
-      <div class="flex items-center my-4">
-        <div class="flex-grow border-t border-gray-300"></div>
-        <span class="px-3 text-xs text-gray-500 font-medium">หรือ</span>
-        <div class="flex-grow border-t border-gray-300"></div>
-      </div>
-      
-      <div class="mt-5 flex flex-col gap-4">
-
-        <button type="button" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
-          <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
-          <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
-        </button>
-
-
-        <div class="flex justify-center items-center gap-4 flex-wrap">
-          <button type="button" onclick="toggleForm('registerForm')" class="text-xs text-[#122e5a] hover:underline font-bold">
-            สมัครบัญชีผู้ใช้งานใหม่
-          </button> 
-          <span class="text-gray-300 text-xs">|</span> 
-          <button type="button" onclick="showStaffPopup()" class="text-xs text-gray-500 hover:text-gray-800 hover:underline font-medium">
-            มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
-          </button>
-        </div>
-      </div>
-    </form>
-
-
-      <form id="registerForm" class="hidden" onsubmit="submitRegister(event)">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fa-solid fa-user-plus text-[#122e5a] mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
-        
-        <div class="mb-3">
+      <!-- ================= LOGIN ================= -->
+      <form id="loginForm" onsubmit="requestOTP(event)" autocomplete="off">
+        <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <select id="regAgency" required class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-            <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
-          </select>
+          <input type="text" id="agency" list="agencyList" required maxlength="200" placeholder="พิมพ์ชื่อหน่วยงานของท่าน"
+            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+          <datalist id="agencyList"></datalist>
         </div>
 
-        <div class="mb-3">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-          <input type="text" id="regName" required placeholder="สมชาย ใจดี" class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
-
-        <div class="mb-3">
+        <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-          <input type="email" id="regEmail" required placeholder="name@domain.go.th" class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+          <input type="email" id="email" required maxlength="254" placeholder="name@domain.go.th"
+            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
         </div>
 
         <div class="mb-4">
           <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
-          <input type="tel" id="regPhone" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx" class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+          <input type="tel" id="phone" required maxlength="10" inputmode="numeric"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
+            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+        </div>
+
+        <div id="loginError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium leading-relaxed"></div>
+
+        <button type="submit" id="btnAuth" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition flex justify-center items-center shadow-md">
+          <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
+        </button>
+
+        <div class="flex items-center my-4">
+          <div class="flex-grow border-t border-gray-300"></div>
+          <span class="px-3 text-xs text-gray-500 font-medium">หรือ</span>
+          <div class="flex-grow border-t border-gray-300"></div>
+        </div>
+
+        <div class="mt-5 flex flex-col gap-4">
+          <button type="button" id="btnSso" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
+            <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
+            <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
+          </button>
+
+          <div class="flex justify-center items-center gap-4 flex-wrap">
+            <button type="button" onclick="toggleForm('registerForm')" class="text-xs text-[#122e5a] hover:underline font-bold">
+              สมัครบัญชีผู้ใช้งานใหม่
+            </button>
+            <span class="text-gray-300 text-xs">|</span>
+            <button type="button" onclick="showStaffPopup()" class="text-xs text-gray-500 hover:text-gray-800 hover:underline font-medium">
+              มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- ================= REGISTER ================= -->
+      <form id="registerForm" class="hidden" onsubmit="submitRegister(event)" autocomplete="off">
+        <h2 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fa-solid fa-user-plus text-[#122e5a] mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
+
+        <div class="mb-3">
+          <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
+          <input type="text" id="regAgency" list="agencyList" required maxlength="200" placeholder="พิมพ์ชื่อหน่วยงานของท่าน"
+            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-xs font-semibold text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
+          <input type="text" id="regName" required maxlength="150" placeholder="สมชาย ใจดี"
+            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
+          <input type="email" id="regEmail" required maxlength="254" placeholder="name@domain.go.th"
+            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
+          <input type="tel" id="regPhone" required maxlength="10" inputmode="numeric"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
+            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
         </div>
 
         <div id="regError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium"></div>
         <div id="regSuccess" class="hidden mb-4 p-2.5 bg-emerald-100/90 text-emerald-700 text-xs rounded-lg border border-emerald-300 text-center font-bold"></div>
-        
+
         <button type="submit" id="btnRegister" class="w-full bg-emerald-600 text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-700 transition shadow-md">
           ลงทะเบียนบัญชี
         </button>
@@ -137,7 +140,8 @@
         </div>
       </form>
 
-      <form id="otpForm" class="hidden text-center" onsubmit="submitOTP(event)">
+      <!-- ================= OTP ================= -->
+      <form id="otpForm" class="hidden text-center" onsubmit="submitOTP(event)" autocomplete="off">
         <div class="mb-5 mt-2">
           <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-[#122e5a] text-xl">
             <i class="fa-solid fa-envelope-open-text"></i>
@@ -147,7 +151,9 @@
           <p id="displayEmail" class="text-sm font-bold text-[#122e5a] mt-1"></p>
         </div>
         <div class="mb-5">
-          <input type="text" id="otpCode" required maxlength="6" placeholder="รหัส 6 หลัก" class="w-full px-4 py-3 text-center text-3xl tracking-[0.4em] font-bold bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none">
+          <input type="text" id="otpCode" required maxlength="6" inputmode="numeric" autocomplete="one-time-code"
+            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="รหัส 6 หลัก"
+            class="w-full px-4 py-3 text-center text-3xl tracking-[0.4em] font-bold bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none">
         </div>
         <div id="otpError" class="hidden mb-4 p-2 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium"></div>
         <button type="submit" id="btnVerify" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition shadow-md mb-3">
@@ -168,9 +174,10 @@
 
   <div class="absolute bottom-4 left-0 w-full px-6 md:px-12 flex justify-between items-center text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">
     <span>Copyright © สำนักดิจิทัลการแพทย์</span>
-    <span>Version 1.0.2</span>
+    <span>Version 2.0.0</span>
   </div>
 
+  <!-- ================= STAFF POPUP ================= -->
   <div id="staffPopup" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
     <div class="bg-white rounded-xl p-6 w-10/12 max-w-sm text-center shadow-2xl relative">
       <button onclick="hideStaffPopup()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-600">
@@ -181,13 +188,13 @@
       </div>
       <h3 class="text-lg font-bold text-gray-800 mb-1">ติดต่อเจ้าหน้าที่</h3>
       <p class="text-xs text-gray-500 mb-4">หากท่านต้องการให้เปิดใช้งานบัญชี หรือพบบัญชีถูกระงับ กรุณาติดต่อ:</p>
-      
+
       <div class="bg-gray-50 rounded-lg p-3 text-left mb-5 border border-gray-100 shadow-inner text-sm space-y-2">
         <p class="text-gray-700"><i class="fa-solid fa-building text-gray-400 w-5"></i> <strong>หน่วยงาน:</strong> สำนักดิจิทัลการแพทย์</p>
         <p class="text-gray-700"><i class="fa-solid fa-phone text-gray-400 w-5"></i> <strong>โทรศัพท์:</strong> 0-2590-6315</p>
         <p class="text-gray-700"><i class="fa-solid fa-envelope text-gray-400 w-5"></i> <strong>อีเมล:</strong> saran.j@dms.mail.go.th</p>
       </div>
-      
+
       <button onclick="hideStaffPopup()" class="w-full bg-[#122e5a] text-white text-sm py-2.5 rounded-lg font-bold hover:bg-blue-900 transition">
         รับทราบและปิดหน้าต่าง
       </button>
@@ -195,12 +202,11 @@
   </div>
 
   <script>
-
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
-    let sessionUser = { agency: "", email: "", phone: "", fullname: "" };
+    // เก็บเฉพาะค่าที่จำเป็นระหว่างขั้นตอนล็อกอิน (agency/ชื่อจริงจะได้จาก server หลัง OTP ผ่าน)
+    let pendingLogin = { agency: "", email: "", phone: "" };
     let countdownInterval;
-
 
     async function callBackend(action, payload = {}) {
       try {
@@ -210,34 +216,35 @@
           body: JSON.stringify({ action: action, payload: payload })
         });
         const res = await response.json();
-        return res.success ? res.data : { success: false, message: res.message || "เกิดข้อผิดพลาด" };
+        if (!res.success) return { success: false, message: res.message || "เกิดข้อผิดพลาด" };
+        return res.data || { success: false, message: "เกิดข้อผิดพลาด" };
       } catch (err) {
-        return { success: false, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้: " + err.toString() };
+        return { success: false, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง" };
       }
     }
 
-    document.addEventListener("DOMContentLoaded", async function() {
-      // 2. โหลดรายชื่อหน่วยงาน
-      const agencies = await callBackend("getAgencies");
-      const selectLogin = document.getElementById('agency');
-      const selectReg = document.getElementById('regAgency');
-      
-      if (Array.isArray(agencies) && agencies.length > 0) {
-        selectLogin.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>';
-        selectReg.innerHTML = '<option value="" disabled selected>-- เลือกหน่วยงาน --</option>';
-        agencies.forEach(name => {
-          selectLogin.innerHTML += `<option value="${name}">${name}</option>`;
-          selectReg.innerHTML += `<option value="${name}">${name}</option>`;
-        });
-      } else {
-        selectLogin.innerHTML = '<option value="" disabled selected>-- โหลดข้อมูลผิดพลาด --</option>';
-      }
-
-
-      const savedAgency = sessionStorage.getItem('mfa_agency');
-      const savedName = sessionStorage.getItem('mfa_name');
-      if (savedAgency && savedName) {
+    document.addEventListener("DOMContentLoaded", async function () {
+      // ถ้ามี session token ที่ยังไม่หมดอายุอยู่แล้ว ให้เข้าระบบเลย
+      const tk = sessionStorage.getItem('access_token');
+      const exp = parseInt(sessionStorage.getItem('token_exp') || "0", 10);
+      if (tk && exp > Date.now()) {
         window.location.href = "index.html";
+        return;
+      }
+      sessionStorage.clear();
+
+      // รายชื่อหน่วยงานเป็นเพียง "ตัวช่วยพิมพ์" (datalist) ถ้าเซิร์ฟเวอร์ปิดไว้ก็ยังพิมพ์เองได้
+      const res = await callBackend("getPublicAgencies");
+      const list = (res && res.agencies) ? res.agencies : [];
+      if (Array.isArray(list) && list.length > 0) {
+        const dl = document.getElementById('agencyList');
+        const frag = document.createDocumentFragment();
+        list.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;               // ใช้ createElement กัน HTML injection
+          frag.appendChild(opt);
+        });
+        dl.appendChild(frag);
       }
     });
 
@@ -245,29 +252,28 @@
     function hideStaffPopup() { document.getElementById('staffPopup').classList.add('hidden'); }
 
     function toggleForm(formId) {
-      document.getElementById('loginForm').classList.add('hidden');
-      document.getElementById('registerForm').classList.add('hidden');
-      document.getElementById('otpForm').classList.add('hidden');
+      ['loginForm', 'registerForm', 'otpForm'].forEach(id => document.getElementById(id).classList.add('hidden'));
       document.getElementById(formId).classList.remove('hidden');
-      document.getElementById('loginError').classList.add('hidden');
-      document.getElementById('regError').classList.add('hidden');
-      document.getElementById('regSuccess').classList.add('hidden');
+      ['loginError', 'regError', 'regSuccess', 'otpError'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
     }
-
 
     async function submitRegister(e) {
       e.preventDefault();
-      const agency = document.getElementById('regAgency').value;
+      const agency = document.getElementById('regAgency').value.trim();
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
-      
+
       const err = document.getElementById('regError');
       const succ = document.getElementById('regSuccess');
       const btn = document.getElementById('btnRegister');
 
-      if (phone.length !== 10) {
-        err.innerText = "กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"; err.classList.remove('hidden');
+      if (!/^0[0-9]{8,9}$/.test(phone)) {
+        err.textContent = "กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0)";
+        err.classList.remove('hidden');
         return;
       }
 
@@ -275,49 +281,50 @@
       btn.disabled = true; err.classList.add('hidden'); succ.classList.add('hidden');
 
       const res = await callBackend("registerUser", { agency, email, phone, fullname: name });
-      
+
       btn.innerHTML = 'ลงทะเบียนบัญชี'; btn.disabled = false;
       if (res.success) {
-        succ.innerText = res.message; succ.classList.remove('hidden');
-        document.getElementById('regName').value = '';
-        document.getElementById('regEmail').value = '';
-        document.getElementById('regPhone').value = '';
-        document.getElementById('regAgency').value = '';
+        succ.textContent = res.message; succ.classList.remove('hidden');
+        ['regName', 'regEmail', 'regPhone', 'regAgency'].forEach(id => document.getElementById(id).value = '');
       } else {
-        err.innerText = res.message; err.classList.remove('hidden');
+        err.textContent = res.message; err.classList.remove('hidden');
       }
     }
 
-
     async function requestOTP(e) {
       e.preventDefault();
-      sessionUser.agency = document.getElementById('agency').value;
-      sessionUser.email = document.getElementById('email').value.trim();
-      sessionUser.phone = document.getElementById('phone').value.trim();
-      
+      pendingLogin.agency = document.getElementById('agency').value.trim();
+      pendingLogin.email = document.getElementById('email').value.trim();
+      pendingLogin.phone = document.getElementById('phone').value.trim();
+
       const btn = document.getElementById('btnAuth');
       const err = document.getElementById('loginError');
 
-      if (sessionUser.phone.length !== 10) {
-        err.innerText = "กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก"; err.classList.remove('hidden');
+      if (!/^0[0-9]{8,9}$/.test(pendingLogin.phone)) {
+        err.textContent = "กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง (ขึ้นต้นด้วย 0)";
+        err.classList.remove('hidden');
         return;
       }
 
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...'; 
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...';
       btn.disabled = true; err.classList.add('hidden');
 
-      const res = await callBackend("verifyUser", { agency: sessionUser.agency, email: sessionUser.email, phone: sessionUser.phone });
+      const res = await callBackend("verifyUser", {
+        agency: pendingLogin.agency, email: pendingLogin.email, phone: pendingLogin.phone
+      });
 
       if (res.success) {
-        sessionUser.fullname = res.fullname;
-        document.getElementById('displayEmail').innerText = sessionUser.email;
+        document.getElementById('displayEmail').textContent = pendingLogin.email;
         toggleForm('otpForm');
+        document.getElementById('otpCode').value = '';
+        document.getElementById('otpCode').focus();
         startCountdown();
       } else {
-        err.innerText = res.message; err.classList.remove('hidden');
-        if (res.locked || res.inactive) showStaffPopup();
+        err.textContent = res.message; err.classList.remove('hidden');
+        if (res.locked) showStaffPopup();
       }
-      btn.innerHTML = '<span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>'; btn.disabled = false;
+      btn.innerHTML = '<span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>';
+      btn.disabled = false;
     }
 
     function startCountdown() {
@@ -325,17 +332,25 @@
       const txt = document.getElementById('countdownText');
       const btn = document.getElementById('btnResend');
       txt.classList.remove('hidden'); btn.classList.add('hidden');
-      let timeLeft = 60; timer.innerText = timeLeft;
+      let timeLeft = 60; timer.textContent = timeLeft;
       clearInterval(countdownInterval);
       countdownInterval = setInterval(() => {
-        timeLeft--; timer.innerText = timeLeft;
-        if (timeLeft <= 0) { clearInterval(countdownInterval); txt.classList.add('hidden'); btn.classList.remove('hidden'); }
+        timeLeft--; timer.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(countdownInterval);
+          txt.classList.add('hidden');
+          btn.classList.remove('hidden');
+        }
       }, 1000);
     }
 
     async function resendOTP() {
-      document.getElementById('otpError').classList.add('hidden');
-      await callBackend("generateAndSaveOTP", { email: sessionUser.email, fullname: sessionUser.fullname });
+      const err = document.getElementById('otpError');
+      err.classList.add('hidden');
+      const res = await callBackend("generateAndSaveOTP", { email: pendingLogin.email });
+      if (!res.success) {
+        err.textContent = res.message; err.classList.remove('hidden');
+      }
       startCountdown();
     }
 
@@ -344,45 +359,50 @@
       toggleForm('loginForm');
     }
 
-
     async function submitOTP(e) {
       e.preventDefault();
       const otpCode = document.getElementById('otpCode').value.trim();
       const btn = document.getElementById('btnVerify');
       const err = document.getElementById('otpError');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...'; btn.disabled = true; err.classList.add('hidden');
 
-      const res = await callBackend("verifyOTP", { email: sessionUser.email, userOtp: otpCode });
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังตรวจสอบ...';
+      btn.disabled = true; err.classList.add('hidden');
 
-      if (res.success) {
-        sessionStorage.setItem('mfa_agency', sessionUser.agency);
-        sessionStorage.setItem('mfa_email', sessionUser.email);
-        sessionStorage.setItem('mfa_name', sessionUser.fullname);
-        
-        document.getElementById('authContainer').innerHTML = '<div class="p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a] mb-5"></i><h2 class="text-xl font-bold text-gray-800">ยืนยันตัวตนสำเร็จ</h2><p class="text-sm text-gray-600 mt-2">กำลังเข้าสู่ระบบประเมินความเสี่ยง...</p></div>';
-        
+      const res = await callBackend("verifyOTP", { email: pendingLogin.email, userOtp: otpCode });
 
-        setTimeout(() => {
-          window.location.href = "index.html";
-        }, 800);
+      if (res.success && res.token) {
+        clearInterval(countdownInterval);
+
+        // ✅ เก็บ session token จริงจาก server ส่วน agency/ชื่อ ใช้ค่าที่ server ยืนยันเท่านั้น
+        sessionStorage.setItem('access_token', res.token);
+        sessionStorage.setItem('token_exp', String(res.expiresAt || 0));
+        sessionStorage.setItem('mfa_agency', res.user.agency || '');
+        sessionStorage.setItem('mfa_email', res.user.email || '');
+        sessionStorage.setItem('mfa_name', res.user.fullname || '');
+
+        document.getElementById('authContainer').innerHTML =
+          '<div class="p-12 text-center"><i class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a] mb-5"></i>' +
+          '<h2 class="text-xl font-bold text-gray-800">ยืนยันตัวตนสำเร็จ</h2>' +
+          '<p class="text-sm text-gray-600 mt-2">กำลังเข้าสู่ระบบประเมินความเสี่ยง...</p></div>';
+
+        setTimeout(() => { window.location.href = "index.html"; }, 800);
       } else {
-        err.innerText = res.message; err.classList.remove('hidden');
+        err.textContent = res.message || "รหัส OTP ไม่ถูกต้อง";
+        err.classList.remove('hidden');
         btn.innerHTML = 'ยืนยันเข้าสู่ระบบ'; btn.disabled = false;
       }
     }
 
     async function loginWithDmsSso() {
-      const btn = event.currentTarget;
+      const btn = document.getElementById('btnSso');
       const originalText = btn.innerHTML;
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> กำลังเชื่อมต่อ DMS SSO...';
       btn.disabled = true;
 
       const res = await callBackend("getSsoLoginUrl");
 
-      if (res && res.url) {
-
+      if (res && res.success && res.url) {
         sessionStorage.setItem('sso_state', res.state);
-
         window.location.href = res.url;
       } else {
         alert("ไม่สามารถเชื่อมต่อระบบ DMS SSO ได้ในขณะนี้: " + (res.message || "ไม่ทราบสาเหตุ"));

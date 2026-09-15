@@ -3,122 +3,94 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>กำลังเข้าสู่ระบบผ่าน DMS SSO...</title>
-  
+
   <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <style>
-    body { 
-      font-family: 'Noto Sans Thai', sans-serif; 
-      /* 🟢 ตั้งค่าภาพพื้นหลังตรงนี้ */
+    body {
+      font-family: 'Noto Sans Thai', sans-serif;
       background-image: url('img/cyber-claims.webp');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
     }
-    
-    /* 🟢 เพิ่มเลเยอร์สีดำจางๆ ให้พื้นหลัง เพื่อให้กล่องข้อความตรงกลางอ่านง่ายขึ้น */
-    .bg-overlay {
-      background-color: rgba(15, 23, 42, 0.4); 
-      min-height: 100vh;
-      width: 100%;
-    }
+    .bg-overlay { background-color: rgba(15, 23, 42, 0.4); min-height: 100vh; width: 100%; }
   </style>
 </head>
-<!-- ลบ bg-slate-100 เดิมออก แล้วครอบด้วย .bg-overlay แทน -->
 <body class="m-0 p-0">
 
   <div class="bg-overlay flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center space-y-4 border-t-4 border-[#122e5a]">
-      
-      <!-- Loading / Error Icon -->
       <div id="iconContainer">
         <i id="loadingIcon" class="fa-solid fa-circle-notch fa-spin text-5xl text-[#122e5a]"></i>
       </div>
-
-      <!-- Title & Status Message -->
       <h2 id="statusTitle" class="text-xl font-bold text-slate-800">DMS SSO</h2>
       <p id="statusMessage" class="text-sm text-slate-600 leading-relaxed">กำลังยืนยันตัวตนผ่าน DMS SSO...</p>
-
-      <!-- Error Action Button (แสดงเฉพาะตอนเกิดข้อผิดพลาด) -->
       <div id="errorAction" class="hidden pt-2">
         <a href="auth.html" class="inline-block bg-[#122e5a] text-white text-xs font-bold py-2.5 px-5 rounded-lg hover:bg-blue-900 transition">
           <i class="fa-solid fa-arrow-left mr-1.5"></i> กลับไปหน้าเข้าสู่ระบบ
         </a>
       </div>
-
     </div>
   </div>
 
   <script>
-    // 🔴 Web App URL ของ Google Apps Script
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
-    
-    document.addEventListener("DOMContentLoaded", async function() {
+
+    document.addEventListener("DOMContentLoaded", async function () {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
       const state = urlParams.get('state');
       const savedState = sessionStorage.getItem('sso_state');
 
-      // 1. เช็กกรณี DMS SSO ปฏิเสธการล็อกอิน
+      // ล้าง code/state ออกจาก address bar ทันที (กันหลุดไปกับ history / referrer)
+      history.replaceState(null, '', window.location.pathname);
+
       if (urlParams.get('error')) {
         showError("DMS SSO ปฏิเสธการเข้าสู่ระบบ หรือยกเลิกการทำรายการ");
         return;
       }
-
-      // 2. เช็กว่ามี Code ส่งมาหรือไม่
       if (!code) {
         showError("ไม่พบรหัสยืนยันตัวตน (Authorization Code)");
         return;
       }
-
-      // 3. เช็กค่า State เพื่อป้องกัน CSRF Attack
-      if (savedState && state !== savedState) {
-        showError("คำขอเข้าสู่ระบบไม่ถูกต้อง (State Mismatch)");
+      if (!savedState || state !== savedState) {
+        showError("คำขอเข้าสู่ระบบไม่ถูกต้อง (State Mismatch) กรุณาเริ่มเข้าสู่ระบบใหม่");
         return;
       }
+      sessionStorage.removeItem('sso_state');
 
       try {
-        // 4. ส่ง Code ไปให้ Google Apps Script แลก Token และ Profile
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'handleSsoCallback',
-            payload: { code: code }
-          })
+          // ✅ ส่ง state ไปให้ server ตรวจซ้ำอีกชั้น (ฝั่ง browser เชื่อถือไม่ได้)
+          body: JSON.stringify({ action: 'handleSsoCallback', payload: { code: code, state: state } })
         });
-        
+
         const res = await response.json();
 
-        if (res && res.success && res.data && res.data.success) {
-          const user = res.data.user;
-          
-          // 5. บันทึก Session ข้อมูลผู้ใช้ลงในเบราว์เซอร์
-          sessionStorage.setItem('mfa_agency', user.agency || "DMS SSO");
-          sessionStorage.setItem('mfa_email', user.email || user.cid);
-          sessionStorage.setItem('mfa_name', user.fullname);
-          
-          // 🟢 เพิ่มการเก็บบันทึก CID (เลขบัตรประชาชน) ไว้ในระบบ
-          sessionStorage.setItem('mfa_cid', user.cid);
-          
+        if (res && res.success && res.data && res.data.success && res.data.token) {
+          const d = res.data;
+          sessionStorage.setItem('access_token', d.token);
+          sessionStorage.setItem('token_exp', String(d.expiresAt || 0));
+          sessionStorage.setItem('mfa_agency', d.user.agency || '');
+          sessionStorage.setItem('mfa_email', d.user.email || '');
+          sessionStorage.setItem('mfa_name', d.user.fullname || '');
+
           document.getElementById('statusMessage').textContent = "ยืนยันตัวตนสำเร็จ กำลังนำท่านเข้าสู่ระบบ...";
-          
-          // 6. เปลี่ยนหน้าไปยัง index.html
-          setTimeout(() => {
-            window.location.href = "index.html";
-          }, 1000);
-
+          setTimeout(() => { window.location.href = "index.html"; }, 800);
         } else {
-          showError(res.data ? res.data.message : "ไม่สามารถเข้าสู่ระบบผ่าน DMS SSO ได้");
+          showError((res.data && res.data.message) || res.message || "ไม่สามารถเข้าสู่ระบบผ่าน DMS SSO ได้");
         }
-
       } catch (err) {
-        showError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์: " + err.toString());
+        showError("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์ กรุณาลองใหม่อีกครั้ง");
       }
     });
 
