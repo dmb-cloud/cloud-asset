@@ -314,8 +314,8 @@
               <div>
                 <label class="font-bold mb-1 block text-slate-700">สถานะ (Status)</label>
                 <select id="edit_status" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="ใช้งาน">✅ ใช้งาน (Active)</option>
-                  <option value="ไม่ใช้งาน">❌ ไม่ใช้งาน (Inactive)</option>
+                  <option value="ใช้งาน">ใช้งาน (Active)</option>
+                  <option value="ไม่ใช้งาน">ไม่ใช้งาน (Inactive)</option>
                 </select>
               </div>
               <div>
@@ -636,6 +636,8 @@
     ];
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
+        `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
+       $('edit_type').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
