@@ -92,8 +92,8 @@
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
-          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">ใช้งาน: <span id="cardActiveSub">0</span></span>
+          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">ไม่ใช้งาน: <span id="cardInactive">0</span></span>
         </div>
       </div>
 
@@ -807,7 +807,7 @@
       $('edit_owners').value = a.owners || "";
       $('edit_owners').disabled = !userIsAdmin;
 
-      $('edit_type').value = a.typeFilter || TYPES[0][0];
+      $('edit_type').value = a.type || TYPES[0][0];
       $('edit_name').value = a.name || "";
       $('edit_status').value = a.status || 'ใช้งาน';
       $('edit_domain').value = a.domain || "";
