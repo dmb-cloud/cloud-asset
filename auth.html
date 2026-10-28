@@ -9,18 +9,32 @@
   <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
     body {
       font-family: 'Noto Sans Thai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-image: url('img/nature.webp');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
-<body class="min-h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex items-center justify-center p-4 sm:p-8 antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200" id="mainBody">
+<body class="min-h-full text-slate-800 flex items-center justify-center p-4 sm:p-8 antialiased selection:bg-blue-600 selection:text-white relative" id="mainBody">
 
-  <div class="flex flex-col justify-center items-center min-h-screen relative w-full py-8">
+  <div class="fixed inset-0 bg-black/50 z-0"></div>
+
+  <div class="flex flex-col justify-center items-center min-h-screen relative z-10 w-full py-8">
     <div class="w-11/12 md:w-10/12 lg:w-8/12 xl:w-7/12">
 
       <!-- Top Logo & App Title (Desktop) -->
@@ -29,13 +43,13 @@
           <img src="img/ico_logo@2x.png" alt="Logo" class="w-full h-full object-contain">
         </div>
         <div class="text-left">
-          <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">DMS Cloud Registry</h1>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">สำนักดิจิทัลการแพทย์ กรมการแพทย์</p>
+          <h1 class="text-xl font-bold tracking-tight text-white leading-tight drop-shadow-md">DMS Cloud Registry</h1>
+          <p class="text-[11px] text-white/80 font-medium drop-shadow-md">สำนักดิจิทัลการแพทย์ กรมการแพทย์</p>
         </div>
       </div>
 
       <!-- Main Card Container -->
-      <div id="authContainer" class="relative bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden p-6 md:p-10 transition-colors">
+      <div id="authContainer" class="glass-panel relative rounded-3xl overflow-hidden p-6 md:p-10">
 
         <!-- Top Logo & App Title (Mobile) -->
         <div class="flex md:hidden flex-col justify-center items-center gap-2 mb-6 text-center">
@@ -213,9 +227,9 @@
       </div>
 
       <!-- Footer -->
-      <div class="flex justify-between items-center text-xs text-slate-400 dark:text-slate-500 mt-6 px-2">
+      <div class="flex justify-between items-center text-xs text-white/80 drop-shadow-md mt-6 px-2">
         <span>Copyright © สำนักดิจิทัลการแพทย์</span>
-        <span class="font-mono">Version 2.0.1 20261028</span>
+        <span class="font-mono">Version 2.0.0</span>
       </div>
 
     </div>
