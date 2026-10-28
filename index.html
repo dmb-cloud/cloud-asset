@@ -175,10 +175,15 @@
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
                 <th class="py-4 px-3 w-14 text-center">
                   <div class="flex flex-col items-center">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
                     <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
                   </div>
                 </th>
-                <th class="py-4 px-3 w-12 text-center">#</th>
+                <!-- เพิ่ม sort # -->
+                <th onclick="sortTable('index')" class="py-4 px-3 w-12 text-center th-sortable transition">
+                  # <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                </th>
                 <th onclick="sortTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
                   สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
@@ -848,7 +853,6 @@
     const STATUS_OFF_CLASS = "status-select bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
     const FIELD_CLASS = "w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-800 outline-none focus:ring-1 focus:ring-sky-500";
     const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
-    const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
 
     const SW_FIELD = { app: "swApp", fe: "swFe", be: "swBe", db: "swDb" };
 
@@ -894,7 +898,6 @@
       document.getElementById('edit_sysType').value = row.querySelector('.type-select').value;
       document.getElementById('edit_note').value = row.querySelector('.note-input').value;
       
-      // นำข้อมูลซอฟต์แวร์ทั้ง 4 ช่องมาแสดงผล
       document.getElementById('edit_swApp').value = row.querySelector('.sw-val[data-sw="app"]').value;
       document.getElementById('edit_swFe').value = row.querySelector('.sw-val[data-sw="fe"]').value;
       document.getElementById('edit_swBe').value = row.querySelector('.sw-val[data-sw="be"]').value;
@@ -921,7 +924,6 @@
       row.querySelector('.type-select').value = document.getElementById('edit_sysType').value;
       row.querySelector('.note-input').value = document.getElementById('edit_note').value;
       
-      // บันทึกกลับลงแถวทั้ง 4 ช่อง
       row.querySelector('.sw-val[data-sw="app"]').value = document.getElementById('edit_swApp').value;
       row.querySelector('.sw-val[data-sw="fe"]').value = document.getElementById('edit_swFe').value;
       row.querySelector('.sw-val[data-sw="be"]').value = document.getElementById('edit_swBe').value;
@@ -949,20 +951,23 @@
 
       allAssets.forEach((item) => {
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        const badgeType = isDomain ? BADGE_DOMAIN : BADGE_SERVER;
-
         const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
-        const selectColorClass = (currentStatus === 'ใช้งาน') ? STATUS_ON_CLASS : STATUS_OFF_CLASS;
 
+        // ✅ กรองให้แสดงเฉพาะประเภท Domain และ สถานะที่ใช้งานแล้วเท่านั้น
+        if (!isDomain || currentStatus !== 'ใช้งาน') return;
+
+        const badgeType = BADGE_DOMAIN;
+        const selectColorClass = STATUS_ON_CLASS;
+
+        // ✅ ล็อค Dropdown สถานะให้มีเฉพาะ "ใช้งาน" และคลิกเปลี่ยนไม่ได้
         const statusSelectHtml = `
-          <select onchange="handleStatusChange(this)" class="${selectColorClass}">
-            <option value="ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
-            <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
+          <select class="${selectColorClass} opacity-80 !cursor-not-allowed" disabled>
+            <option value="ใช้งาน" class="bg-white text-slate-800" selected>ใช้งาน</option>
           </select>`;
 
-        const isChecked = (currentStatus === 'ใช้งาน') ? 'checked' : '';
-        const rowDisabledClass = isChecked ? '' : 'row-disabled';
-        const fieldDisabled = isChecked ? '' : 'disabled';
+        const isChecked = 'checked';
+        const rowDisabledClass = '';
+        const fieldDisabled = '';
 
         const sysTypeOptions = SYS_TYPES.map(([label, key]) =>
           `<option value="${escapeHtml(label)}" ${(item.sysType && item.sysType.includes(key)) ? 'selected' : ''}>${escapeHtml(label)}</option>`
@@ -973,7 +978,7 @@
             <td class="py-3 px-3 text-center">
               <input type="checkbox" onchange="toggleRowActive(this)" class="active-cb w-4 h-4 text-emerald-600 rounded cursor-pointer" ${isChecked}>
             </td>
-            <td class="py-3 px-3 text-center text-slate-400 font-mono">${++count}</td>
+            <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${++count}</td>
             <td class="py-3 px-4 text-center">${statusSelectHtml}</td>
             <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell" data-original-contact="${escapeHtml(item.contact)}">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-4 text-center cell-type">${badgeType}</td>
@@ -1002,7 +1007,7 @@
       });
 
       if (count === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เปิดใช้งาน</td></tr>';
       }
 
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
@@ -1010,16 +1015,6 @@
       });
       const masterCb = document.getElementById('selectAllCb');
       if (masterCb) masterCb.checked = false;
-    }
-
-    function handleStatusChange(selectElement) {
-      const row = selectElement.closest('tr');
-      const cb = row.querySelector('.active-cb');
-      const isConfirmed = selectElement.value === 'ใช้งาน';
-      if (cb && cb.checked !== isConfirmed) {
-        cb.checked = isConfirmed;
-        toggleRowActive(cb, true);
-      }
     }
 
     function sortTable(column) {
@@ -1030,6 +1025,10 @@
 
       rows.sort((a, b) => {
         let valA = '', valB = '';
+        if (column === 'index') {
+          valA = parseInt(a.querySelector('.cell-index').textContent, 10) || 0;
+          valB = parseInt(b.querySelector('.cell-index').textContent, 10) || 0;
+        }
         if (column === 'type') { valA = a.getAttribute('data-type'); valB = b.getAttribute('data-type'); }
         if (column === 'status') { valA = a.querySelector('.status-select').value; valB = b.querySelector('.status-select').value; }
         if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
@@ -1037,6 +1036,8 @@
         if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
         if (column === 'name') { valA = a.querySelector('.cell-name').value; valB = b.querySelector('.cell-name').value; }
         if (column === 'impact') { valA = parseInt(a.querySelector('.impact-badge').innerText); valB = parseInt(b.querySelector('.impact-badge').innerText); }
+        
+        if (column === 'index') return asc ? valA - valB : valB - valA;
         if (valA < valB) return asc ? -1 : 1;
         if (valA > valB) return asc ? 1 : -1;
         return 0;
@@ -1071,15 +1072,17 @@
         row.classList.remove('row-disabled');
         elements.forEach(el => el.disabled = false);
         if (statusSelect) {
+          statusSelect.innerHTML = '<option value="ใช้งาน" class="bg-white text-slate-800">ใช้งาน</option>';
           statusSelect.value = 'ใช้งาน';
-          statusSelect.className = STATUS_ON_CLASS;
+          statusSelect.className = STATUS_ON_CLASS + " opacity-80 !cursor-not-allowed";
         }
       } else {
         row.classList.add('row-disabled');
         elements.forEach(el => el.disabled = true);
         if (statusSelect) {
+          statusSelect.innerHTML = '<option value="ไม่ใช้งาน" class="bg-white text-slate-800">ไม่ใช้งาน</option>';
           statusSelect.value = 'ไม่ใช้งาน';
-          statusSelect.className = STATUS_OFF_CLASS;
+          statusSelect.className = STATUS_OFF_CLASS + " opacity-80 !cursor-not-allowed";
         }
       }
       if (shouldUpdateDash) updateCardDashboard();
@@ -1354,13 +1357,12 @@
     });
 
     // ---------- save ----------
-async function submitToDatabase() {
+    async function submitToDatabase() {
       const payloadData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
         const id = row.getAttribute('data-id');
 
-        // ✅ แก้ไขตรงนี้: ดึงไปบันทึกเฉพาะแถวที่มีสถานะ is-changed (ถูกแก้ไข) เท่านั้น
         if (id && row.classList.contains('is-changed')) {
           payloadData.push({
             id: id,
@@ -1395,7 +1397,6 @@ async function submitToDatabase() {
       if (res && res.success) {
         document.getElementById('successMessage').textContent = res.message || "บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว";
         document.getElementById('successPopup').classList.remove('hidden');
-        // ล้างสถานะ is-changed ออกหลังจากบันทึกสำเร็จ
         document.querySelectorAll('.is-changed').forEach(el => el.classList.remove('is-changed'));
       } else {
         alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
