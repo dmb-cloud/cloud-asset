@@ -282,8 +282,7 @@
                 </th>
                 <th rowspan="2" class="py-4 px-4 min-w-[190px]">ประเภทระบบ</th>
                 
-                <!-- ยุบรวมช่องซอฟต์แวร์เป็น 1 ช่อง -->
-                <th rowspan="2" class="py-4 px-4 min-w-[200px]">ซอฟต์แวร์และเวอร์ชัน</th>
+                <th colspan="4" class="py-3 px-3 text-center border-b border-slate-700">ซอฟต์แวร์และเวอร์ชัน</th>
 
                 <th rowspan="2" class="py-4 px-3 min-w-[110px] text-center font-normal">
                   <div class="flex items-center justify-center gap-1.5 text-white">
@@ -306,6 +305,11 @@
                 <th rowspan="2" class="py-4 px-4 min-w-[140px]">หมายเหตุ</th>
               </tr>
               <tr class="bg-slate-700 text-slate-200">
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Application</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Frontend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Backend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Database</th>
+
                 <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
                     <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
@@ -480,9 +484,26 @@
             </div>
 
             <!-- ซอฟต์แวร์ที่ใช้ -->
-            <div class="space-y-2 mt-3">
-              <label class="font-bold mb-1 block text-slate-700" for="edit_software">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</label>
-              <input type="text" id="edit_software" placeholder="ตัวอย่างเช่น php v8.2, MySQL v8.0, Laravel" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+            <div class="space-y-3 mt-3">
+              <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
+                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+                <div>
+                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Frontend</label>
+                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+                <div>
+                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Backend</label>
+                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+                <div>
+                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Database</label>
+                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL v8.0" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                </div>
+              </div>
             </div>
           </section>
 
@@ -831,6 +852,8 @@
     const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
     const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
 
+    const SW_FIELD = { app: "swApp", fe: "swFe", be: "swBe", db: "swDb" };
+
     function ciaOpts(v) {
       return [1, 2, 3].map(n => `<option value="${n}" ${v == n ? 'selected' : ''}>${n}</option>`).join('');
     }
@@ -871,8 +894,14 @@
         '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ' + (name ? ': ' + escapeHtml(name) : '');
 
       document.getElementById('edit_sysType').value = row.querySelector('.type-select').value;
-      document.getElementById('edit_software').value = row.querySelector('.sw-val').value;
       document.getElementById('edit_note').value = row.querySelector('.note-input').value;
+      
+      // นำข้อมูลซอฟต์แวร์ทั้ง 4 ช่องมาแสดงผล
+      document.getElementById('edit_swApp').value = row.querySelector('.sw-val[data-sw="app"]').value;
+      document.getElementById('edit_swFe').value = row.querySelector('.sw-val[data-sw="fe"]').value;
+      document.getElementById('edit_swBe').value = row.querySelector('.sw-val[data-sw="be"]').value;
+      document.getElementById('edit_swDb').value = row.querySelector('.sw-val[data-sw="db"]').value;
+
       document.getElementById('edit_pdpa').checked = row.querySelector('.pdpa-cb').checked;
       document.getElementById('edit_c').value = row.querySelector('.c-select').value;
       document.getElementById('edit_i').value = row.querySelector('.i-select').value;
@@ -892,8 +921,14 @@
       if (!row) return;
 
       row.querySelector('.type-select').value = document.getElementById('edit_sysType').value;
-      row.querySelector('.sw-val').value = document.getElementById('edit_software').value;
       row.querySelector('.note-input').value = document.getElementById('edit_note').value;
+      
+      // บันทึกกลับลงแถวทั้ง 4 ช่อง
+      row.querySelector('.sw-val[data-sw="app"]').value = document.getElementById('edit_swApp').value;
+      row.querySelector('.sw-val[data-sw="fe"]').value = document.getElementById('edit_swFe').value;
+      row.querySelector('.sw-val[data-sw="be"]').value = document.getElementById('edit_swBe').value;
+      row.querySelector('.sw-val[data-sw="db"]').value = document.getElementById('edit_swDb').value;
+
       row.querySelector('.pdpa-cb').checked = document.getElementById('edit_pdpa').checked;
       row.querySelector('.c-select').value = document.getElementById('edit_c').value;
       row.querySelector('.i-select').value = document.getElementById('edit_i').value;
@@ -935,10 +970,6 @@
           `<option value="${escapeHtml(label)}" ${(item.sysType && item.sysType.includes(key)) ? 'selected' : ''}>${escapeHtml(label)}</option>`
         ).join('');
 
-        // ผสานข้อมูลซอฟต์แวร์เก่าจาก 4 ฟิลด์เดิม (กรณีฐานข้อมูลเก่ามีข้อมูล)
-        let oldSoftwareCombined = [item.swApp, item.swFe, item.swBe, item.swDb].filter(Boolean).join(', ');
-        let swVal = item.software || oldSoftwareCombined;
-
         const rowHtml = `
           <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
             <td class="py-3 px-3 text-center">
@@ -959,13 +990,13 @@
               </button>
               <div class="hidden">
                 <select ${fieldDisabled} class="type-select">${sysTypeOptions}</select>
-                <input type="hidden" ${fieldDisabled} class="sw-val" value="${escapeHtml(swVal)}">
                 <input type="text" ${fieldDisabled} value="${escapeHtml(item.note)}" class="note-input">
                 <input type="checkbox" ${fieldDisabled} class="pdpa-cb" ${item.pdpa ? 'checked' : ''}>
                 <select ${fieldDisabled} class="c-select">${ciaOpts(item.c)}</select>
                 <select ${fieldDisabled} class="i-select">${ciaOpts(item.i)}</select>
                 <select ${fieldDisabled} class="a-select">${ciaOpts(item.a)}</select>
                 <span class="impact-badge">${escapeHtml(item.impact || 1)}</span>
+                ${['app', 'fe', 'be', 'db'].map(k => `<input type="hidden" class="sw-val" data-sw="${k}" value="${escapeHtml(item[SW_FIELD[k]])}">`).join('')}
               </div>
             </td>
           </tr>`;
@@ -1155,7 +1186,10 @@
           typeFilter: asset.typeFilter || '',
           nameVal: row.querySelector('.name-input').value,
           typeVal: row.querySelector('.type-select').value,
-          softwareVal: row.querySelector('.sw-val').value, // <--- ใช้ตัวนี้ตัวเดียวแล้ว
+          swApp: row.querySelector('.sw-val[data-sw="app"]').value,
+          swFe: row.querySelector('.sw-val[data-sw="fe"]').value,
+          swBe: row.querySelector('.sw-val[data-sw="be"]').value,
+          swDb: row.querySelector('.sw-val[data-sw="db"]').value,
           noteVal: row.querySelector('.note-input').value,
           hasPdpa: row.querySelector('.pdpa-cb').checked,
           c: row.querySelector('.c-select').value,
@@ -1210,7 +1244,7 @@
       const totalFiltered = filteredSummaryDataList.length;
 
       if (totalFiltered === 0) {
-        summaryBody.innerHTML = '<tr><td colspan="16" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
+        summaryBody.innerHTML = '<tr><td colspan="19" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
         document.getElementById('summaryPaginationControls').style.display = 'none';
         return;
       }
@@ -1244,7 +1278,10 @@
             <td class="py-3.5 px-4 text-slate-700 font-medium">${escapeHtml(data.domain) || '-'}</td>
             <td class="py-3.5 px-4 text-slate-900 font-bold">${escapeHtml(data.nameVal)}</td>
             <td class="py-3.5 px-4 text-slate-600">${escapeHtml(data.typeVal)}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[200px] break-words">${escapeHtml(data.softwareVal) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swApp) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swFe) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swBe) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swDb) || '-'}</td>
             <td class="py-3.5 px-3 text-center font-bold ${data.hasPdpa ? 'text-sky-600' : 'text-slate-400'}">${data.hasPdpa ? '✔️ มี' : '-'}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.c)}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.i)}</td>
@@ -1283,7 +1320,10 @@
           'Domain Name': asset.domain || '-',
           'Resource_Name': row.querySelector('.name-input').value,
           'ประเภทระบบ': row.querySelector('.type-select').value,
-          'ซอฟต์แวร์และเวอร์ชัน': row.querySelector('.sw-val').value || '-',
+          'Application': row.querySelector('.sw-val[data-sw="app"]').value || '-',
+          'Frontend': row.querySelector('.sw-val[data-sw="fe"]').value || '-',
+          'Backend': row.querySelector('.sw-val[data-sw="be"]').value || '-',
+          'Database': row.querySelector('.sw-val[data-sw="db"]').value || '-',
           'PDPA': row.querySelector('.pdpa-cb').checked ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': row.querySelector('.c-select').value,
           'Integrity (I)': row.querySelector('.i-select').value,
@@ -1327,7 +1367,10 @@
             id: id,
             resourceName: row.querySelector('.name-input').value,
             sysType: row.querySelector('.type-select').value,
-            software: row.querySelector('.sw-val').value, // <--- ใช้ software เป็น key เดียว
+            swApp: row.querySelector('.sw-val[data-sw="app"]').value,
+            swFe: row.querySelector('.sw-val[data-sw="fe"]').value,
+            swBe: row.querySelector('.sw-val[data-sw="be"]').value,
+            swDb: row.querySelector('.sw-val[data-sw="db"]').value,
             note: row.querySelector('.note-input').value,
             pdpa: row.querySelector('.pdpa-cb').checked,
             c: row.querySelector('.c-select').value,
