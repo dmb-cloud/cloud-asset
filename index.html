@@ -623,7 +623,17 @@
       ["ระบบข้อมูลสารสนเทศ (HIS)", "HIS"],
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
-
+    // ---------- main table ----------
+    const TYPES = [
+      ["GDCC", "GDCC"],
+      ["AWS ", "AWS"],
+      ["NIPA", "NIPA"],
+      ["Huawei", "Huawei"],
+      ["GPC", "GPC"],
+      ["INET", "INET"],
+      ["Private Cloud", "Private Cloud"],
+      ["อื่นๆ", "อื่นๆ"]
+    ];
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
@@ -795,7 +805,7 @@
       $('edit_owners').value = a.owners || "";
       $('edit_owners').disabled = !userIsAdmin;
 
-      $('edit_type').value = a.typeFilter || "";
+      $('edit_type').value = a.typeFilter || TYPES[0][0];
       $('edit_name').value = a.name || "";
       $('edit_status').value = a.status || 'ใช้งาน';
       $('edit_domain').value = a.domain || "";
