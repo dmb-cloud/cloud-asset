@@ -92,8 +92,8 @@
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">ใช้งาน: <span id="cardActiveSub">0</span></span>
-          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">ไม่ใช้งาน: <span id="cardInactive">0</span></span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
+          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
         </div>
       </div>
 
@@ -161,6 +161,11 @@
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
+            <select id="typeFilterSelect" onchange="applyFilterAndPagination(true)" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
+              <option value="all">ทุก Type</option>
+              <option value="domain">Domain</option>
+              <option value="server">Server</option>
+            </select>
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             <div class="flex items-center gap-2.5">
               <span class="font-medium">แสดง:</span>
@@ -299,8 +304,8 @@
               </div>
               <div>
                 <label class="font-bold mb-1 block text-slate-700">Type</label>
-                <select id="edit_type" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
-                
+                <input type="text" id="edit_type" list="typeList" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                <datalist id="typeList"><option value="Domain"><option value="Server"></datalist>
               </div>
               <div class="md:col-span-2">
                 <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
@@ -309,8 +314,8 @@
               <div>
                 <label class="font-bold mb-1 block text-slate-700">สถานะ (Status)</label>
                 <select id="edit_status" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="ใช้งาน">ใช้งาน (Active)</option>
-                  <option value="ไม่ใช้งาน">ไม่ใช้งาน (Inactive)</option>
+                  <option value="ใช้งาน">✅ ใช้งาน (Active)</option>
+                  <option value="ไม่ใช้งาน">❌ ไม่ใช้งาน (Inactive)</option>
                 </select>
               </div>
               <div>
@@ -578,7 +583,7 @@
     // ---------- dashboard ----------
     function updateCardDashboard() {
       const total = allAssets.length;
-      const totalDomain = allAssets.filter(item => (item.type || '').trim().toLowerCase() === 'domain').length;
+      const totalDomain = allAssets.filter(item => (item.typeFilter || '').trim().toLowerCase() === 'domain').length;
       const totalServer = total - totalDomain;
 
       let activeCount = 0, assessedCount = 0, pdpaCount = 0;
@@ -618,31 +623,28 @@
       ["ระบบข้อมูลสารสนเทศ (HIS)", "HIS"],
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
-    // ---------- main table ----------
-    const TYPES = [
-      ["GDCC", "GDCC"],
-      ["AWS ", "AWS"],
-      ["NIPA", "NIPA"],
-      ["Huawei", "Huawei"],
-      ["GPC", "GPC"],
-      ["INET", "INET"],
-      ["Private Cloud", "Private Cloud"],
-      ["อื่นๆ", "อื่นๆ"]
-    ];
+    const TYPES = [
+      ["GDCC", "GDCC"],
+      ["AWS ", "AWS"],
+      ["NIPA", "NIPA"],
+      ["Huawei", "Huawei"],
+      ["GPC", "GPC"],
+      ["INET", "INET"],
+      ["Private Cloud", "Private Cloud"],
+      ["อื่นๆ", "อื่นๆ"]
+    ];
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
-        `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
-       $('edit_type').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
     function renderMainTable() {
       const htmlRows = allAssets.map((item, idx) => {
-        const isDomain = (item.type || '').trim().toLowerCase() === 'domain';
+        const isDomain = (item.typeFilter || '').trim().toLowerCase() === 'domain';
         const badgeType = isDomain
           ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe"></i> Domain</span>`
-          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> ${escapeHtml(item.type || 'Server')}</span>`;
+          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> ${escapeHtml(item.typeFilter || 'Server')}</span>`;
 
         let impactBadgeHtml = "-";
         if (item.isSaved) {
@@ -674,7 +676,7 @@
         return `
           <tr class="asset-row hover:bg-slate-50/80 transition${inactive}" data-id="${escapeHtml(item.id)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
-            <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.type)}">${badgeType}</td>
+            <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
             <td class="py-3 px-4"><div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div></td>
             <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
             <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
@@ -728,6 +730,7 @@
     function applyFilterAndPagination(resetPage = false) {
       if (resetPage) currentPage = 1;
       const searchValue = $('searchInput').value.toLowerCase().trim();
+      const typeSel = $('typeFilterSelect').value;
       const rows = Array.from(document.querySelectorAll('#mainTableBody tr.asset-row'));
 
       const filteredRows = rows.filter((row) => {
@@ -768,6 +771,7 @@
     function changePage(direction) { currentPage += direction; applyFilterAndPagination(); }
     function resetFilters() {
       $('searchInput').value = '';
+      $('typeFilterSelect').value = 'all';
       $('pageSizeSelect').value = '10';
       pageSize = 10;
       applyFilterAndPagination(true);
@@ -800,7 +804,7 @@
       $('edit_owners').value = a.owners || "";
       $('edit_owners').disabled = !userIsAdmin;
 
-      $('edit_type').value = a.type || TYPES[0][0];
+      $('edit_type').value = a.typeFilter || "";
       $('edit_name').value = a.name || "";
       $('edit_status').value = a.status || 'ใช้งาน';
       $('edit_domain').value = a.domain || "";
@@ -824,7 +828,7 @@
       editingAssetId = null;
       $('editModalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> เพิ่มข้อมูลระบบใหม่';
       $('edit_idBadge').textContent = 'ID: (สร้างอัตโนมัติ)';
-      setForm({ agency: userAgency, type: 'Domain', status: 'ใช้งาน' });
+      setForm({ agency: userAgency, typeFilter: 'Domain', status: 'ใช้งาน' });
       $('editAssetModal').classList.remove('hidden');
     }
 
@@ -905,7 +909,7 @@
       allAssets.forEach(asset => {
         excelData.push({
           'หน่วยงาน': asset.agency || userAgency,
-          'Type': asset.type || '-',
+          'Type': asset.typeFilter,
           'IP Address': asset.ip || '-',
           'Domain Name': asset.domain || '-',
           'Resource_Name': asset.name || '-',
