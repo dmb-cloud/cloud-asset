@@ -161,7 +161,6 @@
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
             <select id="typeFilterSelect" onchange="applyFilterAndPagination(true)" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
-              <option value="all">ทุก Type</option>
               <option value="domain">Domain</option>
             </select>
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
@@ -659,9 +658,8 @@
       $('edit_type').innerHTML = TYPES.map(([label, val]) =>
         `<option value="${escapeHtml(val.trim())}">${escapeHtml(label)}</option>`).join('');
 
-      // สร้างตัวเลือก Filter Type ให้ตรงกับ TYPES
-      let filterHtml = '<option value="all">ทุก Type</option>';
-      filterHtml += '<option value="domain">Domain</option>';
+      // สร้างตัวเลือก Filter Type ให้ตรงกับ TYPES (เอา "ทุก Type" ออก)
+      let filterHtml = '<option value="domain">Domain</option>';
       TYPES.forEach(([label, val]) => {
         filterHtml += `<option value="${escapeHtml(val.trim().toLowerCase())}">${escapeHtml(label)}</option>`;
       });
@@ -669,12 +667,27 @@
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
+    // ฟังก์ชันช่วยกำหนดสีและป้ายกำกับของ Cloud
+    function getCloudBadgeHtml(typeRaw) {
+      const t = String(typeRaw || '').trim();
+      const tl = t.toLowerCase();
+
+      if (tl === 'domain') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe"></i> Domain</span>`;
+      if (tl === 'aws') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200/80"><i class="fa-brands fa-aws text-[11px]"></i> AWS</span>`;
+      if (tl === 'gdcc') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200/80"><i class="fa-solid fa-cloud"></i> GDCC</span>`;
+      if (tl === 'nipa') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200/80"><i class="fa-solid fa-cloud"></i> NIPA</span>`;
+      if (tl === 'huawei') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80"><i class="fa-solid fa-cloud"></i> Huawei</span>`;
+      if (tl === 'gpc') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80"><i class="fa-solid fa-cloud"></i> GPC</span>`;
+      if (tl === 'inet') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200/80"><i class="fa-solid fa-cloud"></i> INET</span>`;
+      if (tl === 'private cloud') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300"><i class="fa-solid fa-server"></i> Private Cloud</span>`;
+      
+      return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/80"><i class="fa-solid fa-cloud"></i> ${escapeHtml(t || 'Server')}</span>`;
+    }
+
     function renderMainTable() {
       const htmlRows = allAssets.map((item, idx) => {
-        const isDomain = (item.typeFilter || '').trim().toLowerCase() === 'domain';
-        const badgeType = isDomain
-          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe"></i> Domain</span>`
-          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> ${escapeHtml(item.typeFilter || 'Server')}</span>`;
+        // ใช้ Badge แบบใหม่ที่มีสีแยกตาม Cloud
+        const badgeType = getCloudBadgeHtml(item.typeFilter);
 
         let impactBadgeHtml = "-";
         if (item.isSaved) {
@@ -684,13 +697,16 @@
           }">${impact}</span>`;
         }
 
-        const swStack = `
-          <div class="text-[10px] space-y-0.5 leading-tight">
-            <div><span class="font-bold text-slate-500 mr-1">App:</span> ${escapeHtml(item.swApp) || '-'}</div>
-            <div><span class="font-bold text-slate-500 mr-1">FE:</span> ${escapeHtml(item.swFe) || '-'}</div>
-            <div><span class="font-bold text-slate-500 mr-1">BE:</span> ${escapeHtml(item.swBe) || '-'}</div>
-            <div><span class="font-bold text-slate-500 mr-1">DB:</span> ${escapeHtml(item.swDb) || '-'}</div>
-          </div>`;
+        // จัดหน้าตา Software Stack ใหม่ให้เป็นบล็อก (Pills)
+        const app = item.swApp ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-slate-100 text-slate-600 border border-slate-200 truncate" title="App: ${escapeHtml(item.swApp)}"><span class="font-bold mr-1 opacity-60">App:</span> <span class="truncate">${escapeHtml(item.swApp)}</span></div>` : '';
+        const fe = item.swFe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-sky-50 text-sky-700 border border-sky-200 truncate" title="Frontend: ${escapeHtml(item.swFe)}"><span class="font-bold mr-1 opacity-60">FE:</span> <span class="truncate">${escapeHtml(item.swFe)}</span></div>` : '';
+        const be = item.swBe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-violet-50 text-violet-700 border border-violet-200 truncate" title="Backend: ${escapeHtml(item.swBe)}"><span class="font-bold mr-1 opacity-60">BE:</span> <span class="truncate">${escapeHtml(item.swBe)}</span></div>` : '';
+        const db = item.swDb ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-amber-50 text-amber-700 border border-amber-200 truncate" title="Database: ${escapeHtml(item.swDb)}"><span class="font-bold mr-1 opacity-60">DB:</span> <span class="truncate">${escapeHtml(item.swDb)}</span></div>` : '';
+        
+        let swStack = `<div class="flex flex-col gap-1 w-full max-w-[160px]">${app}${fe}${be}${db}</div>`;
+        if (!app && !fe && !be && !db) {
+          swStack = `<span class="text-slate-300 font-medium text-center block">-</span>`;
+        }
 
         let lastUpdateStr = '-', ts = 0;
         if (item.lastUpdate) {
@@ -765,7 +781,10 @@
 
       const filteredRows = rows.filter((row) => {
         const t = (row.querySelector('.cell-type').dataset.type || '').trim().toLowerCase();
-        if (typeSel !== 'all' && t !== typeSel) return false;
+        
+        // ตัดเงื่อนไข typeSel !== 'all' ออกเพราะเราเอาตัวเลือกนี้ออกแล้ว
+        if (t !== typeSel) return false;
+        
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
         const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
         const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
@@ -799,9 +818,11 @@
 
     function changePageSize() { pageSize = $('pageSizeSelect').value; applyFilterAndPagination(true); }
     function changePage(direction) { currentPage += direction; applyFilterAndPagination(); }
+    
     function resetFilters() {
       $('searchInput').value = '';
-      $('typeFilterSelect').value = 'all';
+      // Default กลับไปที่ Type แรกเสมอ เนื่องจากเอา 'all' ออกแล้ว
+      $('typeFilterSelect').value = 'domain';
       $('pageSizeSelect').value = '10';
       pageSize = 10;
       applyFilterAndPagination(true);
