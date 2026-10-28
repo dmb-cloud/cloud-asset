@@ -806,12 +806,50 @@
           }">${impact}</span>`;
         }
 
-        // คอลัมน์ OS
-        const osHasEof = item.os && item.os.toUpperCase().includes('EOF');
-        const osClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700';
-        const osHtml = item.os 
-          ? `<span class="truncate block w-full max-w-[100px] mx-auto ${osClass}" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
-          : `<span class="text-slate-300">-</span>`;
+// คอลัมน์ OS พร้อม Icon (ไอคอนอยู่บน ชื่ออยู่ล่าง)
+        let osHtml = `<span class="text-slate-300">-</span>`;
+        if (item.os) {
+          const osUpper = item.os.toUpperCase();
+          const osHasEof = osUpper.includes('EOF');
+          const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
+          
+          // ตรวจสอบชื่อ OS เพื่อเลือก Icon และสีประจำแบรนด์
+          let iconClass = "fa-solid fa-compact-disc text-slate-400"; // ค่าเริ่มต้น
+          
+          if (osUpper.includes("UBUNTU")) {
+            iconClass = "fa-brands fa-ubuntu text-orange-500";
+          } else if (osUpper.includes("WINDOWS")) {
+            iconClass = "fa-brands fa-windows text-sky-500";
+          } else if (osUpper.includes("REDHAT") || osUpper.includes("RHEL")) {
+            iconClass = "fa-brands fa-redhat text-red-600";
+          } else if (osUpper.includes("SUSE")) {
+            iconClass = "fa-brands fa-suse text-emerald-500";
+          } else if (osUpper.includes("FEDORA")) {
+            iconClass = "fa-brands fa-fedora text-blue-600";
+          } else if (osUpper.includes("CENTOS")) {
+            iconClass = "fa-brands fa-linux text-purple-600"; // CentOS ใช้เพนกวินสีม่วง
+          } else if (osUpper.includes("ALMA")) {
+            iconClass = "fa-brands fa-linux text-blue-400"; // AlmaLinux ใช้เพนกวินสีฟ้า
+          } else if (osUpper.includes("ROCKY")) {
+            iconClass = "fa-brands fa-linux text-emerald-600"; // Rocky ใช้เพนกวินสีเขียว
+          } else if (osUpper.includes("DEBIAN")) {
+            iconClass = "fa-brands fa-linux text-rose-600"; // Debian ใช้เพนกวินสีแดง
+          } else if (osUpper.includes("LINUX")) {
+            iconClass = "fa-brands fa-linux text-slate-700"; // Linux ทั่วไป
+          }
+          
+          // หากสถานะเป็น EOF (หมดอายุ) ให้บังคับเปลี่ยนสีไอคอนเป็นสีแดงเข้ม
+          if (osHasEof) {
+            iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
+          }
+
+          osHtml = `
+            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${escapeHtml(item.os)}">
+              <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
+              <span class="truncate w-full text-[9px] ${osTextClass}">${escapeHtml(item.os)}</span>
+            </div>
+          `;
+        }
 
         // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
         const swParts = [];
