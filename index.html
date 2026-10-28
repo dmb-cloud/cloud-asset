@@ -160,7 +160,6 @@
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
-            <!-- เอา Dropdown Filter Type ออกแล้ว -->
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             <div class="flex items-center gap-2.5">
               <span class="font-medium">แสดง:</span>
@@ -288,19 +287,19 @@
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
         <div class="p-5 space-y-4 overflow-y-auto">
 
+          <!-- Hidden inputs เพื่อไม่ให้บันทึกข้อมูลเสีย -->
+          <input type="hidden" id="edit_agency">
+          <input type="hidden" id="edit_status" value="ใช้งาน">
+          <input type="hidden" id="edit_owners">
+
           <!-- 1. ข้อมูลระบบ -->
           <section class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
               <h4 class="font-bold text-slate-800">ข้อมูลระบบ (System Info)</h4>
-              <span id="edit_idBadge" class="text-[10px] text-slate-400 font-mono"></span>
             </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">หน่วยงาน (Agency)</label>
-                <input type="text" id="edit_agency" list="agencyList" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-500">
-                <datalist id="agencyList"></datalist>
-              </div>
-              <div>
+              <div class="md:col-span-1">
                 <label class="font-bold mb-1 block text-slate-700">Type</label>
                 <select id="edit_type" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
               </div>
@@ -308,34 +307,23 @@
                 <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
                 <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
-              <div>
-                <label class="font-bold mb-1 block text-slate-700">สถานะ (Status)</label>
-                <select id="edit_status" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="ใช้งาน">✅ ใช้งาน (Active)</option>
-                  <option value="ไม่ใช้งาน">❌ ไม่ใช้งาน (Inactive)</option>
-                </select>
-              </div>
-              <div>
+              <div class="md:col-span-1">
                 <label class="font-bold mb-1 block text-slate-700">Domain Name</label>
                 <input type="text" id="edit_domain" maxlength="300" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
-              <div>
+              <div class="md:col-span-1">
                 <label class="font-bold mb-1 block text-slate-700">IP Public</label>
                 <input type="text" id="edit_ip" maxlength="100" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
-              <div>
-                <label class="font-bold mb-1 block text-slate-700">SSL Expiry <span class="font-normal text-slate-400">(YYYY-MM-DD)</span></label>
-                <input type="text" id="edit_ssl" placeholder="2026-12-31" maxlength="30" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              <div class="md:col-span-1">
+                <label class="font-bold mb-1 block text-slate-700">SSL Expiry</label>
+                <input type="date" id="edit_ssl" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 text-slate-700">
               </div>
-              <div class="md:col-span-2">
+              <div class="md:col-span-1">
                 <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
                 <select id="edit_sysType" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
               </div>
-              <div>
-                <label class="font-bold mb-1 block text-slate-700">OwnerGroup <span class="font-normal text-slate-400">(admin)</span></label>
-                <input type="text" id="edit_owners" placeholder="email1, email2" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-500">
-              </div>
-              <div class="md:col-span-3">
+              <div class="md:col-span-2">
                 <label class="font-bold mb-1 block text-slate-700">หมายเหตุ</label>
                 <input type="text" id="edit_note" maxlength="300" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
@@ -344,9 +332,35 @@
             <div class="space-y-3 mt-3 pt-3 border-t border-slate-200">
               <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <!-- ช่อง OS -->
-                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">OS (ระบบปฏิบัติการ)</label>
-                  <input type="text" id="edit_os" placeholder="เช่น Ubuntu 22.04, Windows" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                <!-- Dropdown OS พร้อมเช็ค EOF -->
+                <div>
+                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">OS (ระบบปฏิบัติการ)</label>
+                  <select id="edit_os" onchange="handleOsColor(this)" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                    <option value="">-- ไม่ระบุ --</option>
+                    <optgroup label="Linux">
+                      <option value="Ubuntu 20.04">Ubuntu 20.04</option>
+                      <option value="Ubuntu 22.04">Ubuntu 22.04</option>
+                      <option value="Ubuntu 24.04">Ubuntu 24.04</option>
+                      <option value="CentOS 7 (EOF)">CentOS 7 (EOF)</option>
+                      <option value="CentOS 8 (EOF)">CentOS 8 (EOF)</option>
+                      <option value="AlmaLinux 8">AlmaLinux 8</option>
+                      <option value="AlmaLinux 9">AlmaLinux 9</option>
+                      <option value="Rocky Linux 8">Rocky Linux 8</option>
+                      <option value="Rocky Linux 9">Rocky Linux 9</option>
+                      <option value="Debian 11">Debian 11</option>
+                      <option value="Debian 12">Debian 12</option>
+                    </optgroup>
+                    <optgroup label="Windows">
+                      <option value="Windows Server 2012 (EOF)">Windows Server 2012 (EOF)</option>
+                      <option value="Windows Server 2016">Windows Server 2016</option>
+                      <option value="Windows Server 2019">Windows Server 2019</option>
+                      <option value="Windows Server 2022">Windows Server 2022</option>
+                    </optgroup>
+                    <optgroup label="อื่นๆ">
+                      <option value="อื่นๆ">อื่นๆ</option>
+                    </optgroup>
+                  </select>
+                </div>
                 
                 <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
                   <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
@@ -678,6 +692,17 @@
       return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/80"><i class="fa-solid fa-cloud"></i> ${escapeHtml(t || 'Server')}</span>`;
     }
 
+    // ฟังก์ชันจัดการสีของ OS dropdown ถ้าระบุ EOF จะเป็นสีแดง
+    function handleOsColor(el) {
+      if (el.value.toUpperCase().includes('EOF')) {
+        el.classList.add('text-rose-600', 'font-bold', 'bg-rose-50');
+        el.classList.remove('bg-white', 'text-slate-800');
+      } else {
+        el.classList.remove('text-rose-600', 'font-bold', 'bg-rose-50');
+        el.classList.add('bg-white', 'text-slate-800');
+      }
+    }
+
     function renderMainTable() {
       const htmlRows = allAssets.map((item, idx) => {
         const badgeType = getCloudBadgeHtml(item.typeFilter);
@@ -690,9 +715,11 @@
           }">${impact}</span>`;
         }
 
-        // คอลัมน์ OS
+        // คอลัมน์ OS - ถ้ามี EOF ให้เป็นสีแดง
+        const osHasEof = item.os && item.os.toUpperCase().includes('EOF');
+        const osClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700';
         const osHtml = item.os 
-          ? `<span class="truncate block w-full max-w-[100px]" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
+          ? `<span class="truncate block w-full max-w-[100px] ${osClass}" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
           : `<span class="text-slate-300">-</span>`;
 
         // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
@@ -724,7 +751,7 @@
             <td class="py-3 px-4"><div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div></td>
             <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
             <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
-            <td class="py-3 px-3 text-slate-700 text-[10px] font-medium cell-os">${osHtml}</td>
+            <td class="py-3 px-3 text-[10px] font-medium cell-os">${osHtml}</td>
             <td class="py-3 px-4 cell-sw">${swStack}</td>
             <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
             <td class="py-3 px-3 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
@@ -839,24 +866,30 @@
     }
 
     function setForm(a) {
-      $('agencyList').innerHTML = [...new Set(allAssets.map(x => x.agency).filter(Boolean))]
-        .map(v => `<option value="${escapeHtml(v)}">`).join('');
-
       $('edit_agency').value = a.agency || userAgency || "";
-      $('edit_agency').disabled = !userIsAdmin;
       $('edit_owners').value = a.owners || "";
-      $('edit_owners').disabled = !userIsAdmin;
+      $('edit_status').value = a.status || 'ใช้งาน';
 
       $('edit_type').value = (a.typeFilter || "").trim();
       $('edit_name').value = a.name || "";
-      $('edit_status').value = a.status || 'ใช้งาน';
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
       $('edit_ssl').value = a.sslExpiry || "";
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
-      $('edit_os').value = a.os || "";
+      // ตั้งค่า OS และเช็คสี
+      let osSelect = $('edit_os');
+      let osVal = a.os || "";
+      
+      // กรณีค่าที่มาจาก DB ไม่มีใน List ให้เพิ่ม Option ลงไปชั่วคราวเพื่อให้แสดงค่าได้ถูกต้อง
+      let exists = Array.from(osSelect.options).some(opt => opt.value === osVal);
+      if (!exists && osVal) {
+        osSelect.add(new Option(osVal, osVal));
+      }
+      osSelect.value = osVal;
+      handleOsColor(osSelect);
+      
       $('edit_swApp').value = a.swApp || "";
       $('edit_swFe').value = a.swFe || "";
       $('edit_swBe').value = a.swBe || "";
@@ -871,8 +904,9 @@
     function openAddModal() {
       editMode = 'add';
       editingAssetId = null;
-      $('editModalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> เพิ่มข้อมูลระบบใหม่';
-      $('edit_idBadge').textContent = 'ID: (สร้างอัตโนมัติ)';
+      $('edit_agency').value = userAgency;
+      $('edit_status').value = 'ใช้งาน';
+      
       setForm({ agency: userAgency, typeFilter: 'GDCC', status: 'ใช้งาน' });
       $('editAssetModal').classList.remove('hidden');
     }
@@ -882,9 +916,6 @@
       if (!asset) return;
       editMode = 'edit';
       editingAssetId = id;
-      $('editModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> แก้ไข/ประเมิน: ' +
-        escapeHtml(asset.name || asset.domain || asset.ip);
-      $('edit_idBadge').textContent = 'ID: ' + asset.id;
       setForm(asset);
       $('editAssetModal').classList.remove('hidden');
     }
@@ -911,7 +942,7 @@
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
       const item = {
-        type: v('edit_type'), resourceName: v('edit_name'), status: $('edit_status').value,
+        type: v('edit_type'), resourceName: v('edit_name'), status: v('edit_status'),
         domain: v('edit_domain'), ip: v('edit_ip'), sslExpiry: v('edit_ssl'),
         sysType: $('edit_sysType').value, note: v('edit_note'),
         os: v('edit_os'), swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
