@@ -16,6 +16,7 @@
     :root { --theme-primary: #122e5a; }
     .bg-theme { background-color: var(--theme-primary) !important; }
     .text-theme { color: var(--theme-primary) !important; }
+    tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
     .th-sortable { cursor: pointer; user-select: none; }
     .th-sortable:hover { background-color: #334155; }
   </style>
@@ -132,7 +133,7 @@
     </div>
 
     <!-- MAIN TABLE -->
-    <div class="space-y-4">
+    <div class="space-y-4" id="step1">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
           <div>
@@ -207,6 +208,7 @@
             <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl">หน้า 1 / 1</span>
             <button onclick="changePage(1)" class="nextBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
           </div>
+          <!-- ถอดปุ่ม "ถัดไป (สรุปข้อมูล)" ออกไปเลย เพราะไม่ได้ใช้งาน Step 2 แล้ว -->
         </div>
       </div>
     </div>
@@ -276,6 +278,22 @@
         <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
           <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="infoModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
+      <div class="bg-theme px-6 py-4 flex items-center justify-between text-white border-b border-white/10 shrink-0">
+        <h3 id="modalTitle" class="text-sm font-bold flex items-center gap-2"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl leading-none font-bold">&times;</button>
+      </div>
+      <div class="p-5 overflow-y-auto text-xs">
+        <div id="modalBody" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-600 leading-relaxed space-y-3"></div>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
+        <button onclick="closeModal()" class="px-4 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition">เข้าใจแล้ว / ปิด</button>
       </div>
     </div>
   </div>
@@ -483,16 +501,6 @@
       }
     }
 
-    async function whoAmIWithRetry(retries = 2, delayMs = 700) {
-      for (let attempt = 0; attempt <= retries; attempt++) {
-        const res = await callBackend("whoAmI");
-        if (res.success) return res;
-        if (!res.networkError) return res;
-        if (attempt < retries) await new Promise(r => setTimeout(r, delayMs));
-      }
-      return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
-    }
-
     // ---------- bootstrap ----------
     document.addEventListener("DOMContentLoaded", async function () {
       const exp = parseInt(sessionStorage.getItem('token_exp') || "0", 10);
@@ -500,32 +508,6 @@
         forceLogin();
         return;
       }
-
-      const me = await whoAmIWithRetry();
-
-      if (!me.success) {
-        const overlay = document.getElementById('loadingOverlay');
-        if (me.networkError) {
-          if (overlay) {
-            overlay.innerHTML =
-              '<i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>' +
-              '<h2 class="text-lg font-bold text-slate-800 mb-2">เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ</h2>' +
-              '<p class="text-sm text-slate-500 mb-4">กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p>' +
-              '<button onclick="location.reload()" class="px-5 py-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
-          }
-          return;
-        }
-        forceLogin(me.message || "เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
-        return;
-      }
-
-      userAgency = me.user.agency || "";
-      userEmail = me.user.email || "";
-      userName = me.user.fullname || "";
-
-      document.getElementById('profileName').textContent = userName;
-      document.getElementById('displayAgency').textContent = userAgency + (me.user.isAdmin ? " (ผู้ดูแล)" : "");
-
       startSessionWatch(exp);
       await loadDataFromCloud();
     });
@@ -555,6 +537,14 @@
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets;
 
+        if (res.user) {
+          userAgency = res.user.agency || "";
+          userEmail = res.user.email || "";
+          userName = res.user.fullname || "";
+          document.getElementById('profileName').textContent = userName;
+          document.getElementById('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
+        }
+
         renderMainTable();
         updateCardDashboard();
         applyFilterAndPagination(true);
@@ -568,8 +558,12 @@
           }, 300);
         }
       } else {
-        if (overlay) overlay.classList.add('hidden');
-        if (res && res.message) alert("ไม่สามารถโหลดข้อมูลได้: " + res.message);
+        if (overlay) {
+          overlay.innerHTML =
+            '<i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>' +
+            '<h2 class="text-lg font-bold text-slate-800 mb-2">เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จหรือเซสชันหมดอายุ</h2>' +
+            '<button onclick="location.reload()" class="px-5 py-2 mt-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
+        }
       }
     }
 
@@ -629,6 +623,12 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
+    const STATUS_ON_CLASS = "status-select bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
+    const STATUS_OFF_CLASS = "status-select bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
+    const FIELD_CLASS = "w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-800 outline-none focus:ring-1 focus:ring-sky-500";
+    const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
+    const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
+
     function initEditModal() {
       document.getElementById('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
@@ -639,18 +639,22 @@
       const tbody = document.getElementById('mainTableBody');
       tbody.innerHTML = '';
       let count = 0;
+      const htmlRows = [];
 
       allAssets.forEach((item) => {
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        // แสดงเฉพาะรายการที่เป็น Domain
         if (!isDomain) return;
 
+        // ไม่เอา checkbox ใช้ status เดิมถ้าเคยเป็น 'ใช้งาน' หรือไม่เคยเชฟจะเป็น 'ไม่ใช้งาน'
         const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
         const isActive = currentStatus === 'ใช้งาน';
 
-        const statusBadge = isActive 
-          ? `<span class="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border">✅ ใช้งาน</span>`
-          : `<span class="bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border">❌ ไม่ใช้งาน</span>`;
+        const statusSelectHtml = `
+          <select class="status-select bg-white border border-slate-300 rounded-xl text-[10px] font-bold py-1 px-2 focus:outline-none" disabled>
+            <option value="ใช้งาน" ${isActive ? 'selected' : ''}>✅ ใช้งาน</option>
+            <option value="ไม่ใช้งาน" ${!isActive ? 'selected' : ''}>❌ ไม่ใช้งาน</option>
+          </select>
+        `;
 
         let impactBadgeHtml = "-";
         if (item.isSaved) {
@@ -660,10 +664,10 @@
           }">${impact}</span>`;
         }
 
-        const rowHtml = `
+        htmlRows.push(`
           <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${++count}</td>
-            <td class="py-3 px-4 text-center cell-status" data-status="${escapeHtml(currentStatus)}">${statusBadge}</td>
+            <td class="py-3 px-4 text-center cell-status" data-status="${escapeHtml(currentStatus)}">${statusSelectHtml}</td>
             <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
             <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
@@ -678,12 +682,13 @@
                 <i class="fa-solid fa-pen-to-square"></i> <span>ประเมิน</span>
               </button>
             </td>
-          </tr>`;
-        tbody.insertAdjacentHTML('beforeend', rowHtml);
+          </tr>`);
       });
 
-      if (count === 0) {
+      if (htmlRows.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เป็น Domain</td></tr>';
+      } else {
+        tbody.innerHTML = htmlRows.join('');
       }
     }
 
@@ -795,6 +800,7 @@
       document.getElementById('edit_sysType').value = asset.sysType || "ระบบบริการ (Web Services)";
       document.getElementById('edit_note').value = asset.note || "";
       
+      // ดึง 4 ฟิลด์ (ต้องเช็คชื่อตัวแปรที่รับมาจาก backend ให้ตรงกัน คือ swApp, swFe, swBe, swDb)
       document.getElementById('edit_swApp').value = asset.swApp || "";
       document.getElementById('edit_swFe').value = asset.swFe || "";
       document.getElementById('edit_swBe').value = asset.swBe || "";
@@ -831,6 +837,7 @@
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
+      // จัด Payload ให้ตรงกับฝั่ง backend (ใช้ swApp, swFe, swBe, swDb ให้ตรงกับ code.gs ล่าสุด)
       const payload = [{
         id: editingAssetId,
         resourceName: document.getElementById('edit_name').value,
