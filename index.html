@@ -141,7 +141,6 @@
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
               <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "แก้ไข" เพื่อตรวจสอบ แก้ไขข้อมูล และบันทึกผลกระทบความเสี่ยง หรือกด "เพิ่มข้อมูล" เพื่อเพิ่มระบบใหม่</p>
           </div>
           <div class="flex gap-2 w-full sm:w-auto">
             <button onclick="openAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl transition shadow-sm">
@@ -312,20 +311,29 @@
                 <datalist id="agencyList"></datalist>
               </div>
               <div>
-                <label class="font-bold mb-1 block text-slate-700">Type</label>
-                <input type="text" id="edit_type" list="typeList" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                <datalist id="typeList"><option value="Domain"><option value="Server"></datalist>
-              </div>
-              <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
-                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-              </div>
-              <div>
                 <label class="font-bold mb-1 block text-slate-700">สถานะ (Status)</label>
                 <select id="edit_status" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
                   <option value="ใช้งาน">✅ ใช้งาน (Active)</option>
                   <option value="ไม่ใช้งาน">❌ ไม่ใช้งาน (Inactive)</option>
                 </select>
+              </div>
+              
+              <!-- เพิ่มช่องแยกระหว่าง รูปแบบทรัพยากร (Domain/Server) และ ประเภท Cloud -->
+              <div>
+                <label class="font-bold mb-1 block text-slate-700 text-sky-700">Resource Type <span class="text-rose-500">*</span></label>
+                <select id="edit_typeFilter" class="w-full border border-sky-300 bg-sky-50 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                  <option value="Domain">Domain</option>
+                  <option value="Server">Server</option>
+                </select>
+              </div>
+              <div class="md:col-span-2">
+                <label class="font-bold mb-1 block text-slate-700 text-indigo-700">Cloud Provider (ผู้ให้บริการคลาวด์)</label>
+                <select id="edit_cloudProvider" class="w-full border border-indigo-300 bg-indigo-50 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-indigo-500"></select>
+              </div>
+
+              <div class="md:col-span-3">
+                <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
+                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
               <div>
                 <label class="font-bold mb-1 block text-slate-700">Domain Name</label>
@@ -340,7 +348,7 @@
                 <input type="text" id="edit_ssl" placeholder="2026-12-31" maxlength="30" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
               <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
+                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Architecture)</label>
                 <select id="edit_sysType" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
               </div>
               <div>
@@ -634,9 +642,23 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
+    const CLOUD_TYPES = [
+      ["GDCC", "GDCC"],
+      ["AWS", "AWS"],
+      ["NIPA", "NIPA"],
+      ["Huawei", "Huawei"],
+      ["GPC", "GPC"],
+      ["INET", "INET"],
+      ["Private Cloud", "Private Cloud"],
+      ["อื่นๆ", "อื่นๆ"]
+    ];
+
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
+      
+      $('edit_cloudProvider').innerHTML = CLOUD_TYPES.map(([label, val]) =>
+        `<option value="${escapeHtml(val)}">${escapeHtml(label)}</option>`).join('');
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
@@ -825,7 +847,8 @@
       $('edit_owners').value = a.owners || "";
       $('edit_owners').disabled = !userIsAdmin;
 
-      $('edit_type').value = a.typeFilter || "";
+      $('edit_typeFilter').value = a.typeFilter || "Server";
+      $('edit_cloudProvider').value = a.cloudProvider || (a.type || "GDCC"); // ใช้ค่าจาก type เดิมถ้าย้ายมาจากเวอร์ชั่นก่อน
       $('edit_name').value = a.name || "";
       $('edit_status').value = a.status || 'ใช้งาน';
       $('edit_domain').value = a.domain || "";
@@ -887,7 +910,10 @@
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
       const item = {
-        type: v('edit_type'), resourceName: v('edit_name'), status: $('edit_status').value,
+        typeFilter: $('edit_typeFilter').value,       // สำหรับ Tab Domain/Server
+        cloudProvider: $('edit_cloudProvider').value, // สำหรับ Cloud Provider
+        type: $('edit_cloudProvider').value,          // ส่งกลับไปทับฟิลด์เดิมใน backend เผื่อไว้
+        resourceName: v('edit_name'), status: $('edit_status').value,
         domain: v('edit_domain'), ip: v('edit_ip'), sslExpiry: v('edit_ssl'),
         sysType: $('edit_sysType').value, note: v('edit_note'),
         swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
@@ -930,7 +956,8 @@
       allAssets.forEach(asset => {
         excelData.push({
           'หน่วยงาน': asset.agency || userAgency,
-          'Type': asset.typeFilter,
+          'Resource Type': asset.typeFilter,
+          'Cloud Provider': asset.cloudProvider || asset.type || '-',
           'IP Address': asset.ip || '-',
           'Domain Name': asset.domain || '-',
           'Resource_Name': asset.name || '-',
