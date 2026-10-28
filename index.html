@@ -68,7 +68,7 @@
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั้งหมด (Total)</p>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่กำลังใช้งาน (Active)</p>
             <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
           </div>
           <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">
@@ -80,19 +80,20 @@
         </div>
       </div>
 
+      <!-- Card 2: OS ที่หมดอายุ -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
-            <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
+            <p class="text-xs font-bold text-rose-500 uppercase tracking-wider">OS หมดระยะสนับสนุน (EOF)</p>
+            <h3 id="cardEof" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
-            <i class="fa-solid fa-power-off"></i>
+          <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-triangle-exclamation"></i>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
-          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ ควรปรับปรุง: <span id="cardEofSub">0</span></span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-shield-check"></i> ปกติ: <span id="cardSafeOs">0</span></span>
         </div>
       </div>
 
@@ -113,18 +114,18 @@
       </div>
 
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
-        <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
         <div class="flex justify-between items-start relative z-10">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่มี PDPA</p>
-            <h3 id="cardPdpa" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+            <h3 id="cardPdpa" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+          <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-fingerprint"></i>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
-          <span class="text-rose-600 flex items-center">
+          <span class="text-emerald-600 flex items-center">
             <i class="fa-solid fa-shield-halved mr-1.5"></i>ข้อมูลส่วนบุคคล
           </span>
         </div>
@@ -179,63 +180,52 @@
   <table id="mainTable" class="w-full text-xs border-collapse">
     <thead>
       <tr class="bg-theme text-white font-medium text-[12px] select-none whitespace-nowrap tracking-wide">
-        
         <th onclick="sortTable('index')" class="py-3.5 px-3 w-12 text-center th-sortable transition">
           <div class="flex items-center justify-center gap-1.5">
             # <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th onclick="sortTable('type')" class="py-3.5 px-4 text-center th-sortable transition min-w-[90px]">
           <div class="flex items-center justify-center gap-1.5">
             Type <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th onclick="sortTable('name')" class="py-3.5 px-4 text-center th-sortable transition min-w-[200px]">
           <div class="flex items-center justify-center gap-1.5">
             Resource Name <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th onclick="sortTable('domain')" class="py-3.5 px-4 text-center th-sortable transition min-w-[180px]">
           <div class="flex items-center justify-center gap-1.5">
             Domain Name <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th onclick="sortTable('ip')" class="py-3.5 px-4 text-center th-sortable transition min-w-[120px]">
           <div class="flex items-center justify-center gap-1.5">
             IP Public <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
           <div class="flex items-center justify-center gap-1.5">
             OS <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
         <th class="py-3.5 px-4 text-center min-w-[220px]">
           Software
         </th>
-        
         <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
           <div class="flex items-center justify-center gap-1.5">
             Impact <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
           </div>
         </th>
-        
-    <th onclick="sortTable('lastupdate')" class="py-3.5 px-4 text-center th-sortable transition min-w-[140px]">
-              <div class="flex items-center justify-center gap-1.5">
-                ผู้ประเมิน / อัปเดต <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
-              </div>
-            </th>
-        
+        <th onclick="sortTable('lastupdate')" class="py-3.5 px-4 text-center th-sortable transition min-w-[140px]">
+          <div class="flex items-center justify-center gap-1.5">
+            ผู้ประเมิน / อัปเดต <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
         <th class="py-3.5 px-4 text-center w-24">
           จัดการ
         </th>
-
       </tr>
     </thead>
     <tbody id="mainTableBody" class="divide-y divide-slate-100 bg-white text-center"></tbody>
@@ -449,7 +439,7 @@
               <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                 <i class="fa-solid fa-shield-halved text-emerald-500"></i> ประเมินความเสี่ยงทางไซเบอร์ (C-I-A)
               </h4>
-              <span id="edit_impactBadge" class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm transition">Impact: 1 - ต่ำ</span>
+              <span id="edit_impactBadge" class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm transition">Impact: LOW</span>
             </div>
 
             <!-- PDPA Card Toggle -->
@@ -472,27 +462,27 @@
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> ข้อมูลรั่วไหล (C)</label>
                 <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">1 - ต่ำ (หลุดรอดได้ ไม่รุนแรง)</option>
-                  <option value="2">2 - ปานกลาง (กระทบชื่อเสียง)</option>
-                  <option value="3">3 - สูง (ความลับองค์กร)</option>
+                  <option value="1">LOW (หลุดรอดได้ ไม่รุนแรง)</option>
+                  <option value="2">MEDIUM (กระทบชื่อเสียง)</option>
+                  <option value="3">HIGH (ความลับองค์กร)</option>
                 </select>
               </div>
               <!-- I -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ถูกแก้ไขปลอมแปลง (I)</label>
                 <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">1 - ต่ำ (เจตนาทำร้ายต่ำ)</option>
-                  <option value="2">2 - ปานกลาง (กระทบความถูกต้อง)</option>
-                  <option value="3">3 - สูง (ธุรกรรมเสียหาย/ทุจริต)</option>
+                  <option value="1">LOW (เจตนาทำร้ายต่ำ)</option>
+                  <option value="2">MEDIUM (กระทบความถูกต้อง)</option>
+                  <option value="3">HIGH (ธุรกรรมเสียหาย/ทุจริต)</option>
                 </select>
               </div>
               <!-- A -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ระบบล่มใช้งานไม่ได้ (A)</label>
                 <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">1 - ต่ำ (หยุดได้เกิน 24 ชม.)</option>
-                  <option value="2">2 - ปานกลาง (หยุดได้ไม่เกิน 4 ชม.)</option>
-                  <option value="3">3 - สูง (พร้อมใช้ 24/7 ล่มไม่ได้)</option>
+                  <option value="1">LOW (หยุดได้เกิน 24 ชม.)</option>
+                  <option value="2">MEDIUM (หยุดได้ไม่เกิน 4 ชม.)</option>
+                  <option value="3">HIGH (พร้อมใช้ 24/7 ล่มไม่ได้)</option>
                 </select>
               </div>
             </div>
@@ -678,14 +668,31 @@
 
     // ---------- dashboard ----------
     function updateCardDashboard() {
-      const total = allAssets.length;
+      // 1. คัดเฉพาะรายการที่ 'ใช้งาน' มาคำนวณ Dashboard ให้ตรงกับตาราง
+      const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
+      const totalActive = activeAssets.length;
       
       const typeCounts = {};
-      allAssets.forEach(item => {
+      let eofCount = 0;
+      let assessedCount = 0;
+      let pdpaCount = 0;
+
+      activeAssets.forEach(item => {
+        // นับ Cloud Type
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
+
+        // นับจำนวน OS ที่มีสถานะ EOF
+        if (item.os && item.os.toUpperCase().includes('EOF')) {
+          eofCount++;
+        }
+
+        // นับอื่นๆ
+        if (item.isSaved) assessedCount++;
+        if (item.pdpa) pdpaCount++;
       });
 
+      // สร้าง HTML แสดงผลบน Card ที่ 1
       let cloudStatsHtml = '';
       const allTypes = ["Domain", ...TYPES.map(t => t[1].trim())]; 
       
@@ -696,34 +703,27 @@
            delete typeCounts[type];
         }
       });
-
       Object.keys(typeCounts).forEach(type => {
          cloudStatsHtml += `<span><i class="fa-solid fa-server text-slate-400 mr-1"></i>${type}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
       });
 
-      $('cardTotal').textContent = total;
+      // อัปเดตตัวเลขลงในการ์ดทั้ง 4 ใบ
+      $('cardTotal').textContent = totalActive;
       const statsContainer = document.getElementById('cloudTypeStats');
       if (statsContainer) statsContainer.innerHTML = cloudStatsHtml;
 
-      let activeCount = 0, assessedCount = 0, pdpaCount = 0;
-      allAssets.forEach(item => {
-        const isActive = item.status === 'ใช้งาน';
-        if (isActive) {
-          activeCount++;
-          if (item.pdpa) pdpaCount++;
-          if (item.isSaved) assessedCount++;
-        }
-      });
+      // Card 2: OS EOF
+      if($('cardEof')) $('cardEof').textContent = eofCount;
+      if($('cardEofSub')) $('cardEofSub').textContent = eofCount;
+      if($('cardSafeOs')) $('cardSafeOs').textContent = totalActive - eofCount;
 
-      const inactiveCount = total - activeCount;
-      const pendingCount = activeCount - assessedCount;
-
-      $('cardActive').textContent = activeCount;
-      $('cardActiveSub').textContent = activeCount;
-      $('cardInactive').textContent = inactiveCount < 0 ? 0 : inactiveCount;
+      // Card 3: Assessed
+      const pendingCount = totalActive - assessedCount;
       $('cardAssessed').textContent = assessedCount;
       $('cardAssessedSub').textContent = assessedCount;
-      $('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
+      if($('cardPending')) $('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
+
+      // Card 4: PDPA
       $('cardPdpa').textContent = pdpaCount;
     }
 
@@ -784,113 +784,7 @@
         el.classList.add('bg-white', 'text-slate-800');
       }
     }
-/*
-    function renderMainTable() {
-      // กรองเอาเฉพาะข้อมูลที่ไม่ใช่ 'ไม่ใช้งาน' (แสดงแค่ 'ใช้งาน' หรือ 'ช่องว่าง')
-      const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
-      const htmlRows = filteredAssets.map((item, idx) => {
-        const badgeType = getCloudBadgeHtml(item.typeFilter);
-
-        let impactBadgeHtml = "-";
-        if (item.isSaved) {
-          const impact = item.impact || 1;
-          impactBadgeHtml = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-            impact === 1 ? 'bg-emerald-500 text-white' : impact === 2 ? 'bg-amber-400 text-slate-900' : 'bg-rose-600 text-white'
-          }">${impact}</span>`;
-        }
-
-// คอลัมน์ OS พร้อม Icon (ไอคอนอยู่บน ชื่ออยู่ล่าง)
-        let osHtml = `<span class="text-slate-300">-</span>`;
-        if (item.os) {
-          const osUpper = item.os.toUpperCase();
-          const osHasEof = osUpper.includes('EOF');
-          const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
-          
-          // ตรวจสอบชื่อ OS เพื่อเลือก Icon และสีประจำแบรนด์
-          let iconClass = "fa-solid fa-compact-disc text-slate-400"; // ค่าเริ่มต้น
-          
-          if (osUpper.includes("UBUNTU")) {
-            iconClass = "fa-brands fa-ubuntu text-orange-500";
-          } else if (osUpper.includes("WINDOWS")) {
-            iconClass = "fa-brands fa-windows text-sky-500";
-          } else if (osUpper.includes("REDHAT") || osUpper.includes("RHEL")) {
-            iconClass = "fa-brands fa-redhat text-red-600";
-          } else if (osUpper.includes("SUSE")) {
-            iconClass = "fa-brands fa-suse text-emerald-500";
-          } else if (osUpper.includes("FEDORA")) {
-            iconClass = "fa-brands fa-fedora text-blue-600";
-          } else if (osUpper.includes("CENTOS")) {
-            iconClass = "fa-brands fa-linux text-purple-600"; // CentOS ใช้เพนกวินสีม่วง
-          } else if (osUpper.includes("ALMA")) {
-            iconClass = "fa-brands fa-linux text-blue-400"; // AlmaLinux ใช้เพนกวินสีฟ้า
-          } else if (osUpper.includes("ROCKY")) {
-            iconClass = "fa-brands fa-linux text-emerald-600"; // Rocky ใช้เพนกวินสีเขียว
-          } else if (osUpper.includes("DEBIAN")) {
-            iconClass = "fa-brands fa-linux text-rose-600"; // Debian ใช้เพนกวินสีแดง
-          } else if (osUpper.includes("LINUX")) {
-            iconClass = "fa-brands fa-linux text-slate-700"; // Linux ทั่วไป
-          }
-          
-          // หากสถานะเป็น EOF (หมดอายุ) ให้บังคับเปลี่ยนสีไอคอนเป็นสีแดงเข้ม
-          if (osHasEof) {
-            iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
-          }
-
-          osHtml = `
-            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${escapeHtml(item.os)}">
-              <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
-              <span class="truncate w-full text-[9px] ${osTextClass}">${escapeHtml(item.os)}</span>
-            </div>
-          `;
-        }
-
-        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
-        const swParts = [];
-        if (item.swApp) swParts.push(escapeHtml(item.swApp));
-        if (item.swFe) swParts.push(escapeHtml(item.swFe));
-        if (item.swBe) swParts.push(escapeHtml(item.swBe));
-        if (item.swDb) swParts.push(escapeHtml(item.swDb));
-        
-        let swStack = swParts.length > 0 
-          ? `<div class="truncate w-full max-w-[180px] mx-auto text-[10px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
-          : `<span class="text-slate-300 font-medium">-</span>`;
-
-        let lastUpdateStr = '-', ts = 0;
-        if (item.lastUpdate) {
-          const d = new Date(item.lastUpdate);
-          if (!isNaN(d)) {
-            ts = d.getTime();
-            lastUpdateStr = d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) +
-              ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
-          }
-        }
-
-        // เนื่องจากเรากรองเอาเฉพาะที่ใช้งานมาแล้ว จึงไม่ต้องใส่คลาส row-disabled ทำสีทึบอีก
-        return `
-          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
-            <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
-            <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
-            <td class="py-3 px-4 text-center"><div class="cell-name text-slate-800 font-bold mx-auto">${escapeHtml(item.name)}</div></td>
-            <td class="py-3 px-4 text-center text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
-            <td class="py-3 px-4 text-center font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
-            <td class="py-3 px-3 text-center text-[10px] font-medium cell-os">${osHtml}</td>
-            <td class="py-3 px-4 text-center cell-sw">${swStack}</td>
-            <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
-            <td class="py-3 px-3 text-center text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
-            <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate" data-ts="${ts}">${lastUpdateStr}</td>
-            <td class="py-3 px-3 text-center">
-              <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-3 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-pen-to-square"></i> <span>แก้ไข</span>
-              </button>
-            </td>
-          </tr>`;
-      });
-
-      $('mainTableBody').innerHTML = htmlRows.length
-        ? htmlRows.join('')
-        : `<tr><td colspan="11" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล (ไม่มีระบบที่กำลังใช้งานในหน่วยงานของท่าน)</td></tr>`;
-    }*/
     function renderMainTable() {
       // กรองเอาเฉพาะข้อมูลที่ไม่ใช่ 'ไม่ใช้งาน'
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
@@ -901,7 +795,6 @@
         let impactBadgeHtml = "-";
         if (item.isSaved) {
           const impact = item.impact || 1;
-          // กำหนดข้อความและสีตามระดับ Impact
           const impactText = impact === 1 ? 'LOW' : impact === 2 ? 'MEDIUM' : 'HIGH';
           const impactClass = impact === 1 ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 
                               impact === 2 ? 'bg-amber-100 text-amber-700 border-amber-300' : 
@@ -969,23 +862,10 @@
         const ipHtml = item.ip 
           ? `<div class="truncate w-full max-w-[110px] mx-auto font-mono font-semibold text-sky-600 cell-ip" title="${escapeHtml(item.ip)}">${escapeHtml(item.ip)}</div>`
           : `<span class="text-slate-300 cell-ip">-</span>`;
-        const contactHtml = item.contact 
-          ? `<div class="truncate w-full max-w-[110px] mx-auto contact-cell" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
-          : `<span class="text-slate-300 contact-cell">-</span>`;
-
-        return `
-          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
-            <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
-            <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
-            <td class="py-3 px-4 text-center">${resNameHtml}</td>
-            <td class="py-3 px-4 text-center">${domainHtml}</td>
-            <td class="py-3 px-4 text-center">${ipHtml}</td>
-            <td class="py-3 px-3 text-center cell-os">${osHtml}</td>
-            <td class="py-3 px-4 text-center cell-sw">${swStack}</td>
-            <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
-const contactName = item.contact 
-          ? `<div class="truncate w-full max-w-[120px] mx-auto text-slate-700 font-bold" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
-          : `<div class="text-slate-300">-</div>`;
+          
+        const contactName = item.contact 
+          ? `<div class="truncate w-full max-w-[120px] mx-auto text-slate-700 font-bold contact-cell" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
+          : `<div class="text-slate-300 contact-cell">-</div>`;
         const dateStr = `<div class="text-[9px] text-slate-500 mt-0.5" title="${lastUpdateStr}"><i class="fa-regular fa-clock"></i> ${lastUpdateStr}</div>`;
         
         const combinedUpdateHtml = `
@@ -1014,7 +894,7 @@ const contactName = item.contact
           </tr>`;
       });
 
-$('mainTableBody').innerHTML = htmlRows.length
+      $('mainTableBody').innerHTML = htmlRows.length
         ? htmlRows.join('')
         : `<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล (ไม่มีระบบที่กำลังใช้งานในหน่วยงานของท่าน)</td></tr>`;
 
@@ -1038,7 +918,6 @@ $('mainTableBody').innerHTML = htmlRows.length
           valB = parseInt(b.querySelector('.cell-index').textContent, 10) || 0;
         }
         if (column === 'type') { valA = a.querySelector('.cell-type').getAttribute('data-type'); valB = b.querySelector('.cell-type').getAttribute('data-type'); }
-      
         if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
         if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
         if (column === 'name') { valA = a.querySelector('.cell-name').innerText; valB = b.querySelector('.cell-name').innerText; }
@@ -1104,7 +983,7 @@ $('mainTableBody').innerHTML = htmlRows.length
     }
 
     // ---------- Edit / Add modal ----------
-function calcImpact() {
+    function calcImpact() {
       const hasPdpa = $('edit_pdpa').checked;
       const c = parseInt($('edit_c').value);
       const i = parseInt($('edit_i').value);
@@ -1112,7 +991,6 @@ function calcImpact() {
       let impact = Math.max(c, i, a);
       if (hasPdpa && impact < 2) impact = 2;
       
-      // เปลี่ยนข้อความตรงนี้
       const map = {
         1: ['Impact: LOW', 'bg-emerald-100 text-emerald-700 border-emerald-300'],
         2: ['Impact: MEDIUM', 'bg-amber-100 text-amber-700 border-amber-300'],
@@ -1134,6 +1012,7 @@ function calcImpact() {
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
       $('edit_ssl').value = a.sslExpiry || "";
+      
       let sslDisp = document.getElementById('ssl_display');
       if (a.sslExpiry) {
         sslDisp.innerText = a.sslExpiry;
@@ -1145,7 +1024,6 @@ function calcImpact() {
         sslDisp.classList.add('text-slate-400');
       }
       
-      
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
@@ -1153,7 +1031,6 @@ function calcImpact() {
       let osSelect = $('edit_os');
       let osVal = a.os || "";
       
-      // กรณีค่าที่มาจาก DB ไม่มีใน List ให้เพิ่ม Option ลงไปชั่วคราวเพื่อให้แสดงค่าได้ถูกต้อง
       let exists = Array.from(osSelect.options).some(opt => opt.value === osVal);
       if (!exists && osVal) {
         osSelect.add(new Option(osVal, osVal));
@@ -1251,7 +1128,7 @@ function calcImpact() {
     }
 
     // ---------- export ----------
-   function exportToExcel() {
+    function exportToExcel() {
       const excelData = [];
       
       // กรองข้อมูล: คัดเอาเฉพาะรายการที่สถานะไม่ใช่ 'ไม่ใช้งาน'
