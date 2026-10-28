@@ -35,7 +35,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.0.0</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.1.0</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -140,11 +140,16 @@
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
               <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "ประเมิน" เพื่อตรวจสอบข้อมูลและบันทึกผลกระทบความเสี่ยง</p>
+            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "แก้ไข" เพื่อตรวจสอบ แก้ไขข้อมูล และบันทึกผลกระทบความเสี่ยง หรือกด "เพิ่มข้อมูล" เพื่อเพิ่มระบบใหม่</p>
           </div>
-          <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
-            <i class="fa-solid fa-file-excel mr-2 text-sm"></i> ดาวน์โหลด Excel
-          </button>
+          <div class="flex gap-2 w-full sm:w-auto">
+            <button onclick="openAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-plus mr-2 text-sm"></i> เพิ่มข้อมูล
+            </button>
+            <button onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-file-excel mr-2 text-sm"></i> ดาวน์โหลด Excel
+            </button>
+          </div>
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
@@ -156,6 +161,11 @@
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
+            <select id="typeFilterSelect" onchange="applyFilterAndPagination(true)" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
+              <option value="all">ทุก Type</option>
+              <option value="domain">Domain</option>
+              <option value="server">Server</option>
+            </select>
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             <div class="flex items-center gap-2.5">
               <span class="font-medium">แสดง:</span>
@@ -266,67 +276,85 @@
     </div>
   </div>
 
-  <!-- Edit Modal: ประเมินความเสี่ยงระบบ -->
+  <!-- Edit / Add Modal -->
   <div id="editAssetModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
 
       <div class="bg-theme px-6 py-4 flex justify-between items-center text-white border-b border-white/10 shrink-0">
         <h3 id="editModalTitle" class="text-sm font-bold flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ
+          <i class="fa-solid fa-pen-to-square"></i> แก้ไข/ประเมินความเสี่ยงระบบ
         </h3>
         <button type="button" onclick="closeEditModal()" class="text-slate-400 hover:text-white font-bold text-2xl leading-none">&times;</button>
       </div>
 
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
         <div class="p-5 space-y-4 overflow-y-auto">
-          
+
           <!-- 1. ข้อมูลระบบ -->
           <section class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
               <h4 class="font-bold text-slate-800">ข้อมูลระบบ (System Info)</h4>
+              <span id="edit_idBadge" class="text-[10px] text-slate-400 font-mono"></span>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name)</label>
-                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                <label class="font-bold mb-1 block text-slate-700">หน่วยงาน (Agency)</label>
+                <input type="text" id="edit_agency" list="agencyList" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-500">
+                <datalist id="agencyList"></datalist>
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">Type</label>
+                <input type="text" id="edit_type" list="typeList" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                <datalist id="typeList"><option value="Domain"><option value="Server"></datalist>
+              </div>
+              <div class="md:col-span-2">
+                <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
+                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
               <div>
                 <label class="font-bold mb-1 block text-slate-700">สถานะ (Status)</label>
-                <select id="edit_status" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                <select id="edit_status" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
                   <option value="ใช้งาน">✅ ใช้งาน (Active)</option>
                   <option value="ไม่ใช้งาน">❌ ไม่ใช้งาน (Inactive)</option>
                 </select>
               </div>
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
-                <select id="edit_sysType" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">Domain Name</label>
+                <input type="text" id="edit_domain" maxlength="300" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">IP Public</label>
+                <input type="text" id="edit_ip" maxlength="100" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">SSL Expiry <span class="font-normal text-slate-400">(YYYY-MM-DD)</span></label>
+                <input type="text" id="edit_ssl" placeholder="2026-12-31" maxlength="30" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
               <div class="md:col-span-2">
+                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
+                <select id="edit_sysType" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">OwnerGroup <span class="font-normal text-slate-400">(admin)</span></label>
+                <input type="text" id="edit_owners" placeholder="email1, email2" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-100 disabled:text-slate-500">
+              </div>
+              <div class="md:col-span-3">
                 <label class="font-bold mb-1 block text-slate-700">หมายเหตุ</label>
-                <input type="text" id="edit_note" maxlength="300" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                <input type="text" id="edit_note" maxlength="300" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
               </div>
             </div>
 
-            <!-- ช่องกรอกข้อความ 4 ช่องแยกกันตามชีต -->
             <div class="space-y-3 mt-3 pt-3 border-t border-slate-200">
               <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
-                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Frontend</label>
-                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Backend</label>
-                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">Database</label>
-                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL v8.0" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
+                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
+                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Frontend</label>
+                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Backend</label>
+                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Database</label>
+                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL v8.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
               </div>
             </div>
           </section>
@@ -377,8 +405,8 @@
 
         <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
           <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">ยกเลิก</button>
-          <!-- ปุ่มนี้จะทำงานบันทึกแค่ ID เดียวเท่านั้น (ตรวจสอบแล้ว) -->
-          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-save mr-1"></i> บันทึกข้อมูลการประเมิน</button>
+          <!-- ส่งเฉพาะ id ที่กำลังแก้ไขเท่านั้น -->
+          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-save mr-1"></i> บันทึกข้อมูล</button>
         </div>
       </form>
     </div>
@@ -420,9 +448,12 @@
   <script>
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
+    const $ = id => document.getElementById(id);
+
     let userAgency = "";
     let userEmail = "";
     let userName = "";
+    let userIsAdmin = false;
     let allAssets = [];
     let sessionTimerId = null;
 
@@ -430,6 +461,8 @@
     let currentPage = 1;
     let pageSize = 10;
     let sortDirection = {};
+    let editingAssetId = null;
+    let editMode = 'edit'; // 'edit' | 'add'
 
     // ---------- helpers ----------
     function getToken() { return sessionStorage.getItem('access_token') || ""; }
@@ -492,13 +525,13 @@
         }
         const m = Math.floor(left / 60000);
         const s = Math.floor((left % 60000) / 1000);
-        document.getElementById('sessionTimer').textContent =
+        $('sessionTimer').textContent =
           String(m).padStart(2, '0') + ":" + String(s).padStart(2, '0');
       }, 1000);
     }
 
     async function loadDataFromCloud() {
-      const overlay = document.getElementById('loadingOverlay');
+      const overlay = $('loadingOverlay');
       if (overlay) overlay.classList.remove('hidden', 'opacity-0');
 
       const res = await callBackend("getAllRiskCloudData");
@@ -510,8 +543,9 @@
           userAgency = res.user.agency || "";
           userEmail = res.user.email || "";
           userName = res.user.fullname || "";
-          document.getElementById('profileName').textContent = userName;
-          document.getElementById('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
+          userIsAdmin = !!res.user.isAdmin;
+          $('profileName').textContent = userName;
+          $('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
         }
 
         renderMainTable();
@@ -540,22 +574,22 @@
       window.location.href = "auth.html";
     }
 
-    function openLogoutModal() { document.getElementById('logoutModal').classList.remove('hidden'); }
-    function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
-    function closeAnnouncement() { document.getElementById('announcementPopup').classList.add('hidden'); }
-    function closeSuccessPopup() { document.getElementById('successPopup').classList.add('hidden'); }
+    function openLogoutModal() { $('logoutModal').classList.remove('hidden'); }
+    function closeLogoutModal() { $('logoutModal').classList.add('hidden'); }
+    function closeAnnouncement() { $('announcementPopup').classList.add('hidden'); }
+    function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
+    function closeModal() { $('infoModal').classList.add('hidden'); }
 
     // ---------- dashboard ----------
     function updateCardDashboard() {
       const total = allAssets.length;
-      const totalDomain = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() === 'domain').length;
+      const totalDomain = allAssets.filter(item => (item.typeFilter || '').trim().toLowerCase() === 'domain').length;
       const totalServer = total - totalDomain;
 
       let activeCount = 0, assessedCount = 0, pdpaCount = 0;
 
       allAssets.forEach(item => {
         const isActive = item.status === 'ใช้งาน';
-
         if (isActive) {
           activeCount++;
           if (item.pdpa) pdpaCount++;
@@ -566,16 +600,16 @@
       const inactiveCount = total - activeCount;
       const pendingCount = activeCount - assessedCount;
 
-      document.getElementById('cardTotal').textContent = total;
-      document.getElementById('cardTotalDomain').innerHTML = `<i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: ${totalDomain}`;
-      document.getElementById('cardTotalServer').innerHTML = `<i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: ${totalServer}`;
-      document.getElementById('cardActive').textContent = activeCount;
-      document.getElementById('cardActiveSub').textContent = activeCount;
-      document.getElementById('cardInactive').textContent = inactiveCount < 0 ? 0 : inactiveCount;
-      document.getElementById('cardAssessed').textContent = assessedCount;
-      document.getElementById('cardAssessedSub').textContent = assessedCount;
-      document.getElementById('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
-      document.getElementById('cardPdpa').textContent = pdpaCount;
+      $('cardTotal').textContent = total;
+      $('cardTotalDomain').innerHTML = `<i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: ${totalDomain}`;
+      $('cardTotalServer').innerHTML = `<i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: ${totalServer}`;
+      $('cardActive').textContent = activeCount;
+      $('cardActiveSub').textContent = activeCount;
+      $('cardInactive').textContent = inactiveCount < 0 ? 0 : inactiveCount;
+      $('cardAssessed').textContent = assessedCount;
+      $('cardAssessedSub').textContent = assessedCount;
+      $('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
+      $('cardPdpa').textContent = pdpaCount;
     }
 
     // ---------- main table ----------
@@ -591,29 +625,17 @@
     ];
 
     function initEditModal() {
-      document.getElementById('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
+      $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
     function renderMainTable() {
-      const tbody = document.getElementById('mainTableBody');
-      tbody.innerHTML = '';
-      let count = 0;
-      const htmlRows = [];
-
-      allAssets.forEach((item) => {
-        // ดึงเฉพาะ Domain (ปรับได้ถ้าต้องการให้โชว์ทุกอย่าง)
-        const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        if (!isDomain) return;
-
-        const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
-        const isActive = currentStatus === 'ใช้งาน';
-        
-        // รูปแบบ badge ของประเภท (Type)
-        const badgeType = isDomain 
+      const htmlRows = allAssets.map((item, idx) => {
+        const isDomain = (item.typeFilter || '').trim().toLowerCase() === 'domain';
+        const badgeType = isDomain
           ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe"></i> Domain</span>`
-          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> Server</span>`;
+          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> ${escapeHtml(item.typeFilter || 'Server')}</span>`;
 
         let impactBadgeHtml = "-";
         if (item.isSaved) {
@@ -623,61 +645,51 @@
           }">${impact}</span>`;
         }
 
-        // จัดรวมกลุ่มซอฟต์แวร์ให้อยู่คอลัมน์เดียวกัน
         const swStack = `
           <div class="text-[10px] space-y-0.5 leading-tight">
             <div><span class="font-bold text-slate-500 mr-1">App:</span> ${escapeHtml(item.swApp) || '-'}</div>
             <div><span class="font-bold text-slate-500 mr-1">FE:</span> ${escapeHtml(item.swFe) || '-'}</div>
             <div><span class="font-bold text-slate-500 mr-1">BE:</span> ${escapeHtml(item.swBe) || '-'}</div>
             <div><span class="font-bold text-slate-500 mr-1">DB:</span> ${escapeHtml(item.swDb) || '-'}</div>
-          </div>
-        `;
+          </div>`;
 
-        // แปลงวันที่ (ถ้ามีค่าส่งมาจาก Code.gs จะแสดง ถ้าไม่มีจะขึ้นขีด)
-        let lastUpdateStr = '-';
-        if (item.lastUpdate && item.lastUpdate !== "") {
+        let lastUpdateStr = '-', ts = 0;
+        if (item.lastUpdate) {
           const d = new Date(item.lastUpdate);
           if (!isNaN(d)) {
-            lastUpdateStr = d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) + 
-                            ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+            ts = d.getTime();
+            lastUpdateStr = d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) +
+              ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
           }
         }
 
-        // โครงสร้าง Table Row ตรงกับ Header ที่แก้ไข
-        htmlRows.push(`
-          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
-            <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${++count}</td>
+        const inactive = item.status !== 'ใช้งาน' ? ' row-disabled' : '';
+        return `
+          <tr class="asset-row hover:bg-slate-50/80 transition${inactive}" data-id="${escapeHtml(item.id)}">
+            <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
             <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
-            <td class="py-3 px-4">
-              <div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div>
-            </td>
+            <td class="py-3 px-4"><div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div></td>
             <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
-            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
-            
+            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
             <td class="py-2 px-4 cell-sw">${swStack}</td>
-            
-            <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact||1) : 0}">
-              ${impactBadgeHtml}
-            </td>
+            <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
             <td class="py-3 px-3 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
-            <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate">${lastUpdateStr}</td>
+            <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate" data-ts="${ts}">${lastUpdateStr}</td>
             <td class="py-3 px-3 text-center">
               <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-3 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center gap-1.5">
-                <i class="fa-solid fa-pen-to-square"></i> <span>ประเมิน</span>
+                <i class="fa-solid fa-pen-to-square"></i> <span>แก้ไข</span>
               </button>
             </td>
-          </tr>`);
+          </tr>`;
       });
 
-      if (htmlRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เป็น Domain</td></tr>';
-      } else {
-        tbody.innerHTML = htmlRows.join('');
-      }
+      $('mainTableBody').innerHTML = htmlRows.length
+        ? htmlRows.join('')
+        : `<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล — ตรวจสอบว่าหน่วยงานในชีตตรงกับ "${escapeHtml(userAgency)}" และ OwnerGroup ของท่าน</td></tr>`;
     }
 
     function sortTable(column) {
-      const tbody = document.getElementById('mainTableBody');
+      const tbody = $('mainTableBody');
       const rows = Array.from(tbody.querySelectorAll('.asset-row'));
       sortDirection[column] = !sortDirection[column];
       const asc = sortDirection[column];
@@ -694,9 +706,9 @@
         if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
         if (column === 'name') { valA = a.querySelector('.cell-name').innerText; valB = b.querySelector('.cell-name').innerText; }
         if (column === 'impact') { valA = parseInt(a.querySelector('.cell-impact').getAttribute('data-impact')); valB = parseInt(b.querySelector('.cell-impact').getAttribute('data-impact')); }
-        if (column === 'lastupdate') { valA = a.querySelector('.cell-lastupdate').innerText; valB = b.querySelector('.cell-lastupdate').innerText; }
-        
-        if (column === 'index' || column === 'impact') return asc ? valA - valB : valB - valA;
+        if (column === 'lastupdate') { valA = Number(a.querySelector('.cell-lastupdate').dataset.ts) || 0; valB = Number(b.querySelector('.cell-lastupdate').dataset.ts) || 0; }
+
+        if (column === 'index' || column === 'impact' || column === 'lastupdate') return asc ? valA - valB : valB - valA;
         if (valA < valB) return asc ? -1 : 1;
         if (valA > valB) return asc ? 1 : -1;
         return 0;
@@ -708,10 +720,13 @@
 
     function applyFilterAndPagination(resetPage = false) {
       if (resetPage) currentPage = 1;
-      const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
+      const searchValue = $('searchInput').value.toLowerCase().trim();
+      const typeSel = $('typeFilterSelect').value;
       const rows = Array.from(document.querySelectorAll('#mainTableBody tr.asset-row'));
 
       const filteredRows = rows.filter((row) => {
+        const t = (row.querySelector('.cell-type').dataset.type || '').trim().toLowerCase();
+        if (typeSel !== 'all' && t !== typeSel) return false;
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
         const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
         const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
@@ -732,8 +747,8 @@
 
       filteredRows.slice(startIndex, endIndex).forEach(row => row.style.display = '');
 
-      document.getElementById('visibleCount').textContent = Math.max(0, Math.min(endIndex, totalFiltered) - startIndex);
-      document.getElementById('totalCount').textContent = rows.length;
+      $('visibleCount').textContent = Math.max(0, Math.min(endIndex, totalFiltered) - startIndex);
+      $('totalCount').textContent = rows.length;
 
       const ctrlDiv = document.querySelector('#paginationControls');
       if (ctrlDiv) {
@@ -743,23 +758,22 @@
       }
     }
 
-    function changePageSize() { pageSize = document.getElementById('pageSizeSelect').value; applyFilterAndPagination(true); }
+    function changePageSize() { pageSize = $('pageSizeSelect').value; applyFilterAndPagination(true); }
     function changePage(direction) { currentPage += direction; applyFilterAndPagination(); }
     function resetFilters() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('pageSizeSelect').value = '10';
+      $('searchInput').value = '';
+      $('typeFilterSelect').value = 'all';
+      $('pageSizeSelect').value = '10';
       pageSize = 10;
       applyFilterAndPagination(true);
     }
 
-    // ---------- Edit modal (ประเมินความเสี่ยงระบบ) ----------
-    let editingAssetId = null;
-
+    // ---------- Edit / Add modal ----------
     function calcImpact() {
-      const hasPdpa = document.getElementById('edit_pdpa').checked;
-      const c = parseInt(document.getElementById('edit_c').value);
-      const i = parseInt(document.getElementById('edit_i').value);
-      const a = parseInt(document.getElementById('edit_a').value);
+      const hasPdpa = $('edit_pdpa').checked;
+      const c = parseInt($('edit_c').value);
+      const i = parseInt($('edit_i').value);
+      const a = parseInt($('edit_a').value);
       let impact = Math.max(c, i, a);
       if (hasPdpa && impact < 2) impact = 2;
       const map = {
@@ -767,116 +781,116 @@
         2: ['Impact: 2 - ปานกลาง', 'bg-amber-100 text-amber-700 border-amber-300'],
         3: ['Impact: 3 - สูง', 'bg-rose-100 text-rose-700 border-rose-300']
       };
-      const badge = document.getElementById('edit_impactBadge');
+      const badge = $('edit_impactBadge');
       badge.textContent = map[impact][0];
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
+    }
+
+    function setForm(a) {
+      $('agencyList').innerHTML = [...new Set(allAssets.map(x => x.agency).filter(Boolean))]
+        .map(v => `<option value="${escapeHtml(v)}">`).join('');
+
+      $('edit_agency').value = a.agency || userAgency || "";
+      $('edit_agency').disabled = !userIsAdmin;
+      $('edit_owners').value = a.owners || "";
+      $('edit_owners').disabled = !userIsAdmin;
+
+      $('edit_type').value = a.typeFilter || "";
+      $('edit_name').value = a.name || "";
+      $('edit_status').value = a.status || 'ใช้งาน';
+      $('edit_domain').value = a.domain || "";
+      $('edit_ip').value = a.ip || "";
+      $('edit_ssl').value = a.sslExpiry || "";
+      $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
+      $('edit_note').value = a.note || "";
+      $('edit_swApp').value = a.swApp || "";
+      $('edit_swFe').value = a.swFe || "";
+      $('edit_swBe').value = a.swBe || "";
+      $('edit_swDb').value = a.swDb || "";
+      $('edit_pdpa').checked = a.pdpa === true;
+      $('edit_c').value = a.c || 1;
+      $('edit_i').value = a.i || 1;
+      $('edit_a').value = a.a || 1;
+      calcImpact();
+    }
+
+    function openAddModal() {
+      editMode = 'add';
+      editingAssetId = null;
+      $('editModalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> เพิ่มข้อมูลระบบใหม่';
+      $('edit_idBadge').textContent = 'ID: (สร้างอัตโนมัติ)';
+      setForm({ agency: userAgency, typeFilter: 'Domain', status: 'ใช้งาน' });
+      $('editAssetModal').classList.remove('hidden');
     }
 
     function openEditModal(id) {
       const asset = allAssets.find(a => String(a.id) === String(id));
       if (!asset) return;
-      
+      editMode = 'edit';
       editingAssetId = id;
-
-      document.getElementById('editModalTitle').innerHTML =
-        '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยง: ' + escapeHtml(asset.name || asset.domain || asset.ip);
-
-      document.getElementById('edit_name').value = asset.name || "";
-      document.getElementById('edit_status').value = asset.status || (asset.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
-      document.getElementById('edit_sysType').value = asset.sysType || "ระบบบริการ (Web Services)";
-      document.getElementById('edit_note').value = asset.note || "";
-      
-      document.getElementById('edit_swApp').value = asset.swApp || "";
-      document.getElementById('edit_swFe').value = asset.swFe || "";
-      document.getElementById('edit_swBe').value = asset.swBe || "";
-      document.getElementById('edit_swDb').value = asset.swDb || "";
-
-      document.getElementById('edit_pdpa').checked = asset.pdpa === true;
-      document.getElementById('edit_c').value = asset.c || 1;
-      document.getElementById('edit_i').value = asset.i || 1;
-      document.getElementById('edit_a').value = asset.a || 1;
-
-      calcImpact();
-      document.getElementById('editAssetModal').classList.remove('hidden');
+      $('editModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> แก้ไข/ประเมิน: ' +
+        escapeHtml(asset.name || asset.domain || asset.ip);
+      $('edit_idBadge').textContent = 'ID: ' + asset.id;
+      setForm(asset);
+      $('editAssetModal').classList.remove('hidden');
     }
 
     function closeEditModal() {
-      document.getElementById('editAssetModal').classList.add('hidden');
+      $('editAssetModal').classList.add('hidden');
       editingAssetId = null;
     }
 
-    // บันทึกเฉพาะ 1 รายการนี้ (ส่ง array 1 ชิ้น)
     async function saveSingleAssessment(e) {
       e.preventDefault();
-      if (!editingAssetId) return;
+      const isAdd = editMode === 'add';
+      if (!isAdd && !editingAssetId) return;
 
-      const btn = document.getElementById('btnSaveModal');
+      const btn = $('btnSaveModal');
       const originalBtnHtml = btn.innerHTML;
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> กำลังบันทึก...';
       btn.disabled = true;
 
-      const hasPdpa = document.getElementById('edit_pdpa').checked;
-      const cVal = parseInt(document.getElementById('edit_c').value);
-      const iVal = parseInt(document.getElementById('edit_i').value);
-      const aVal = parseInt(document.getElementById('edit_a').value);
+      const v = id => $(id).value.trim();
+      const hasPdpa = $('edit_pdpa').checked;
+      const cVal = parseInt($('edit_c').value), iVal = parseInt($('edit_i').value), aVal = parseInt($('edit_a').value);
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
-      // ระบบส่ง Payload แค่ 1 Object (ID ที่กำลังแก้เท่านั้น มั่นใจได้ว่าแก้เฉพาะ ID นี้)
-      const payload = [{
-        id: editingAssetId,
-        resourceName: document.getElementById('edit_name').value,
-        status: document.getElementById('edit_status').value,
-        sysType: document.getElementById('edit_sysType').value,
-        note: document.getElementById('edit_note').value,
-        swApp: document.getElementById('edit_swApp').value,
-        swFe: document.getElementById('edit_swFe').value,
-        swBe: document.getElementById('edit_swBe').value,
-        swDb: document.getElementById('edit_swDb').value,
-        pdpa: hasPdpa,
-        c: cVal,
-        i: iVal,
-        a: aVal,
-        impact: impactVal
-      }];
+      const item = {
+        type: v('edit_type'), resourceName: v('edit_name'), status: $('edit_status').value,
+        domain: v('edit_domain'), ip: v('edit_ip'), sslExpiry: v('edit_ssl'),
+        sysType: $('edit_sysType').value, note: v('edit_note'),
+        swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
+        pdpa: hasPdpa, c: cVal, i: iVal, a: aVal, impact: impactVal
+      };
+      if (userIsAdmin) { item.agency = v('edit_agency'); item.owners = v('edit_owners'); }
 
-      const res = await callBackend("saveAssessmentData", { assets: payload });
+      let res;
+      if (isAdd) {
+        res = await callBackend("addAssetData", { asset: item });
+      } else {
+        item.id = editingAssetId; // ส่งเฉพาะ id ที่กำลังแก้
+        res = await callBackend("saveAssessmentData", { assets: [item] });
+      }
 
       btn.innerHTML = originalBtnHtml;
       btn.disabled = false;
 
-      if (res && res.success) {
-        // อัปเดตข้อมูลใน allAssets ในฝั่ง UI ด้วยค่าใหม่
-        const assetIndex = allAssets.findIndex(a => String(a.id) === String(editingAssetId));
-        if (assetIndex > -1) {
-          allAssets[assetIndex].name = payload[0].resourceName;
-          allAssets[assetIndex].status = payload[0].status;
-          allAssets[assetIndex].sysType = payload[0].sysType;
-          allAssets[assetIndex].note = payload[0].note;
-          allAssets[assetIndex].swApp = payload[0].swApp;
-          allAssets[assetIndex].swFe = payload[0].swFe;
-          allAssets[assetIndex].swBe = payload[0].swBe;
-          allAssets[assetIndex].swDb = payload[0].swDb;
-          allAssets[assetIndex].pdpa = payload[0].pdpa;
-          allAssets[assetIndex].c = payload[0].c;
-          allAssets[assetIndex].i = payload[0].i;
-          allAssets[assetIndex].a = payload[0].a;
-          allAssets[assetIndex].impact = payload[0].impact;
-          allAssets[assetIndex].isSaved = true;
-          allAssets[assetIndex].contact = userName; // ผู้บันทึกล่าสุด
-          allAssets[assetIndex].lastUpdate = new Date().toISOString(); // อัปเดตเวลาจำลองบน UI
+      if (res && res.success && res.asset) {
+        if (isAdd) {
+          allAssets.push(res.asset);
+        } else {
+          const idx = allAssets.findIndex(a => String(a.id) === String(editingAssetId));
+          if (idx > -1) allAssets[idx] = res.asset;
         }
-
         renderMainTable();
         updateCardDashboard();
-        applyFilterAndPagination();
-
+        applyFilterAndPagination(isAdd);
         closeEditModal();
-        
-        document.getElementById('successMessage').textContent = res.message || "บันทึกข้อมูลเรียบร้อยแล้ว";
-        document.getElementById('successPopup').classList.remove('hidden');
+        $('successMessage').textContent = res.message || "บันทึกข้อมูลเรียบร้อยแล้ว";
+        $('successPopup').classList.remove('hidden');
       } else {
-        alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
+        alert("เกิดข้อผิดพลาดในการบันทึก: " + ((res && res.message) || "ไม่ทราบสาเหตุ"));
       }
     }
 
@@ -884,14 +898,13 @@
     function exportToExcel() {
       const excelData = [];
       allAssets.forEach(asset => {
-        if (!asset.typeFilter || asset.typeFilter.toLowerCase() !== 'domain') return; 
-
         excelData.push({
           'หน่วยงาน': asset.agency || userAgency,
           'Type': asset.typeFilter,
-          'IP Address': asset.ip || asset.privateIp || '-',
+          'IP Address': asset.ip || '-',
           'Domain Name': asset.domain || '-',
           'Resource_Name': asset.name || '-',
+          'SSL Expiry': asset.sslExpiry || '-',
           'ประเภทระบบ': asset.sysType || '-',
           'Application': asset.swApp || '-',
           'Frontend': asset.swFe || '-',
@@ -904,6 +917,7 @@
           'ระดับผลกระทบรวม': asset.impact || '',
           'สถานะ': asset.status || (asset.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน'),
           'ผู้บันทึกล่าสุด': asset.contact || '-',
+          'OwnerGroup': asset.owners || '-',
           'หมายเหตุ': asset.note || '-'
         });
       });
