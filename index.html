@@ -139,7 +139,6 @@
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
               <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "แก้ไข" เพื่อตรวจสอบ แก้ไขข้อมูล และบันทึกผลกระทบความเสี่ยง หรือกด "เพิ่มข้อมูล" เพื่อเพิ่มระบบใหม่</p>
           </div>
           <div class="flex gap-2 w-full sm:w-auto">
             <button onclick="openAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl transition shadow-sm">
@@ -177,45 +176,77 @@
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5 shadow-sm">
-          <table id="mainTable" class="w-full text-xs text-left border-collapse">
-            <thead>
-              <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th onclick="sortTable('index')" class="py-4 px-3 w-10 text-center th-sortable transition">
-                  # <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('type')" class="py-4 px-3 text-center th-sortable transition min-w-[80px]">
-                  Type <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('name')" class="py-4 px-4 min-w-[160px] th-sortable transition">
-                  Resource_Name <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('domain')" class="py-4 px-4 min-w-[150px] th-sortable transition">
-                  Domain_name <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('ip')" class="py-4 px-4 min-w-[110px] th-sortable transition">
-                  IP_Public <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('os')" class="py-4 px-3 min-w-[90px] th-sortable transition">
-                  OS <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th class="py-4 px-4 min-w-[180px]">
-                  Software <span class="font-normal opacity-70">(App | FE | BE | DB)</span>
-                </th>
-                <th onclick="sortTable('impact')" class="py-4 px-3 text-center min-w-[90px] th-sortable transition">
-                  Impact <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('contact')" class="py-4 px-3 min-w-[120px] th-sortable transition">
-                  Assessor <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('lastupdate')" class="py-4 px-3 min-w-[100px] th-sortable transition text-center">
-                  Last_Update <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th class="py-4 px-3 text-center w-24">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody id="mainTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
-          </table>
-        </div>
+  <table id="mainTable" class="w-full text-xs border-collapse">
+    <thead>
+      <tr class="bg-slate-800 text-white font-medium text-[12px] select-none whitespace-nowrap tracking-wide">
+        
+        <th onclick="sortTable('index')" class="py-3.5 px-3 w-12 text-center th-sortable transition">
+          <div class="flex items-center justify-center gap-1.5">
+            # <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('type')" class="py-3.5 px-4 text-center th-sortable transition min-w-[90px]">
+          <div class="flex items-center justify-center gap-1.5">
+            Type <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('name')" class="py-3.5 px-4 text-center th-sortable transition min-w-[200px]">
+          <div class="flex items-center justify-center gap-1.5">
+            Resource Name <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('domain')" class="py-3.5 px-4 text-center th-sortable transition min-w-[180px]">
+          <div class="flex items-center justify-center gap-1.5">
+            Domain Name <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('ip')" class="py-3.5 px-4 text-center th-sortable transition min-w-[120px]">
+          <div class="flex items-center justify-center gap-1.5">
+            IP Public <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
+          <div class="flex items-center justify-center gap-1.5">
+            OS <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th class="py-3.5 px-4 text-center min-w-[220px]">
+          Software <span class="font-normal opacity-70 ml-1">(App | FE | BE | DB)</span>
+        </th>
+        
+        <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
+          <div class="flex items-center justify-center gap-1.5">
+            Impact <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('contact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[140px]">
+          <div class="flex items-center justify-center gap-1.5">
+            ผู้ประเมิน <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th onclick="sortTable('lastupdate')" class="py-3.5 px-4 text-center th-sortable transition min-w-[130px]">
+          <div class="flex items-center justify-center gap-1.5">
+            อัปเดตล่าสุด <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
+          </div>
+        </th>
+        
+        <th class="py-3.5 px-4 text-center w-24">
+          จัดการ
+        </th>
+
+      </tr>
+    </thead>
+    <tbody id="mainTableBody" class="divide-y divide-slate-100 bg-white text-center"></tbody>
+  </table>
+</div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
           <div id="paginationControls" class="flex items-center gap-2 text-xs">
@@ -285,7 +316,7 @@
       </div>
 
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
-        <div class="p-5 space-y-4 overflow-y-auto">
+        <div class="p-5 space-y-5 overflow-y-auto bg-slate-50/50">
 
           <!-- Hidden inputs เพื่อไม่ให้บันทึกข้อมูลเสีย -->
           <input type="hidden" id="edit_agency">
@@ -293,49 +324,78 @@
           <input type="hidden" id="edit_owners">
 
           <!-- 1. ข้อมูลระบบ -->
-          <section class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-              <h4 class="font-bold text-slate-800">ข้อมูลระบบ (System Info)</h4>
-            </div>
+          <section class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h4 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-server text-sky-500"></i> ข้อมูลระบบ (System Info)
+            </h4>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">Type</label>
-                <select id="edit_type" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <!-- Type (4 cols) -->
+              <div class="md:col-span-4">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Type</label>
+                <select id="edit_type" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm"></select>
               </div>
-              <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
-                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              
+              <!-- Resource Name (8 cols) -->
+              <div class="md:col-span-8">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
+                <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm placeholder:text-slate-400" placeholder="ระบุชื่อระบบงาน">
               </div>
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">Domain Name</label>
-                <input type="text" id="edit_domain" maxlength="300" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+
+              <!-- Domain Name + SSL (8 cols) -->
+              <div class="md:col-span-8">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Domain Name & SSL Expiry</label>
+                <div class="flex border border-slate-300 bg-slate-50 rounded-xl focus-within:ring-2 focus-within:ring-sky-500 focus-within:bg-white focus-within:border-sky-500 transition shadow-sm overflow-hidden group">
+                  <input type="text" id="edit_domain" maxlength="300" class="w-full p-2.5 outline-none bg-transparent" placeholder="example.com">
+                  
+                  <!-- ส่วนเลือก SSL แบบฝังอยู่ใน Input -->
+                  <div class="flex items-center border-l border-slate-200 bg-slate-100 px-3 relative cursor-pointer hover:bg-slate-200 transition group-focus-within:border-sky-300">
+                    <div class="flex items-center gap-2">
+                      <span id="ssl_display" class="text-[10px] font-bold text-slate-400 whitespace-nowrap">ระบุ SSL</span>
+                      <i class="fa-solid fa-calendar-day text-slate-500 group-hover:text-sky-600 transition"></i>
+                    </div>
+                    <!-- ซ่อน input date ไว้ข้างบนให้กดโดนเสมอ -->
+                    <input type="date" id="edit_ssl" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                           onchange="
+                             let d = this.value; 
+                             let disp = document.getElementById('ssl_display');
+                             if(d) { disp.innerText = d; disp.classList.add('text-sky-600'); disp.classList.remove('text-slate-400'); } 
+                             else { disp.innerText = 'ระบุ SSL'; disp.classList.remove('text-sky-600'); disp.classList.add('text-slate-400'); }
+                           ">
+                  </div>
+                </div>
               </div>
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">IP Public</label>
-                <input type="text" id="edit_ip" maxlength="100" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+
+              <!-- IP Public (4 cols) -->
+              <div class="md:col-span-4">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">IP Public</label>
+                <input type="text" id="edit_ip" maxlength="100" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm font-mono text-sky-700 placeholder:text-slate-400" placeholder="192.168.x.x">
               </div>
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">SSL Expiry</label>
-                <input type="date" id="edit_ssl" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500 text-slate-700">
+
+              <!-- Sys Type (4 cols) -->
+              <div class="md:col-span-4">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">หมวดหมู่ระบบ (System Type)</label>
+                <select id="edit_sysType" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm"></select>
               </div>
-              <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
-                <select id="edit_sysType" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
-              </div>
-              <div class="md:col-span-2">
-                <label class="font-bold mb-1 block text-slate-700">หมายเหตุ</label>
-                <input type="text" id="edit_note" maxlength="300" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+
+              <!-- Note (8 cols) -->
+              <div class="md:col-span-8">
+                <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">หมายเหตุ (Note)</label>
+                <input type="text" id="edit_note" maxlength="300" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm placeholder:text-slate-400" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)">
               </div>
             </div>
 
-            <div class="space-y-3 mt-3 pt-3 border-t border-slate-200">
-              <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <!-- Dropdown OS พร้อมเช็ค EOF -->
-                <div>
-                  <label class="font-bold mb-1 block text-slate-600 text-[11px]">OS (ระบบปฏิบัติการ)</label>
-                  <select id="edit_os" onchange="handleOsColor(this)" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+            <!-- Software Stack -->
+            <div class="mt-6 pt-5 border-t border-slate-100">
+              <h5 class="font-bold text-slate-700 text-[12px] mb-3 flex items-center gap-1.5">
+                <i class="fa-brands fa-stack-overflow text-indigo-500"></i> ซอฟต์แวร์และเวอร์ชัน (Software Stack)
+              </h5>
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                
+                <!-- OS (4 cols) -->
+                <div class="md:col-span-4">
+                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">OS (ระบบปฏิบัติการ)</label>
+                  <select id="edit_os" onchange="handleOsColor(this)" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
                     <option value="">-- ไม่ระบุ --</option>
                     <optgroup label="Linux">
                       <option value="Ubuntu 20.04">Ubuntu 20.04</option>
@@ -362,65 +422,93 @@
                   </select>
                 </div>
                 
-                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
-                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
-                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Frontend</label>
-                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
-                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Backend</label>
-                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
-                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Database</label>
-                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL v8.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                <!-- App (4 cols) -->
+                <div class="md:col-span-4">
+                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Application</label>
+                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                </div>
+                
+                <!-- Frontend (4 cols) -->
+                <div class="md:col-span-4">
+                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Frontend</label>
+                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                </div>
+                
+                <!-- Backend (6 cols) -->
+                <div class="md:col-span-6">
+                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Backend</label>
+                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                </div>
+                
+                <!-- Database (6 cols) -->
+                <div class="md:col-span-6">
+                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Database</label>
+                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL 8.0, PostgreSQL" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                </div>
               </div>
             </div>
           </section>
 
           <!-- 2. C-I-A -->
-          <section class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-              <h4 class="font-bold text-slate-800">ประเมินผลกระทบความเสี่ยงทางไซเบอร์ (C-I-A)</h4>
-              <span id="edit_impactBadge" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300">Impact: 1 - ต่ำ</span>
+          <section class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+              <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-emerald-500"></i> ประเมินความเสี่ยงทางไซเบอร์ (C-I-A)
+              </h4>
+              <span id="edit_impactBadge" class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm transition">Impact: 1 - ต่ำ</span>
             </div>
 
-            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 hover:border-sky-300 transition">
-              <label for="edit_pdpa" class="font-bold text-slate-700 cursor-pointer w-full">ข้อมูลส่วนบุคคล (PDPA)</label>
-              <div class="flex items-center gap-2 shrink-0">
-                <input type="checkbox" id="edit_pdpa" onchange="calcImpact()" class="w-5 h-5 text-sky-600 rounded cursor-pointer">
-                <label for="edit_pdpa" class="text-xs cursor-pointer text-slate-600 font-medium">มีการจัดเก็บข้อมูลส่วนบุคคล</label>
+            <!-- PDPA Card Toggle -->
+            <label class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-sky-300 hover:bg-sky-50/30 cursor-pointer transition group">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm group-hover:border-sky-300 group-hover:text-sky-500 transition">
+                  <i class="fa-solid fa-fingerprint text-sm"></i>
+                </div>
+                <div>
+                  <div class="font-bold text-slate-700 text-xs">ข้อมูลส่วนบุคคล (PDPA)</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">ระบบนี้มีการจัดเก็บหรือประมวลผลข้อมูลส่วนบุคคลหรือไม่?</div>
+                </div>
               </div>
-            </div>
+              <input type="checkbox" id="edit_pdpa" onchange="calcImpact()" class="w-5 h-5 text-sky-600 rounded cursor-pointer border-slate-300 focus:ring-sky-500 transition">
+            </label>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <div class="bg-white p-3 rounded-xl border border-slate-200">
-                <label class="text-[11px] font-bold mb-1.5 block text-slate-500 text-center">ข้อมูลรั่วไหล (C)</label>
-                <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-xs outline-none focus:ring-1 focus:ring-sky-500">
+            <!-- CIA Grids -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- C -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> ข้อมูลรั่วไหล (C)</label>
+                <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
                   <option value="1">1 - ต่ำ (หลุดรอดได้ ไม่รุนแรง)</option>
-                  <option value="2">2 - ปานกลาง (กระทบชื่อเสียงเล็กน้อย)</option>
-                  <option value="3">3 - สูง (ข้อมูลสำคัญองค์กร/ความลับมาก)</option>
+                  <option value="2">2 - ปานกลาง (กระทบชื่อเสียง)</option>
+                  <option value="3">3 - สูง (ความลับองค์กร)</option>
                 </select>
               </div>
-              <div class="bg-white p-3 rounded-xl border border-slate-200">
-                <label class="text-[11px] font-bold mb-1.5 block text-slate-500 text-center">ข้อมูลถูกแก้ไขปลอมแปลง (I)</label>
-                <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-xs outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="1">1 - ต่ำ (แก้ไขได้ง่าย เจตนาทำร้ายต่ำ)</option>
-                  <option value="2">2 - ปานกลาง (กระทบความถูกต้องของงาน)</option>
-                  <option value="3">3 - สูง (ธุรกรรมเสียหาย เจตนาทุจริต)</option>
+              <!-- I -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ถูกแก้ไขปลอมแปลง (I)</label>
+                <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
+                  <option value="1">1 - ต่ำ (เจตนาทำร้ายต่ำ)</option>
+                  <option value="2">2 - ปานกลาง (กระทบความถูกต้อง)</option>
+                  <option value="3">3 - สูง (ธุรกรรมเสียหาย/ทุจริต)</option>
                 </select>
               </div>
-              <div class="bg-white p-3 rounded-xl border border-slate-200">
-                <label class="text-[11px] font-bold mb-1.5 block text-slate-500 text-center">ระบบล่มใช้งานไม่ได้ (A)</label>
-                <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-xs outline-none focus:ring-1 focus:ring-sky-500">
-                  <option value="1">1 - ต่ำ (หยุดงานได้เกิน 24 ชม.)</option>
-                  <option value="2">2 - ปานกลาง (หยุดทำงานได้ไม่เกิน 4 ชม.)</option>
-                  <option value="3">3 - สูง (ต้องพร้อมใช้ 24/7 ล่มไม่ได้เลย)</option>
+              <!-- A -->
+              <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ระบบล่มใช้งานไม่ได้ (A)</label>
+                <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
+                  <option value="1">1 - ต่ำ (หยุดได้เกิน 24 ชม.)</option>
+                  <option value="2">2 - ปานกลาง (หยุดได้ไม่เกิน 4 ชม.)</option>
+                  <option value="3">3 - สูง (พร้อมใช้ 24/7 ล่มไม่ได้)</option>
                 </select>
               </div>
             </div>
           </section>
         </div>
 
-        <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">ยกเลิก</button>
-          <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-save mr-1"></i> บันทึกข้อมูล</button>
+        <!-- Footer Buttons -->
+        <div class="flex justify-end gap-3 px-5 py-4 border-t border-slate-200 bg-white shrink-0">
+          <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition shadow-sm">ยกเลิก</button>
+          <button type="submit" id="btnSaveModal" class="px-6 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5"><i class="fa-solid fa-save"></i> บันทึกข้อมูล</button>
         </div>
       </form>
     </div>
@@ -704,7 +792,11 @@
     }
 
     function renderMainTable() {
-      const htmlRows = allAssets.map((item, idx) => {
+      // เพิ่มบรรทัดนี้เพื่อคัดเฉพาะรายการที่สถานะไม่ใช่ 'ไม่ใช้งาน'
+      const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
+
+      // เปลี่ยนจากการใช้ allAssets มาเป็น filteredAssets 
+      const htmlRows = filteredAssets.map((item, idx) => {
         const badgeType = getCloudBadgeHtml(item.typeFilter);
 
         let impactBadgeHtml = "-";
@@ -715,14 +807,14 @@
           }">${impact}</span>`;
         }
 
-        // คอลัมน์ OS - ถ้ามี EOF ให้เป็นสีแดง
+        // คอลัมน์ OS - จัดให้อยู่กึ่งกลางด้วย mx-auto
         const osHasEof = item.os && item.os.toUpperCase().includes('EOF');
         const osClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700';
         const osHtml = item.os 
-          ? `<span class="truncate block w-full max-w-[100px] ${osClass}" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
+          ? `<span class="truncate block w-full max-w-[100px] mx-auto ${osClass}" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
           : `<span class="text-slate-300">-</span>`;
 
-        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
+        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย | จัดกึ่งกลางด้วย mx-auto
         const swParts = [];
         if (item.swApp) swParts.push(escapeHtml(item.swApp));
         if (item.swFe) swParts.push(escapeHtml(item.swFe));
@@ -730,7 +822,7 @@
         if (item.swDb) swParts.push(escapeHtml(item.swDb));
         
         let swStack = swParts.length > 0 
-          ? `<div class="truncate w-full max-w-[180px] text-[10px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
+          ? `<div class="truncate w-full max-w-[180px] mx-auto text-[10px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
           : `<span class="text-slate-300 font-medium">-</span>`;
 
         let lastUpdateStr = '-', ts = 0;
@@ -748,16 +840,16 @@
           <tr class="asset-row hover:bg-slate-50/80 transition${inactive}" data-id="${escapeHtml(item.id)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
             <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
-            <td class="py-3 px-4"><div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div></td>
-            <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
-            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
-            <td class="py-3 px-3 text-[10px] font-medium cell-os">${osHtml}</td>
-            <td class="py-3 px-4 cell-sw">${swStack}</td>
+            <td class="py-3 px-4 text-center"><div class="cell-name text-slate-800 font-bold mx-auto">${escapeHtml(item.name)}</div></td>
+            <td class="py-3 px-4 text-center text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
+            <td class="py-3 px-4 text-center font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
+            <td class="py-3 px-3 text-center text-[10px] font-medium cell-os">${osHtml}</td>
+            <td class="py-3 px-4 text-center cell-sw">${swStack}</td>
             <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
-            <td class="py-3 px-3 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
+            <td class="py-3 px-3 text-center text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate" data-ts="${ts}">${lastUpdateStr}</td>
             <td class="py-3 px-3 text-center">
-              <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-3 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center gap-1.5">
+              <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-3 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-pen-to-square"></i> <span>แก้ไข</span>
               </button>
             </td>
@@ -875,6 +967,18 @@
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
       $('edit_ssl').value = a.sslExpiry || "";
+      let sslDisp = document.getElementById('ssl_display');
+      if (a.sslExpiry) {
+        sslDisp.innerText = a.sslExpiry;
+        sslDisp.classList.add('text-sky-600');
+        sslDisp.classList.remove('text-slate-400');
+      } else {
+        sslDisp.innerText = 'ระบุ SSL';
+        sslDisp.classList.remove('text-sky-600');
+        sslDisp.classList.add('text-slate-400');
+      }
+      
+      
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
