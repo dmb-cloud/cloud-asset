@@ -16,6 +16,7 @@
     :root { --theme-primary: #122e5a; }
     .bg-theme { background-color: var(--theme-primary) !important; }
     .text-theme { color: var(--theme-primary) !important; }
+    .border-theme { border-color: var(--theme-primary) !important; }
     tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
     .th-sortable { cursor: pointer; user-select: none; }
     .th-sortable:hover { background-color: #334155; }
@@ -135,7 +136,7 @@
     <!-- MAIN TABLE -->
     <div class="space-y-4" id="step1">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
           <div>
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
               <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
@@ -152,6 +153,19 @@
           </div>
         </div>
 
+        <!-- TABS NAV -->
+        <div class="flex space-x-6 border-b border-slate-200 mb-5 overflow-x-auto">
+          <button id="tab-all" onclick="switchTab('all')" class="pb-3 text-sm font-bold border-b-2 border-theme text-theme transition-colors whitespace-nowrap">
+            <i class="fa-solid fa-layer-group mr-1.5"></i> ทั้งหมด (All)
+          </button>
+          <button id="tab-domain" onclick="switchTab('domain')" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-colors whitespace-nowrap">
+            <i class="fa-solid fa-globe mr-1.5"></i> Domains
+          </button>
+          <button id="tab-server" onclick="switchTab('server')" class="pb-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 transition-colors whitespace-nowrap">
+            <i class="fa-solid fa-server mr-1.5"></i> Servers
+          </button>
+        </div>
+
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
           <div class="relative w-full sm:w-80">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -161,11 +175,6 @@
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
-            <select id="typeFilterSelect" onchange="applyFilterAndPagination(true)" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
-              <option value="all">ทุก Type</option>
-              <option value="domain">Domain</option>
-              <option value="server">Server</option>
-            </select>
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             <div class="flex items-center gap-2.5">
               <span class="font-medium">แสดง:</span>
@@ -458,6 +467,7 @@
     let sessionTimerId = null;
 
     // Dynamic State
+    let currentTabType = 'all'; // เก็บสถานะ Tab ที่เลือก (all, domain, server)
     let currentPage = 1;
     let pageSize = 10;
     let sortDirection = {};
@@ -623,16 +633,7 @@
       ["ระบบข้อมูลสารสนเทศ (HIS)", "HIS"],
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
-    const TYPES = [
-      ["GDCC", "GDCC"],
-      ["AWS ", "AWS"],
-      ["NIPA", "NIPA"],
-      ["Huawei", "Huawei"],
-      ["GPC", "GPC"],
-      ["INET", "INET"],
-      ["Private Cloud", "Private Cloud"],
-      ["อื่นๆ", "อื่นๆ"]
-    ];
+
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
@@ -727,10 +728,30 @@
       applyFilterAndPagination();
     }
 
+    // ฟังก์ชันจัดการ Tabs
+    function switchTab(tab) {
+      currentTabType = tab;
+      
+      const tabs = ['all', 'domain', 'server'];
+      tabs.forEach(t => {
+        const el = $('tab-' + t);
+        if (t === tab) {
+          // Tab ที่ทำงานอยู่
+          el.classList.add('border-theme', 'text-theme');
+          el.classList.remove('border-transparent', 'text-slate-500');
+        } else {
+          // Tab ที่ไม่ได้เลือก
+          el.classList.remove('border-theme', 'text-theme');
+          el.classList.add('border-transparent', 'text-slate-500');
+        }
+      });
+      applyFilterAndPagination(true);
+    }
+
     function applyFilterAndPagination(resetPage = false) {
       if (resetPage) currentPage = 1;
       const searchValue = $('searchInput').value.toLowerCase().trim();
-      const typeSel = $('typeFilterSelect').value;
+      const typeSel = currentTabType; // ดึงค่าจากตัวแปร currentTabType ของ Tab แทน <select>
       const rows = Array.from(document.querySelectorAll('#mainTableBody tr.asset-row'));
 
       const filteredRows = rows.filter((row) => {
@@ -769,12 +790,12 @@
 
     function changePageSize() { pageSize = $('pageSizeSelect').value; applyFilterAndPagination(true); }
     function changePage(direction) { currentPage += direction; applyFilterAndPagination(); }
+    
     function resetFilters() {
       $('searchInput').value = '';
-      $('typeFilterSelect').value = 'all';
       $('pageSizeSelect').value = '10';
       pageSize = 10;
-      applyFilterAndPagination(true);
+      switchTab('all'); // เรียกใช้ฟังก์ชัน switchTab แทนการเซ็ตค่า Dropdown
     }
 
     // ---------- Edit / Add modal ----------
@@ -945,5 +966,4 @@
 
   </script>
 </body>
-
 </html>
