@@ -342,7 +342,11 @@
 
             <div class="space-y-3 mt-3 pt-3 border-t border-slate-200">
               <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <!-- ช่อง OS -->
+                <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">OS (ระบบปฏิบัติการ)</label>
+                  <input type="text" id="edit_os" placeholder="เช่น Ubuntu 22.04, Windows" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
+                
                 <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Application</label>
                   <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-white p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></div>
                 <div><label class="font-bold mb-1 block text-slate-600 text-[11px]">Frontend</label>
@@ -579,14 +583,12 @@
     function updateCardDashboard() {
       const total = allAssets.length;
       
-      // 1. นับแยกตามประเภท Cloud และ Domain
       const typeCounts = {};
       allAssets.forEach(item => {
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
       });
 
-      // 2. สร้าง HTML แสดงผลบน Card
       let cloudStatsHtml = '';
       const allTypes = ["Domain", ...TYPES.map(t => t[1].trim())]; 
       
@@ -606,7 +608,6 @@
       const statsContainer = document.getElementById('cloudTypeStats');
       if (statsContainer) statsContainer.innerHTML = cloudStatsHtml;
 
-      // 3. นับ Active, Assessed, PDPA
       let activeCount = 0, assessedCount = 0, pdpaCount = 0;
       allAssets.forEach(item => {
         const isActive = item.status === 'ใช้งาน';
@@ -658,7 +659,6 @@
       $('edit_type').innerHTML = TYPES.map(([label, val]) =>
         `<option value="${escapeHtml(val.trim())}">${escapeHtml(label)}</option>`).join('');
 
-      // สร้างตัวเลือก Filter Type ให้ตรงกับ TYPES (เอา "ทุก Type" ออก)
       let filterHtml = '<option value="domain">Domain</option>';
       TYPES.forEach(([label, val]) => {
         filterHtml += `<option value="${escapeHtml(val.trim().toLowerCase())}">${escapeHtml(label)}</option>`;
@@ -667,7 +667,6 @@
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
-    // ฟังก์ชันช่วยกำหนดสีและป้ายกำกับของ Cloud
     function getCloudBadgeHtml(typeRaw) {
       const t = String(typeRaw || '').trim();
       const tl = t.toLowerCase();
@@ -686,7 +685,6 @@
 
     function renderMainTable() {
       const htmlRows = allAssets.map((item, idx) => {
-        // ใช้ Badge แบบใหม่ที่มีสีแยกตาม Cloud
         const badgeType = getCloudBadgeHtml(item.typeFilter);
 
         let impactBadgeHtml = "-";
@@ -697,14 +695,14 @@
           }">${impact}</span>`;
         }
 
-        // จัดหน้าตา Software Stack ใหม่ให้เป็นบล็อก (Pills)
+        const os = item.os ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-gray-100 text-gray-700 border border-gray-300 truncate" title="OS: ${escapeHtml(item.os)}"><span class="font-bold mr-1 opacity-70">OS:</span> <span class="truncate">${escapeHtml(item.os)}</span></div>` : '';
         const app = item.swApp ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-slate-100 text-slate-600 border border-slate-200 truncate" title="App: ${escapeHtml(item.swApp)}"><span class="font-bold mr-1 opacity-60">App:</span> <span class="truncate">${escapeHtml(item.swApp)}</span></div>` : '';
         const fe = item.swFe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-sky-50 text-sky-700 border border-sky-200 truncate" title="Frontend: ${escapeHtml(item.swFe)}"><span class="font-bold mr-1 opacity-60">FE:</span> <span class="truncate">${escapeHtml(item.swFe)}</span></div>` : '';
         const be = item.swBe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-violet-50 text-violet-700 border border-violet-200 truncate" title="Backend: ${escapeHtml(item.swBe)}"><span class="font-bold mr-1 opacity-60">BE:</span> <span class="truncate">${escapeHtml(item.swBe)}</span></div>` : '';
         const db = item.swDb ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-amber-50 text-amber-700 border border-amber-200 truncate" title="Database: ${escapeHtml(item.swDb)}"><span class="font-bold mr-1 opacity-60">DB:</span> <span class="truncate">${escapeHtml(item.swDb)}</span></div>` : '';
         
-        let swStack = `<div class="flex flex-col gap-1 w-full max-w-[160px]">${app}${fe}${be}${db}</div>`;
-        if (!app && !fe && !be && !db) {
+        let swStack = `<div class="flex flex-col gap-1 w-full max-w-[160px]">${os}${app}${fe}${be}${db}</div>`;
+        if (!os && !app && !fe && !be && !db) {
           swStack = `<span class="text-slate-300 font-medium text-center block">-</span>`;
         }
 
@@ -782,7 +780,6 @@
       const filteredRows = rows.filter((row) => {
         const t = (row.querySelector('.cell-type').dataset.type || '').trim().toLowerCase();
         
-        // ตัดเงื่อนไข typeSel !== 'all' ออกเพราะเราเอาตัวเลือกนี้ออกแล้ว
         if (t !== typeSel) return false;
         
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
@@ -821,7 +818,6 @@
     
     function resetFilters() {
       $('searchInput').value = '';
-      // Default กลับไปที่ Type แรกเสมอ เนื่องจากเอา 'all' ออกแล้ว
       $('typeFilterSelect').value = 'domain';
       $('pageSizeSelect').value = '10';
       pageSize = 10;
@@ -863,6 +859,8 @@
       $('edit_ssl').value = a.sslExpiry || "";
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
+      
+      $('edit_os').value = a.os || "";
       $('edit_swApp').value = a.swApp || "";
       $('edit_swFe').value = a.swFe || "";
       $('edit_swBe').value = a.swBe || "";
@@ -920,7 +918,7 @@
         type: v('edit_type'), resourceName: v('edit_name'), status: $('edit_status').value,
         domain: v('edit_domain'), ip: v('edit_ip'), sslExpiry: v('edit_ssl'),
         sysType: $('edit_sysType').value, note: v('edit_note'),
-        swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
+        os: v('edit_os'), swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
         pdpa: hasPdpa, c: cVal, i: iVal, a: aVal, impact: impactVal
       };
       if (userIsAdmin) { item.agency = v('edit_agency'); item.owners = v('edit_owners'); }
@@ -966,6 +964,7 @@
           'Resource_Name': asset.name || '-',
           'SSL Expiry': asset.sslExpiry || '-',
           'ประเภทระบบ': asset.sysType || '-',
+          'OS': asset.os || '-',
           'Application': asset.swApp || '-',
           'Frontend': asset.swFe || '-',
           'Backend': asset.swBe || '-',
