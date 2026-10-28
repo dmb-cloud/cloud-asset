@@ -18,6 +18,7 @@
     .text-theme { color: var(--theme-primary) !important; }
     tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
     .th-sortable { cursor: pointer; user-select: none; }
+    tr.row-disabled details { pointer-events: none; }
     .th-sortable:hover { background-color: #334155; }
   </style>
 </head>
@@ -39,7 +40,7 @@
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
-        class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded transition">
+        class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition">
         <i class="fa-solid fa-book mr-2"></i> คู่มือ
       </a>
       <span class="text-slate-400">|</span>
@@ -65,13 +66,13 @@
 
     <!-- Dashboard Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั้งหมด (Total)</p>
             <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-lg">
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-layer-group"></i>
           </div>
         </div>
@@ -81,46 +82,46 @@
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ใช้งาน (Active)</p>
             <h3 id="cardActive" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center text-lg">
+          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-power-off"></i>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
-          <span class="text-slate-500 bg-slate-100 px-2 py-0.5 rounded">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
+          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ประเมินแล้ว (Assessed)</p>
             <h3 id="cardAssessed" class="text-3xl font-black text-sky-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-lg flex items-center justify-center text-lg">
+          <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-clipboard-check"></i>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded">ประเมินแล้ว: <span id="cardAssessedSub">0</span></span>
-          <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded">รอประเมิน: <span id="cardPending">0</span></span>
+          <span class="text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">ประเมินแล้ว: <span id="cardAssessedSub">0</span></span>
+          <span class="text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full">รอประเมิน: <span id="cardPending">0</span></span>
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
         <div class="flex justify-between items-start relative z-10">
           <div>
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่มี PDPA</p>
             <h3 id="cardPdpa" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-lg flex items-center justify-center text-lg">
+          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-fingerprint"></i>
           </div>
         </div>
@@ -134,113 +135,119 @@
 
     <!-- STEP 1: MAIN TABLE -->
     <div id="step1" class="space-y-4">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
           <div>
-            <h2 class="text-xl font-bold text-slate-800 mb-1"><i class="fa-solid fa-layer-group text-blue-600 mr-2"></i>
-              รายการระบบสารสนเทศทั้งหมด (Domain &amp; Server)</h2>
-            <p class="text-xs text-slate-500">เลือกเปิดใช้งานและประเมินผลกระทบของระบบ (ขั้นตอนที่ 1/2)</p>
+            <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
+              <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด (Domain &amp; Server)
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">เลือกเปิดใช้งานและประเมินผลกระทบของระบบ (ขั้นตอนที่ 1/2)</p>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-          <div class="relative w-full sm:w-64">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
+          <div class="relative w-full sm:w-80">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Type..."
-              class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+              class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-slate-500 hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
-            <div class="flex items-center gap-2 text-xs text-slate-600">
-              <span>แสดง:</span>
-              <select id="pageSizeSelect" onchange="changePageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+          <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
+            <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
+            <div class="flex items-center gap-2.5">
+              <span class="font-medium">แสดง:</span>
+              <select id="pageSizeSelect" onchange="changePageSize()" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
                 <option value="5">5 แถว</option>
                 <option value="10" selected>10 แถว</option>
                 <option value="20">20 แถว</option>
                 <option value="all">ทั้งหมด</option>
               </select>
             </div>
-            <button onclick="resetFilters()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg transition" title="ล้างการค้นหา">
+            <button onclick="resetFilters()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition shadow-sm" title="ล้างการค้นหา">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
-          <table id="mainTable" class="w-full text-xs text-center border-collapse">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5 shadow-sm">
+          <table id="mainTable" class="w-full text-xs text-left border-collapse">
             <thead>
-              <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
-                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
+              <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">
                   <div class="flex flex-col items-center">
                     <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
                     <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
                     <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
                   </div>
                 </th>
-                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
-                <th rowspan="2" onclick="sortTable('status')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700">
-                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">#</th>
+                <th rowspan="2" onclick="sortTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
+                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortTable('contact')" class="py-3 px-3 min-w-[130px] th-sortable border-r border-slate-700">
-                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortTable('contact')" class="py-4 px-4 min-w-[130px] th-sortable transition">
+                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortTable('type')" class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
-                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortTable('type')" class="py-4 px-4 min-w-[100px] text-center th-sortable transition">
+                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortTable('ip')" class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
-                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortTable('ip')" class="py-4 px-4 min-w-[130px] th-sortable transition">
+                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortTable('domain')" class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
-                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortTable('domain')" class="py-4 px-4 min-w-[150px] th-sortable transition">
+                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortTable('name')" class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
-                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortTable('name')" class="py-4 px-4 min-w-[180px] th-sortable transition">
+                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
-                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
-                  <div class="flex items-center justify-center gap-1 text-white">
+                <th rowspan="2" class="py-4 px-4 min-w-[190px]">ประเภทระบบ</th>
+                <th colspan="4" class="py-3 px-3 text-center border-b border-slate-700">ซอฟต์แวร์ที่ใช้ (Software)</th>
+                <th rowspan="2" class="py-4 px-3 min-w-[110px] text-center font-normal">
+                  <div class="flex items-center justify-center gap-1.5 text-white">
                     <span>ข้อมูล PDPA</span>
                     <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
                   </div>
                 </th>
-                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
+                <th colspan="3" class="py-3 px-3 text-center border-b border-slate-700">
                   <div class="flex items-center justify-center gap-1.5">
                     <span>ประเมินผลกระทบ (C-I-A)</span>
                     <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
                   </div>
                 </th>
-                <th rowspan="2" onclick="sortTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
+                <th rowspan="2" onclick="sortTable('impact')" class="py-4 px-3 min-w-[90px] th-sortable text-center transition">
                   <div class="flex items-center justify-center gap-1.5">
                     <span>ผลกระทบ</span>
-                    <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
+                    <i class="fa-solid fa-sort text-slate-400 opacity-70 text-xs shrink-0"></i>
                   </div>
                 </th>
-                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
+                <th rowspan="2" class="py-4 px-4 min-w-[140px]">หมายเหตุ</th>
               </tr>
               <tr class="bg-slate-700 text-slate-200">
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Application</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Frontend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Backend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Database</th>
+                <th class="py-3 px-3 min-w-[170px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Confidentiality (C)</span>
                       <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
                     <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
                   </div>
                 </th>
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[170px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Integrity (I)</span>
                       <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
                     <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
                   </div>
                 </th>
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[170px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Availability (A)</span>
                       <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
@@ -249,17 +256,17 @@
                 </th>
               </tr>
             </thead>
-            <tbody id="mainTableBody" class="divide-y divide-slate-200 bg-white"></tbody>
+            <tbody id="mainTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
           </table>
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
-          <div id="paginationControls" class="flex items-center gap-1.5 text-xs">
-            <button onclick="changePage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
-            <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
-            <button onclick="changePage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
+          <div id="paginationControls" class="flex items-center gap-2 text-xs">
+            <button onclick="changePage(-1)" class="prevBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
+            <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl">หน้า 1 / 1</span>
+            <button onclick="changePage(1)" class="nextBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
           </div>
-          <button onclick="goToStep(2)" class="w-full sm:w-auto px-6 py-2.5 bg-theme text-white text-xs font-bold rounded-lg shadow-md hover:opacity-90 transition">
+          <button onclick="goToStep(2)" class="w-full sm:w-auto px-6 py-2.5 bg-theme text-white text-xs font-bold rounded-xl shadow-sm hover:opacity-90 transition">
             ถัดไป (สรุปข้อมูล) <i class="fa-solid fa-arrow-right ml-2"></i>
           </button>
         </div>
@@ -268,27 +275,27 @@
 
     <!-- STEP 2: SUMMARY TABLE -->
     <div id="step2" class="space-y-4 hidden">
-      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-        <div class="flex flex-col md:flex-row justify-between md:items-center mb-4 gap-4">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
           <div>
-            <h2 class="text-xl font-bold text-slate-800 mb-1">
-              <i class="fa-solid fa-clipboard-check text-emerald-600 mr-2"></i> สรุปผลการประเมินความเสี่ยงทั้งหมด
+            <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
+              <i class="fa-solid fa-clipboard-check text-emerald-600"></i> สรุปผลการประเมินความเสี่ยงทั้งหมด
             </h2>
-            <p class="text-xs text-slate-500">ตรวจสอบความถูกต้องก่อนส่งออกไฟล์ Excel หรืออัปเดตลงฐานข้อมูล (ขั้นตอนที่ 2/2)</p>
+            <p class="text-xs text-slate-500 mt-0.5">ตรวจสอบความถูกต้องก่อนส่งออกไฟล์ Excel หรืออัปเดตลงฐานข้อมูล (ขั้นตอนที่ 2/2)</p>
           </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-          <div class="relative w-full sm:w-64">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <i class="fa-solid fa-magnifying-glass text-xs"></i>
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
+          <div class="relative w-full sm:w-80">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass"></i>
             </div>
             <input type="text" id="summarySearchInput" onkeyup="applySummaryFilterAndPagination(true)" placeholder="ค้นหาชื่อระบบ, IP, Domain..."
-              class="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+              class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
-          <div class="flex items-center gap-2 text-xs text-slate-600">
-            <span>แสดง:</span>
-            <select id="summaryPageSizeSelect" onchange="changeSummaryPageSize()" class="px-2 py-1.5 text-xs font-semibold bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#122e5a]">
+          <div class="flex items-center justify-between w-full sm:w-auto gap-2.5 text-slate-600">
+            <span class="font-medium">แสดง:</span>
+            <select id="summaryPageSizeSelect" onchange="changeSummaryPageSize()" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
               <option value="5">5 แถว</option>
               <option value="10" selected>10 แถว</option>
               <option value="20">20 แถว</option>
@@ -297,79 +304,84 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-slate-200 mb-6">
-          <table class="w-full text-xs text-center border-collapse">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5 shadow-sm">
+          <table class="w-full text-xs text-left border-collapse">
             <thead>
-              <tr class="bg-slate-800 text-white font-medium uppercase tracking-wider">
-                <th rowspan="2" class="py-3 px-2 w-12 border-r border-slate-700">
+              <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">
                   <div class="flex flex-col items-center">
                     <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
                     <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
                     <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
                   </div>
                 </th>
-                <th rowspan="2" class="py-3 px-2 w-8 border-r border-slate-700">#</th>
-                <th rowspan="2" onclick="sortSummaryTable('status')" class="py-3 px-2 min-w-[110px] th-sortable border-r border-slate-700">
-                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">#</th>
+                <th rowspan="2" onclick="sortSummaryTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
+                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('contact')" class="py-3 px-3 min-w-[130px] th-sortable border-r border-slate-700">
-                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortSummaryTable('contact')" class="py-4 px-4 min-w-[130px] th-sortable transition">
+                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('type')" class="py-3 px-3 min-w-[90px] th-sortable border-r border-slate-700">
-                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortSummaryTable('type')" class="py-4 px-4 min-w-[100px] text-center th-sortable transition">
+                  ประเภท <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('ip')" class="py-3 px-3 min-w-[120px] th-sortable border-r border-slate-700">
-                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortSummaryTable('ip')" class="py-4 px-4 min-w-[130px] th-sortable transition">
+                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('domain')" class="py-3 px-3 min-w-[150px] th-sortable border-r border-slate-700">
-                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortSummaryTable('domain')" class="py-4 px-4 min-w-[150px] th-sortable transition">
+                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('name')" class="py-3 px-3 min-w-[160px] th-sortable border-r border-slate-700">
-                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400"></i>
+                <th rowspan="2" onclick="sortSummaryTable('name')" class="py-4 px-4 min-w-[180px] th-sortable transition">
+                  ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th rowspan="2" class="py-3 px-3 min-w-[170px] border-r border-slate-700">ประเภทระบบ</th>
-                <th rowspan="2" class="py-3 px-2 min-w-[110px] border-r border-slate-700 text-center font-normal">
-                  <div class="flex items-center justify-center gap-1 text-white">
+                <th rowspan="2" class="py-4 px-4 min-w-[190px]">ประเภทระบบ</th>
+                <th colspan="4" class="py-3 px-3 text-center border-b border-slate-700">ซอฟต์แวร์ที่ใช้ (Software)</th>
+                <th rowspan="2" class="py-4 px-3 min-w-[110px] text-center font-normal">
+                  <div class="flex items-center justify-center gap-1.5 text-white">
                     <span>ข้อมูล PDPA</span>
                     <button type="button" onclick="openModal('pdpa')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer shrink-0">?</button>
                   </div>
                 </th>
-                <th colspan="3" class="py-2 px-2 border-b border-r border-slate-700">
+                <th colspan="3" class="py-3 px-3 text-center border-b border-slate-700">
                   <div class="flex items-center justify-center gap-1.5">
                     <span>ประเมินผลกระทบ (C-I-A)</span>
                     <button type="button" onclick="openModal('cia')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-xs" title="ดูคำอธิบาย C-I-A">?</button>
                   </div>
                 </th>
-                <th rowspan="2" onclick="sortSummaryTable('impact')" class="py-3 px-2 min-w-[90px] th-sortable border-r border-slate-700 text-center hover:bg-slate-600 transition cursor-pointer">
+                <th rowspan="2" onclick="sortSummaryTable('impact')" class="py-4 px-3 min-w-[90px] th-sortable text-center transition">
                   <div class="flex items-center justify-center gap-1.5">
                     <span>ผลกระทบ</span>
-                    <i class="fa-solid fa-sort text-slate-400 text-xs shrink-0"></i>
+                    <i class="fa-solid fa-sort text-slate-400 opacity-70 text-xs shrink-0"></i>
                   </div>
                 </th>
-                <th rowspan="2" class="py-3 px-3 min-w-[130px]">หมายเหตุ</th>
+                <th rowspan="2" class="py-4 px-4 min-w-[140px]">หมายเหตุ</th>
               </tr>
               <tr class="bg-slate-700 text-slate-200">
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Application</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Frontend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Backend</th>
+                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Database</th>
+                <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Confidentiality (C)</span>
                       <button type="button" onclick="openModal('c')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
                     <span class="text-xs text-slate-400 font-medium">(Data Leak)</span>
                   </div>
                 </th>
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Integrity (I)</span>
                       <button type="button" onclick="openModal('i')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
                     <span class="text-xs text-slate-400 font-medium">(Change Data)</span>
                   </div>
                 </th>
-                <th class="py-2.5 px-3 min-w-[160px] border-r border-slate-600 text-center font-normal">
+                <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
-                    <div class="flex items-center gap-1 text-sm font-semibold text-white">
+                    <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
                       <span>Availability (A)</span>
                       <button type="button" onclick="openModal('a')" class="w-4 h-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white font-bold text-[10px] inline-flex items-center justify-center transition shadow-sm cursor-pointer">?</button>
                     </div>
@@ -378,28 +390,28 @@
                 </th>
               </tr>
             </thead>
-            <tbody id="summaryTableBody" class="divide-y divide-slate-100"></tbody>
+            <tbody id="summaryTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
           </table>
         </div>
 
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
           <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-lg transition shadow-sm">
+            <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
               <i class="fa-solid fa-file-excel mr-2 text-base"></i> ดาวน์โหลด Excel
             </button>
 
-            <div id="summaryPaginationControls" class="flex items-center gap-1.5 text-xs">
-              <button onclick="changeSummaryPage(-1)" class="prevBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
-              <span class="pageInfo px-3 py-1.5 font-medium text-slate-700 bg-white border border-slate-200 rounded-md">หน้า 1 / 1</span>
-              <button onclick="changeSummaryPage(1)" class="nextBtn px-2.5 py-1.5 bg-slate-100 border border-slate-300 rounded-md hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
+            <div id="summaryPaginationControls" class="flex items-center gap-2 text-xs">
+              <button onclick="changeSummaryPage(-1)" class="prevBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
+              <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl">หน้า 1 / 1</span>
+              <button onclick="changeSummaryPage(1)" class="nextBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
             </div>
           </div>
 
           <div class="flex gap-3 w-full sm:w-auto">
-            <button onclick="goToStep(1)" class="w-1/2 sm:w-auto px-5 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300 transition">
+            <button onclick="goToStep(1)" class="w-1/2 sm:w-auto px-5 py-2.5 bg-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-300 transition">
               <i class="fa-solid fa-arrow-left mr-1"></i> ย้อนกลับไปแก้ไข
             </button>
-            <button id="btnSaveFinal" onclick="submitToDatabase()" class="w-1/2 sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition shadow-md">
+            <button id="btnSaveFinal" onclick="submitToDatabase()" class="w-1/2 sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
               <i class="fa-solid fa-save mr-1"></i> ยืนยันบันทึกข้อมูล
             </button>
           </div>
@@ -410,23 +422,23 @@
   </div>
 
   <!-- Announcement Modal -->
-  <div id="announcementPopup" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-[100] hidden transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl w-11/12 max-w-3xl overflow-hidden flex flex-col max-h-[90vh] transform scale-100 transition-transform">
-      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0">
+  <div id="announcementPopup" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4 transition-opacity duration-300">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200">
+      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0 border-b border-white/10">
         <div class="flex items-center gap-3 text-white">
           <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
             <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
           </div>
           <div>
             <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
-            <h2 class="text-lg md:text-xl font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
+            <h2 class="text-base md:text-lg font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
           </div>
         </div>
       </div>
 
-      <div class="p-6 overflow-y-auto text-sm text-slate-700 space-y-5 leading-relaxed bg-slate-50/50">
-        <div class="bg-white border-l-4 border-[#122e5a] p-4 rounded-r-lg shadow-sm">
-          <p class="font-bold text-[#122e5a]">
+      <div class="p-5 overflow-y-auto text-xs text-slate-700 space-y-4 leading-relaxed">
+        <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#122e5a] p-4 rounded-xl">
+          <p class="font-bold text-[#122e5a] text-sm">
             <a href="https://drive.google.com/file/d/1ZmGmwWtDEY29vJaHtQrIgfctnI_FD0Th/view?usp=sharing" target="_blank" rel="noopener">
               <i class="fa-solid fa-file-lines mr-2 text-slate-400"></i>
             </a>
@@ -435,10 +447,10 @@
           <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน 3 ประการ</p>
         </div>
 
-        <div class="space-y-4">
-          <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm relative overflow-hidden">
+        <div class="space-y-3">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-            <p class="font-bold text-rose-800 text-base flex items-center">
+            <p class="font-bold text-rose-800 text-sm flex items-center">
               <i class="fa-solid fa-key w-6 text-center mr-1"></i> 1. การบังคับเปลี่ยนรหัสผ่าน (Force Reset Password)
             </p>
             <p class="mt-2 ml-7 text-slate-600">ให้หน่วยงานแจ้งผู้ดูแลระบบดำเนินการ
@@ -447,9 +459,9 @@
             </p>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-amber-100 shadow-sm relative overflow-hidden">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-            <p class="font-bold text-amber-800 text-base flex items-center">
+            <p class="font-bold text-amber-800 text-sm flex items-center">
               <i class="fa-solid fa-broom w-6 text-center mr-1"></i> 2. การทำความสะอาดระบบ (System Cleansing)
             </p>
             <p class="mt-2 ml-7 text-slate-600">เร่งตรวจสอบระบบสารสนเทศ หากพบ
@@ -458,9 +470,9 @@
             </p>
           </div>
 
-          <div class="bg-white p-4 rounded-xl border border-sky-100 shadow-sm relative overflow-hidden">
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-            <p class="font-bold text-sky-800 text-base flex items-center">
+            <p class="font-bold text-sky-800 text-sm flex items-center">
               <i class="fa-solid fa-shield-halved w-6 text-center mr-1"></i> 3. การยกระดับการยืนยันตัวตน (MFA) และการควบคุมการเข้าถึง
             </p>
             <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA) เช่น Digital Identity (ThaID) มาใช้</p>
@@ -468,8 +480,8 @@
         </div>
       </div>
 
-      <div class="bg-white px-6 py-4 border-t border-slate-200 flex justify-end shrink-0">
-        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-8 py-3 bg-[#122e5a] hover:bg-blue-900 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition flex items-center justify-center">
+      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
+        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
           <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
         </button>
       </div>
@@ -477,44 +489,48 @@
   </div>
 
   <!-- Info Modal -->
-  <div id="infoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 transform transition-all">
-      <div class="bg-slate-800 px-6 py-4 flex items-center justify-between">
-        <h3 id="modalTitle" class="text-base font-bold text-white flex items-center gap-2"></h3>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl leading-none font-bold">&times;</button>
+  <div id="infoModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
+      <div class="bg-theme px-6 py-4 flex items-center justify-between text-white border-b border-white/10 shrink-0">
+        <h3 id="modalTitle" class="text-sm font-bold flex items-center gap-2"></h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl leading-none font-bold">&times;</button>
       </div>
-      <div id="modalBody" class="p-6 text-sm text-slate-600 leading-relaxed space-y-3"></div>
-      <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end">
-        <button onclick="closeModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition">เข้าใจแล้ว / ปิด</button>
+      <div class="p-5 overflow-y-auto text-xs">
+        <div id="modalBody" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-600 leading-relaxed space-y-3"></div>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
+        <button onclick="closeModal()" class="px-4 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition">เข้าใจแล้ว / ปิด</button>
       </div>
     </div>
   </div>
 
   <!-- Success Popup -->
-  <div id="successPopup" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-8 max-w-sm w-full text-center shadow-2xl">
+  <div id="successPopup" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl border border-slate-200">
       <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fa-solid fa-check text-4xl text-green-500"></i>
       </div>
       <h3 class="text-2xl font-bold text-gray-800 mb-2">บันทึกเสร็จสิ้น!</h3>
       <p id="successMessage" class="text-sm text-gray-600 mb-6">บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว</p>
-      <button onclick="reloadDashboard()" class="w-full py-2 bg-theme text-white rounded-lg font-bold text-sm">ตกลง</button>
+      <button onclick="reloadDashboard()" class="w-full py-2.5 bg-theme text-white rounded-xl font-bold text-sm shadow-sm">ตกลง</button>
     </div>
   </div>
 
   <!-- Logout Modal -->
-  <div id="logoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
-      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
+  <div id="logoutModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border border-slate-200">
+      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between text-white border-b border-white/10">
+        <h3 class="text-sm font-bold flex items-center gap-2">
           <i class="fa-solid fa-right-from-bracket"></i> ยืนยันการออกจากระบบ
         </h3>
-        <button onclick="closeLogoutModal()" class="text-rose-200 hover:text-white text-xl leading-none font-bold">&times;</button>
+        <button onclick="closeLogoutModal()" class="text-rose-200 hover:text-white text-2xl leading-none font-bold">&times;</button>
       </div>
-      <div class="p-6 text-sm text-slate-600 text-center">คุณต้องการออกจากระบบใช่หรือไม่?</div>
-      <div class="bg-slate-50 px-6 py-3 border-t border-slate-100 flex justify-end gap-2">
-        <button onclick="closeLogoutModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold rounded-lg transition">ยกเลิก</button>
-        <button onclick="logout()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition">
+      <div class="p-5 text-xs">
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-sm text-slate-600 text-center">คุณต้องการออกจากระบบใช่หรือไม่?</div>
+      </div>
+      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white">
+        <button onclick="closeLogoutModal()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition">ยกเลิก</button>
+        <button onclick="logout()" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
           <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
         </button>
       </div>
@@ -783,6 +799,84 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
+    // layout: ชุดคลาสที่ใช้ซ้ำของ pill สถานะ / badge ประเภท / ช่องกรอก
+    const STATUS_ON_CLASS = "status-select bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
+    const STATUS_OFF_CLASS = "status-select bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
+    const FIELD_CLASS = "w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-800 outline-none focus:ring-1 focus:ring-sky-500";
+    const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
+    const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
+
+    // ---------- Software (Application / Frontend / Backend / Database) ----------
+    const SW_OPTIONS = {
+      app: { label: "Application", items: ["WordPress", "ownCloud", "Joomla", "CRM", "ERP", "XAMPP"] },
+      fe:  { label: "Frontend",    items: ["HTML", "TypeScript", "React", "Vue.js", "Angular", "Next.js", "Nuxt.js", "Tailwind CSS", "Bootstrap"] },
+      be:  { label: "Backend",     items: ["Django", "Node.js", "Laravel", "Python", "PHP", "Ruby", "C#", "Java", "Go"] },
+      db:  { label: "Database",    items: ["MySQL", "PostgreSQL", "Microsoft SQL Server (MSSQL)", "MongoDB", "Redis", "Oracle"] }
+    };
+    const SW_FIELD = { app: "swApp", fe: "swFe", be: "swBe", db: "swDb" };
+
+    // รับได้ทั้ง array หรือ string คั่นด้วย , หรือ ;
+    function parseSwList(v) {
+      if (Array.isArray(v)) return v.map(x => String(x).trim()).filter(Boolean);
+      if (v === null || v === undefined) return [];
+      return String(v).split(/\s*[,;]\s*/).map(x => x.trim()).filter(Boolean);
+    }
+
+    function buildSwCell(key, item, fieldDisabled) {
+      const opt = SW_OPTIONS[key];
+      const selected = parseSwList(item[SW_FIELD[key]]);
+      const otherVals = selected.filter(v => !opt.items.includes(v));
+      const checkboxes = opt.items.map(v =>
+        `<label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-600"><input type="checkbox" ${fieldDisabled} value="${escapeHtml(v)}" class="sw-cb w-4 h-4 text-sky-600 rounded cursor-pointer" ${selected.includes(v) ? 'checked' : ''}> ${escapeHtml(v)}</label>`
+      ).join('');
+      return `
+            <td class="py-3 px-3">
+              <div class="sw-cell min-w-[150px]" data-sw="${key}" onchange="updateSwCell(this)" oninput="updateSwCell(this)">
+                <details class="group">
+                  <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer w-full flex items-center justify-between gap-2 border border-slate-300 bg-white px-3 py-2 rounded-xl">
+                    <span data-label data-ph="เลือก ${opt.label}" class="truncate text-slate-500">เลือก ${opt.label}</span>
+                    <span class="text-slate-400 transition group-open:rotate-180">▾</span>
+                  </summary>
+                  <div class="mt-1 max-h-40 overflow-y-auto bg-white border border-slate-200 rounded-xl p-1.5 space-y-0.5">
+                    ${checkboxes}
+                    <label class="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-600"><input type="checkbox" ${fieldDisabled} class="sw-other-cb w-4 h-4 text-sky-600 rounded cursor-pointer" ${otherVals.length ? 'checked' : ''}> อื่นๆ (ระบุ)</label>
+                  </div>
+                </details>
+                <input type="text" maxlength="100" ${fieldDisabled} value="${escapeHtml(otherVals.join(', '))}" placeholder="ระบุ ${opt.label} อื่นๆ" class="sw-other-txt hidden mt-2 ${FIELD_CLASS}">
+              </div>
+            </td>`;
+    }
+
+    function buildSwCells(item, fieldDisabled) {
+      return ['app', 'fe', 'be', 'db'].map(k => buildSwCell(k, item, fieldDisabled)).join('');
+    }
+
+    // ค่าที่เลือกไว้ในเซลล์ (checkbox ที่ติ๊ก + ข้อความ "อื่นๆ")
+    function swCellValues(cell) {
+      const vals = Array.from(cell.querySelectorAll('.sw-cb:checked')).map(cb => cb.value);
+      const otherCb = cell.querySelector('.sw-other-cb');
+      const otherTxt = cell.querySelector('.sw-other-txt');
+      if (otherCb && otherCb.checked && otherTxt && otherTxt.value.trim()) vals.push(otherTxt.value.trim());
+      return vals;
+    }
+
+    function updateSwCell(cell) {
+      const otherCb = cell.querySelector('.sw-other-cb');
+      const otherTxt = cell.querySelector('.sw-other-txt');
+      if (otherCb && otherTxt) otherTxt.classList.toggle('hidden', !otherCb.checked);
+      const vals = swCellValues(cell);
+      const label = cell.querySelector('[data-label]');
+      label.textContent = vals.length ? vals.join(', ') : label.dataset.ph;
+      label.classList.toggle('text-slate-500', vals.length === 0);
+      label.classList.toggle('text-slate-800', vals.length > 0);
+    }
+
+    // อ่านค่าซอฟต์แวร์ของแถวเป็นข้อความเดียว เช่น "WordPress, CRM"
+    function getSwValues(row, key) {
+      const cell = row.querySelector(`.sw-cell[data-sw="${key}"]`);
+      return cell ? swCellValues(cell).join(', ') : '';
+    }
+
     function renderMainTable() {
       const tbody = document.getElementById('mainTableBody');
       tbody.innerHTML = '';
@@ -790,17 +884,13 @@
 
       allAssets.forEach((item) => {
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        const badgeType = isDomain
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Domain</span>`
-          : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Server</span>`;
+        const badgeType = isDomain ? BADGE_DOMAIN : BADGE_SERVER;
 
         const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
-        const selectColorClass = (currentStatus === 'ใช้งาน')
-          ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-          : 'bg-amber-100 text-amber-800 border-amber-200';
+        const selectColorClass = (currentStatus === 'ใช้งาน') ? STATUS_ON_CLASS : STATUS_OFF_CLASS;
 
         const statusSelectHtml = `
-          <select onchange="handleStatusChange(this)" class="status-select ${selectColorClass} px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer">
+          <select onchange="handleStatusChange(this)" class="${selectColorClass}">
             <option value="ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ใช้งาน' ? 'selected' : ''}>ใช้งาน</option>
             <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
           </select>`;
@@ -815,63 +905,64 @@
 
         // ✅ escape ค่าทุกช่องที่มาจากฐานข้อมูล กัน HTML/attribute injection
         const rowHtml = `
-          <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
-            <td class="py-2 px-2 border-r border-slate-100">
+          <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
+            <td class="py-3 px-3 text-center">
               <input type="checkbox" onchange="toggleRowActive(this)" class="active-cb w-4 h-4 text-emerald-600 rounded cursor-pointer" ${isChecked}>
             </td>
-            <td class="py-2 px-1 text-slate-400 font-medium border-r border-slate-100">${++count}</td>
-            <td class="py-2 px-1 border-r border-slate-100">${statusSelectHtml}</td>
-            <td class="py-2 px-2 text-slate-600 font-medium text-[11px] border-r border-slate-100 contact-cell" data-original-contact="${escapeHtml(item.contact)}">${escapeHtml(item.contact) || '-'}</td>
-            <td class="py-2 px-2 cell-type border-r border-slate-100">${badgeType}</td>
-            <td class="py-2 px-2 text-slate-700 font-mono cell-ip border-r border-slate-100">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
-            <td class="py-2 px-2 text-slate-600 font-semibold cell-domain border-r border-slate-100">${escapeHtml(item.domain) || '-'}</td>
-            <td class="py-2 px-2 border-r border-slate-100">
-              <input type="text" maxlength="200" value="${escapeHtml(item.name)}" ${fieldDisabled} class="name-input cell-name w-full px-2 py-1 border border-slate-300 rounded text-slate-800 font-semibold focus:ring-1 focus:ring-blue-500">
+            <td class="py-3 px-3 text-center text-slate-400 font-mono">${++count}</td>
+            <td class="py-3 px-4 text-center">${statusSelectHtml}</td>
+            <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell" data-original-contact="${escapeHtml(item.contact)}">${escapeHtml(item.contact) || '-'}</td>
+            <td class="py-3 px-4 text-center cell-type">${badgeType}</td>
+            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
+            <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
+            <td class="py-3 px-4">
+              <input type="text" maxlength="200" value="${escapeHtml(item.name)}" ${fieldDisabled} class="name-input cell-name ${FIELD_CLASS} font-bold">
             </td>
-            <td class="py-2 px-2 border-r border-slate-100">
-              <select ${fieldDisabled} class="type-select w-full px-1.5 py-1 border border-slate-300 rounded">${sysTypeOptions}</select>
-            </td>
-            <td class="py-2 px-1 border-r border-slate-100">
+            <td class="py-3 px-4">
+              <select ${fieldDisabled} class="type-select ${FIELD_CLASS}">${sysTypeOptions}</select>
+            </td>${buildSwCells(item, fieldDisabled)}
+            <td class="py-3 px-3 text-center">
               <input type="checkbox" ${fieldDisabled} onchange="updateImpact(this)" class="pdpa-cb w-4 h-4 text-sky-600 rounded" ${item.pdpa ? 'checked' : ''}>
             </td>
-            <td class="py-2 px-1 border-r border-slate-100">
-              <select ${fieldDisabled} onchange="updateImpact(this)" class="c-select px-1 py-1 border rounded w-full">
+            <td class="py-3 px-3">
+              <select ${fieldDisabled} onchange="updateImpact(this)" class="c-select ${FIELD_CLASS}">
                 <option value="1" ${item.c == 1 ? 'selected' : ''}>LOW: ข้อมูลสาธารณะ</option>
                 <option value="2" ${item.c == 2 ? 'selected' : ''}>MEDIUM: ข้อมูลใช้งานภายใน</option>
                 <option value="3" ${item.c == 3 ? 'selected' : ''}>HIGH: ข้อมูลส่วนบุคคล</option>
               </select>
             </td>
-            <td class="py-2 px-1 border-r border-slate-100">
-              <select ${fieldDisabled} onchange="updateImpact(this)" class="i-select px-1 py-1 border rounded w-full">
+            <td class="py-3 px-3">
+              <select ${fieldDisabled} onchange="updateImpact(this)" class="i-select ${FIELD_CLASS}">
                 <option value="1" ${item.i == 1 ? 'selected' : ''}>LOW: ข้อมูลคลาดเคลื่อนเล็กน้อย</option>
                 <option value="2" ${item.i == 2 ? 'selected' : ''}>MEDIUM: ข้อมูลสำคัญถูกดัดแปลง</option>
                 <option value="3" ${item.i == 3 ? 'selected' : ''}>HIGH: ข้อมูลหลักถูกลบหรือแก้ไข</option>
               </select>
             </td>
-            <td class="py-2 px-1 border-r border-slate-100">
-              <select ${fieldDisabled} onchange="updateImpact(this)" class="a-select px-1 py-1 border rounded w-full">
+            <td class="py-3 px-3">
+              <select ${fieldDisabled} onchange="updateImpact(this)" class="a-select ${FIELD_CLASS}">
                 <option value="1" ${item.a == 1 ? 'selected' : ''}>LOW: ระบบหยุดชะงักชั่วคราว</option>
                 <option value="2" ${item.a == 2 ? 'selected' : ''}>MEDIUM: ระบบล่มหลายชั่วโมง</option>
                 <option value="3" ${item.a == 3 ? 'selected' : ''}>HIGH: ระบบล่มถาวร</option>
               </select>
             </td>
-            <td class="py-2 px-1 border-r border-slate-100">
+            <td class="py-3 px-3 text-center">
               <span class="impact-badge inline-flex items-center justify-center w-6 h-6 rounded-full font-bold bg-amber-400">${escapeHtml(item.impact || 1)}</span>
             </td>
-            <td class="py-2 px-2">
-              <input type="text" maxlength="300" ${fieldDisabled} value="${escapeHtml(item.note)}" placeholder="ระบุเพิ่ม" class="note-input w-full px-2 py-1 border border-slate-300 rounded">
+            <td class="py-3 px-4">
+              <input type="text" maxlength="300" ${fieldDisabled} value="${escapeHtml(item.note)}" placeholder="ระบุเพิ่ม" class="note-input ${FIELD_CLASS}">
             </td>
           </tr>`;
         tbody.insertAdjacentHTML('beforeend', rowHtml);
       });
 
       if (count === 0) {
-        tbody.innerHTML = '<tr><td colspan="15" class="py-6 text-slate-400">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="19" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
       }
 
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         if (row.querySelector('.pdpa-cb')) updateImpact(row.querySelector('.pdpa-cb'), false);
       });
+      document.querySelectorAll('#mainTableBody .sw-cell').forEach(updateSwCell);
       const masterCb = document.getElementById('selectAllCb');
       if (masterCb) masterCb.checked = false;
     }
@@ -936,14 +1027,14 @@
         elements.forEach(el => el.disabled = false);
         if (statusSelect) {
           statusSelect.value = 'ใช้งาน';
-          statusSelect.className = "status-select bg-emerald-100 text-emerald-800 border-emerald-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
+          statusSelect.className = STATUS_ON_CLASS;
         }
       } else {
         row.classList.add('row-disabled');
         elements.forEach(el => el.disabled = true);
         if (statusSelect) {
           statusSelect.value = 'ไม่ใช้งาน';
-          statusSelect.className = "status-select bg-amber-100 text-amber-800 border-amber-200 px-1 py-0.5 rounded text-[10px] font-bold border focus:outline-none cursor-pointer";
+          statusSelect.className = STATUS_OFF_CLASS;
         }
       }
       if (shouldUpdateDash) updateCardDashboard();
@@ -1051,6 +1142,10 @@
           typeFilter: asset.typeFilter || '',
           nameVal: row.querySelector('.name-input').value,
           typeVal: row.querySelector('.type-select').value,
+          swApp: getSwValues(row, 'app'),
+          swFe: getSwValues(row, 'fe'),
+          swBe: getSwValues(row, 'be'),
+          swDb: getSwValues(row, 'db'),
           noteVal: row.querySelector('.note-input').value,
           hasPdpa: row.querySelector('.pdpa-cb').checked,
           c: row.querySelector('.c-select').value,
@@ -1105,7 +1200,7 @@
       const totalFiltered = filteredSummaryDataList.length;
 
       if (totalFiltered === 0) {
-        summaryBody.innerHTML = '<tr><td colspan="15" class="py-8 text-slate-500 font-bold">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
+        summaryBody.innerHTML = '<tr><td colspan="19" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
         document.getElementById('summaryPaginationControls').style.display = 'none';
         return;
       }
@@ -1125,28 +1220,30 @@
       currentData.forEach(data => {
         count++;
         const isDomain = (data.typeFilter || '').toLowerCase() === 'domain';
-        const badgeType = isDomain
-          ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">Domain</span>`
-          : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700">Server</span>`;
-        const statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ใช้งาน</span>`;
+        const badgeType = isDomain ? BADGE_DOMAIN : BADGE_SERVER;
+        const statusBadge = `<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">ใช้งาน</span>`;
 
         summaryBody.insertAdjacentHTML('beforeend', `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="py-2.5 px-2 border-r border-slate-100"><input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded"></td>
-            <td class="py-2.5 px-1 text-slate-400 font-medium border-r border-slate-100">${count}</td>
-            <td class="py-2.5 px-1 border-r border-slate-100">${statusBadge}</td>
-            <td class="py-2.5 px-2 text-slate-600 font-medium text-[11px] border-r border-slate-100">${escapeHtml(data.contact) || '-'}</td>
-            <td class="py-2.5 px-2 border-r border-slate-100">${badgeType}</td>
-            <td class="py-2.5 px-2 text-slate-700 font-mono border-r border-slate-100">${escapeHtml(data.ip || data.privateIp) || '-'}</td>
-            <td class="py-2.5 px-2 text-slate-600 font-semibold border-r border-slate-100">${escapeHtml(data.domain) || '-'}</td>
-            <td class="py-2.5 px-3 text-slate-800 font-semibold border-r border-slate-100">${escapeHtml(data.nameVal)}</td>
-            <td class="py-2.5 px-3 text-slate-600 border-r border-slate-100">${escapeHtml(data.typeVal)}</td>
-            <td class="py-2.5 px-2 font-bold ${data.hasPdpa ? 'text-sky-600' : 'text-slate-400'} border-r border-slate-100">${data.hasPdpa ? '✔️ มี' : '-'}</td>
-            <td class="py-2.5 px-2 font-semibold text-slate-700 border-r border-slate-100">${escapeHtml(data.c)}</td>
-            <td class="py-2.5 px-2 font-semibold text-slate-700 border-r border-slate-100">${escapeHtml(data.i)}</td>
-            <td class="py-2.5 px-2 font-semibold text-slate-700 border-r border-slate-100">${escapeHtml(data.a)}</td>
-            <td class="py-2.5 px-2 border-r border-slate-100"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${data.impact == 1 ? 'bg-emerald-100 text-emerald-800' : data.impact == 2 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">ระดับ ${escapeHtml(data.impact)}</span></td>
-            <td class="py-2.5 px-3 text-slate-500">${escapeHtml(data.noteVal) || '-'}</td>
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="py-3.5 px-3 text-center"><input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded"></td>
+            <td class="py-3.5 px-3 text-center text-slate-400 font-mono">${count}</td>
+            <td class="py-3.5 px-4 text-center">${statusBadge}</td>
+            <td class="py-3.5 px-4 text-slate-600 font-medium text-[11px]">${escapeHtml(data.contact) || '-'}</td>
+            <td class="py-3.5 px-4 text-center">${badgeType}</td>
+            <td class="py-3.5 px-4 font-mono font-semibold text-sky-600">${escapeHtml(data.ip || data.privateIp) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-700 font-medium">${escapeHtml(data.domain) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-900 font-bold">${escapeHtml(data.nameVal)}</td>
+            <td class="py-3.5 px-4 text-slate-600">${escapeHtml(data.typeVal)}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swApp) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swFe) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swBe) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swDb) || '-'}</td>
+            <td class="py-3.5 px-3 text-center font-bold ${data.hasPdpa ? 'text-sky-600' : 'text-slate-400'}">${data.hasPdpa ? '✔️ มี' : '-'}</td>
+            <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.c)}</td>
+            <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.i)}</td>
+            <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.a)}</td>
+            <td class="py-3.5 px-3 text-center"><span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold ${data.impact == 1 ? 'bg-emerald-100 text-emerald-800' : data.impact == 2 ? 'bg-amber-100 text-amber-800' : 'bg-rose-100 text-rose-800'}">ระดับ ${escapeHtml(data.impact)}</span></td>
+            <td class="py-3.5 px-4 text-slate-500">${escapeHtml(data.noteVal) || '-'}</td>
           </tr>`);
       });
 
@@ -1179,6 +1276,10 @@
           'Domain Name': asset.domain || '-',
           'Resource_Name': row.querySelector('.name-input').value,
           'ประเภทระบบ': row.querySelector('.type-select').value,
+          'Application': getSwValues(row, 'app') || '-',
+          'Frontend': getSwValues(row, 'fe') || '-',
+          'Backend': getSwValues(row, 'be') || '-',
+          'Database': getSwValues(row, 'db') || '-',
           'PDPA': row.querySelector('.pdpa-cb').checked ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': row.querySelector('.c-select').value,
           'Integrity (I)': row.querySelector('.i-select').value,
@@ -1224,6 +1325,10 @@
             id: id,
             resourceName: row.querySelector('.name-input').value,
             sysType: row.querySelector('.type-select').value,
+            swApp: getSwValues(row, 'app'),
+            swFe: getSwValues(row, 'fe'),
+            swBe: getSwValues(row, 'be'),
+            swDb: getSwValues(row, 'db'),
             note: row.querySelector('.note-input').value,
             pdpa: row.querySelector('.pdpa-cb').checked,
             c: row.querySelector('.c-select').value,
