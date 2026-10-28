@@ -1354,13 +1354,14 @@
     });
 
     // ---------- save ----------
-    async function submitToDatabase() {
+async function submitToDatabase() {
       const payloadData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
         const id = row.getAttribute('data-id');
 
-        if (id && (isActive || row.classList.contains('is-changed'))) {
+        // ✅ แก้ไขตรงนี้: ดึงไปบันทึกเฉพาะแถวที่มีสถานะ is-changed (ถูกแก้ไข) เท่านั้น
+        if (id && row.classList.contains('is-changed')) {
           payloadData.push({
             id: id,
             resourceName: row.querySelector('.name-input').value,
@@ -1394,6 +1395,7 @@
       if (res && res.success) {
         document.getElementById('successMessage').textContent = res.message || "บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว";
         document.getElementById('successPopup').classList.remove('hidden');
+        // ล้างสถานะ is-changed ออกหลังจากบันทึกสำเร็จ
         document.querySelectorAll('.is-changed').forEach(el => el.classList.remove('is-changed'));
       } else {
         alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
