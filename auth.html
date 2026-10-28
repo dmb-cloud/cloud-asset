@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" class="h-full">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,191 +14,232 @@
 
   <style>
     body {
-      font-family: 'Noto Sans Thai', sans-serif;
-      background-image: url('img/cyber-claims.webp');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    }
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      font-family: 'Noto Sans Thai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen relative" id="mainBody">
+<body class="min-h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex items-center justify-center p-4 sm:p-8 antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200" id="mainBody">
 
-  <div class="absolute inset-0 bg-black/50 z-0"></div>
+  <div class="flex flex-col justify-center items-center min-h-screen relative w-full py-8">
+    <div class="w-11/12 md:w-10/12 lg:w-8/12 xl:w-7/12">
 
-  <div id="authContainer" class="glass-panel w-full max-w-md rounded-2xl overflow-hidden relative z-10 m-4 border-t-8 border-[#122e5a]">
-
-    <div class="pt-8 pb-5 px-6 flex items-center gap-5 border-b border-gray-200/60 mb-4">
-      <img src="img/ico_logo@2x.png" alt="Logo" class="w-20 h-20 object-contain flex-shrink-0">
-      <div class="flex flex-col border-l-2 border-[#122e5a]/20 pl-5 py-1.5">
-        <h1 class="text-[16px] font-bold text-[#122e5a] leading-snug">DMS Cloud Registry</h1>
-        <p class="text-[13px] text-gray-500 font-medium mt-1">สำนักดิจิทัลการแพทย์ กรมการแพทย์</p>
+      <!-- Top Logo & App Title (Desktop) -->
+      <div class="hidden md:flex justify-center items-center gap-3.5 mb-6">
+        <div class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-center shadow-sm p-1.5">
+          <img src="img/ico_logo@2x.png" alt="Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="text-left">
+          <h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">DMS Cloud Registry</h1>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">สำนักดิจิทัลการแพทย์ กรมการแพทย์</p>
+        </div>
       </div>
-    </div>
 
-    <div class="px-8 pb-8 pt-3">
+      <!-- Main Card Container -->
+      <div id="authContainer" class="relative bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden p-6 md:p-10 transition-colors">
 
-      <!-- ================= LOGIN ================= -->
-      <form id="loginForm" onsubmit="requestOTP(event)" autocomplete="off">
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <select id="agency" required
-            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-            <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
-          </select>
+        <!-- Top Logo & App Title (Mobile) -->
+        <div class="flex md:hidden flex-col justify-center items-center gap-2 mb-6 text-center">
+          <div class="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shadow-sm p-1.5">
+            <img src="img/ico_logo@2x.png" alt="Logo" class="w-full h-full object-contain">
+          </div>
+          <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">DMS Cloud Registry</h1>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400">สำนักดิจิทัลการแพทย์ กรมการแพทย์</p>
         </div>
 
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-          <input type="email" id="email" required maxlength="254" placeholder="name@domain.go.th"
-            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
+        <div class="text-center mb-8">
+          <h2 class="text-xl md:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            เข้าสู่ระบบ
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">ยืนยันตัวตนเพื่อเข้าใช้งาน DMS Cloud Registry</p>
         </div>
 
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
-          <input type="tel" id="phone" required maxlength="10" inputmode="numeric"
-            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
-            class="w-full px-3 py-2.5 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
+        <!-- 2-Column Grid Layout -->
+        <div class="grid grid-cols-12 gap-6 items-center">
 
-        <div id="loginError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium leading-relaxed"></div>
+          <!-- Left Column (Desktop) / Bottom Section (Mobile): DMS SSO -->
+          <div class="col-span-12 md:col-span-6 order-2 md:order-1 px-1 md:px-6 md:border-r border-slate-200 dark:border-slate-800 pt-6 md:pt-0 border-t md:border-t-0">
 
-        <button type="submit" id="btnAuth" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition flex justify-center items-center shadow-md">
-          <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
-        </button>
+            <div class="md:hidden mb-3 text-center text-xs text-slate-400">หรือ</div>
 
-        <div class="flex items-center my-4">
-          <div class="flex-grow border-t border-gray-300"></div>
-          <span class="px-3 text-xs text-gray-500 font-medium">หรือ</span>
-          <div class="flex-grow border-t border-gray-300"></div>
-        </div>
-
-        <div class="mt-5 flex flex-col gap-4">
-          <button type="button" id="btnSso" onclick="loginWithDmsSso()" class="w-full bg-slate-600 hover:bg-slate-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg flex justify-center items-center shadow-md transition cursor-pointer">
-            <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
-            <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
-          </button>
-
-          <div class="flex justify-center items-center gap-4 flex-wrap">
-            <button type="button" onclick="toggleForm('registerForm')" class="text-xs text-[#122e5a] hover:underline font-bold">
-              สมัครบัญชีผู้ใช้งานใหม่
+            <button type="button" id="btnSso" onclick="loginWithDmsSso()"
+              class="w-full md:mt-2 mb-6 py-3 px-4 bg-slate-600 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold rounded-2xl flex items-center justify-center gap-2.5 text-xs shadow-sm transition cursor-pointer">
+              <i class="fa-solid fa-fingerprint text-lg mr-2 text-slate-300"></i>
+              <span>เข้าสู่ระบบด้วย SSO กรมการแพทย์</span>
             </button>
-            <span class="text-gray-300 text-xs">|</span>
-            <button type="button" onclick="showStaffPopup()" class="text-xs text-gray-500 hover:text-gray-800 hover:underline font-medium">
-              มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
-            </button>
+
+            <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed shadow-sm space-y-2">
+              <div>
+                <span class="font-bold text-slate-900 dark:text-white">สำหรับผู้ใช้งาน</span>
+                เข้าสู่ระบบผ่าน Single Sign-On เพื่อความสะดวกและปลอดภัย
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (Desktop) / Top Section (Mobile): Forms -->
+          <div class="col-span-12 md:col-span-6 order-1 md:order-2 px-1 md:px-2">
+
+            <!-- ================= LOGIN ================= -->
+            <form id="loginForm" onsubmit="requestOTP(event)" autocomplete="off" class="space-y-4 text-xs">
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">หน่วยงาน / สังกัด <span class="text-rose-500">*</span></label>
+                <select id="agency" required
+                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 cursor-pointer shadow-sm">
+                  <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+                </select>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">อีเมล <span class="text-rose-500">*</span></label>
+                <div class="relative">
+                  <input type="email" id="email" required maxlength="254" placeholder="name@domain.go.th"
+                    class="w-full h-10 pl-3 pr-9 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-envelope"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">เบอร์โทรศัพท์ (10 หลัก) <span class="text-rose-500">*</span></label>
+                <div class="relative">
+                  <input type="tel" id="phone" required maxlength="10" inputmode="numeric"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
+                    class="w-full h-10 pl-3 pr-9 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 font-mono tracking-wider shadow-sm">
+                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
+                    <i class="fa-solid fa-phone"></i>
+                  </div>
+                </div>
+              </div>
+
+              <div id="loginError" class="hidden p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs rounded-xl border border-rose-200 dark:border-rose-900 text-center font-medium leading-relaxed"></div>
+
+              <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+                <button type="submit" id="btnAuth" class="flex-1 h-10 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white font-bold rounded-xl transition shadow-sm flex items-center justify-center cursor-pointer text-[11px] tracking-wide">
+                  <span>ขอรหัส OTP</span> <i class="fa-solid fa-paper-plane ml-2"></i>
+                </button>
+                <button type="button" onclick="toggleForm('registerForm')" class="h-10 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[11px] whitespace-nowrap cursor-pointer">
+                  สมัครบัญชีผู้ใช้งานใหม่
+                </button>
+              </div>
+
+              <div class="text-center pt-1">
+                <button type="button" onclick="showStaffPopup()" class="text-[11px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:underline font-medium">
+                  มีปัญหาการใช้งาน? ติดต่อเจ้าหน้าที่
+                </button>
+              </div>
+            </form>
+
+            <!-- ================= REGISTER ================= -->
+            <form id="registerForm" class="hidden space-y-4 text-xs" onsubmit="submitRegister(event)" autocomplete="off">
+              <h2 class="text-base font-bold text-slate-900 dark:text-white text-center"><i class="fa-solid fa-user-plus text-slate-500 dark:text-slate-400 mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">หน่วยงาน / สังกัด <span class="text-rose-500">*</span></label>
+                <select id="regAgency" required
+                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 cursor-pointer shadow-sm">
+                  <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
+                </select>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">ชื่อ-นามสกุล <span class="text-rose-500">*</span></label>
+                <input type="text" id="regName" required maxlength="150" placeholder="สมชาย ใจดี"
+                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">อีเมล <span class="text-rose-500">*</span></label>
+                <input type="email" id="regEmail" required maxlength="254" placeholder="name@domain.go.th"
+                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block font-medium text-slate-700 dark:text-slate-300">เบอร์โทรศัพท์ (10 หลัก) <span class="text-rose-500">*</span></label>
+                <input type="tel" id="regPhone" required maxlength="10" inputmode="numeric"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
+                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 font-mono tracking-wider shadow-sm">
+              </div>
+
+              <div id="regError" class="hidden p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs rounded-xl border border-rose-200 dark:border-rose-900 text-center font-medium"></div>
+              <div id="regSuccess" class="hidden p-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs rounded-xl border border-emerald-200 dark:border-emerald-900 text-center font-bold"></div>
+
+              <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+                <button type="submit" id="btnRegister" class="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition shadow-sm flex items-center justify-center cursor-pointer text-[11px] tracking-wide">
+                  ลงทะเบียนบัญชี
+                </button>
+                <button type="button" onclick="toggleForm('loginForm')" class="h-10 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[11px] whitespace-nowrap cursor-pointer">
+                  <i class="fa-solid fa-arrow-left mr-1.5"></i> กลับไปหน้าเข้าสู่ระบบ
+                </button>
+              </div>
+            </form>
+
+            <!-- ================= OTP ================= -->
+            <form id="otpForm" class="hidden text-center text-xs" onsubmit="submitOTP(event)" autocomplete="off">
+              <div class="mb-5 mt-2">
+                <div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-700 dark:text-slate-200 text-xl">
+                  <i class="fa-solid fa-envelope-open-text"></i>
+                </div>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">ยืนยันรหัส OTP</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">รหัส 6 หลัก ถูกส่งไปยังอีเมล</p>
+                <p id="displayEmail" class="text-sm font-bold text-slate-900 dark:text-white mt-1 break-all"></p>
+              </div>
+
+              <div class="mb-5">
+                <input type="text" id="otpCode" required maxlength="6" inputmode="numeric" autocomplete="one-time-code"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="รหัส 6 หลัก"
+                  class="w-full px-4 py-3 text-center text-3xl tracking-[0.4em] font-bold font-mono bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
+              </div>
+
+              <div id="otpError" class="hidden mb-4 p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs rounded-xl border border-rose-200 dark:border-rose-900 text-center font-medium"></div>
+
+              <button type="submit" id="btnVerify" class="w-full h-10 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white font-bold rounded-xl transition shadow-sm flex items-center justify-center cursor-pointer text-[11px] tracking-wide mb-3">
+                ยืนยันเข้าสู่ระบบ
+              </button>
+
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-3">
+                <span id="countdownText">ขอรหัสผ่านใหม่ได้ใน <span id="timer" class="font-bold text-rose-500">60</span> วินาที</span>
+                <button type="button" id="btnResend" onclick="resendOTP()" class="hidden text-slate-900 dark:text-white font-bold hover:underline mx-auto">
+                  <i class="fa-solid fa-rotate-right mr-1"></i> ขอรับรหัส OTP อีกครั้ง
+                </button>
+              </div>
+
+              <button type="button" onclick="backToLogin()" class="mt-5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white underline font-medium">
+                กลับไปแก้ไขข้อมูล
+              </button>
+            </form>
+
           </div>
         </div>
-      </form>
+      </div>
 
-      <!-- ================= REGISTER ================= -->
-      <form id="registerForm" class="hidden" onsubmit="submitRegister(event)" autocomplete="off">
-        <h2 class="text-lg font-bold text-gray-800 mb-4 text-center"><i class="fa-solid fa-user-plus text-[#122e5a] mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
+      <!-- Footer -->
+      <div class="flex justify-between items-center text-xs text-slate-400 dark:text-slate-500 mt-6 px-2">
+        <span>Copyright © สำนักดิจิทัลการแพทย์</span>
+        <span class="font-mono">Version 2.0.1 20261028</span>
+      </div>
 
-        <div class="mb-3">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
-          <select id="regAgency" required
-            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-            <option value="" disabled selected>-- เลือกหน่วยงาน --</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">ชื่อ-นามสกุล <span class="text-red-500">*</span></label>
-          <input type="text" id="regName" required maxlength="150" placeholder="สมชาย ใจดี"
-            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
-
-        <div class="mb-3">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">อีเมล <span class="text-red-500">*</span></label>
-          <input type="email" id="regEmail" required maxlength="254" placeholder="name@domain.go.th"
-            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-xs font-semibold text-gray-700 mb-1">เบอร์โทรศัพท์ (10 หลัก) <span class="text-red-500">*</span></label>
-          <input type="tel" id="regPhone" required maxlength="10" inputmode="numeric"
-            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
-            class="w-full px-3 py-2 bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none text-gray-800 text-sm">
-        </div>
-
-        <div id="regError" class="hidden mb-4 p-2.5 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium"></div>
-        <div id="regSuccess" class="hidden mb-4 p-2.5 bg-emerald-100/90 text-emerald-700 text-xs rounded-lg border border-emerald-300 text-center font-bold"></div>
-
-        <button type="submit" id="btnRegister" class="w-full bg-emerald-600 text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-emerald-700 transition shadow-md">
-          ลงทะเบียนบัญชี
-        </button>
-
-        <div class="mt-4 text-center">
-          <button type="button" onclick="toggleForm('loginForm')" class="text-xs text-gray-500 hover:text-[#122e5a] underline font-medium">
-            <i class="fa-solid fa-arrow-left mr-1"></i> กลับไปหน้าเข้าสู่ระบบ
-          </button>
-        </div>
-      </form>
-
-      <!-- ================= OTP ================= -->
-      <form id="otpForm" class="hidden text-center" onsubmit="submitOTP(event)" autocomplete="off">
-        <div class="mb-5 mt-2">
-          <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 text-[#122e5a] text-xl">
-            <i class="fa-solid fa-envelope-open-text"></i>
-          </div>
-          <h2 class="text-lg font-bold text-gray-800">ยืนยันรหัส OTP</h2>
-          <p class="text-xs text-gray-600 mt-1">รหัส 6 หลัก ถูกส่งไปยังอีเมล</p>
-          <p id="displayEmail" class="text-sm font-bold text-[#122e5a] mt-1"></p>
-        </div>
-        <div class="mb-5">
-          <input type="text" id="otpCode" required maxlength="6" inputmode="numeric" autocomplete="one-time-code"
-            oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="รหัส 6 หลัก"
-            class="w-full px-4 py-3 text-center text-3xl tracking-[0.4em] font-bold bg-white/80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#122e5a] outline-none">
-        </div>
-        <div id="otpError" class="hidden mb-4 p-2 bg-red-100/90 text-red-600 text-xs rounded-lg border border-red-300 text-center font-medium"></div>
-        <button type="submit" id="btnVerify" class="w-full bg-[#122e5a] text-white text-sm font-bold py-2.5 px-4 rounded-lg hover:bg-blue-900 transition shadow-md mb-3">
-          ยืนยันเข้าสู่ระบบ
-        </button>
-        <div class="text-xs text-gray-600 mt-3">
-          <span id="countdownText">ขอรหัสผ่านใหม่ได้ใน <span id="timer" class="font-bold text-red-500">60</span> วินาที</span>
-          <button type="button" id="btnResend" onclick="resendOTP()" class="hidden text-[#122e5a] font-bold hover:underline mx-auto">
-            <i class="fa-solid fa-rotate-right mr-1"></i> ขอรับรหัส OTP อีกครั้ง
-          </button>
-        </div>
-        <button type="button" onclick="backToLogin()" class="mt-5 text-xs text-gray-500 hover:text-gray-800 underline font-medium">
-          กลับไปแก้ไขข้อมูล
-        </button>
-      </form>
     </div>
-  </div>
-
-  <div class="absolute bottom-4 left-0 w-full px-6 md:px-12 flex justify-between items-center text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">
-    <span>Copyright © สำนักดิจิทัลการแพทย์</span>
-    <span>Version 2.0.0</span>
   </div>
 
   <!-- ================= STAFF POPUP ================= -->
   <div id="staffPopup" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity">
-    <div class="bg-white rounded-xl p-6 w-10/12 max-w-sm text-center shadow-2xl relative">
-      <button onclick="hideStaffPopup()" class="absolute top-3 right-4 text-gray-400 hover:text-gray-600">
+    <div class="bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800 rounded-2xl p-6 w-10/12 max-w-sm text-center shadow-2xl relative">
+      <button onclick="hideStaffPopup()" class="absolute top-3 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
         <i class="fa-solid fa-times text-lg"></i>
       </button>
-      <div class="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3 text-[#122e5a] text-2xl">
+      <div class="w-14 h-14 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-700 dark:text-slate-200 text-2xl">
         <i class="fa-solid fa-headset"></i>
       </div>
-      <h3 class="text-lg font-bold text-gray-800 mb-1">ติดต่อเจ้าหน้าที่</h3>
-      <p class="text-xs text-gray-500 mb-4">หากท่านต้องการให้เปิดใช้งานบัญชี หรือพบบัญชีถูกระงับ กรุณาติดต่อ:</p>
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">ติดต่อเจ้าหน้าที่</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">หากท่านต้องการให้เปิดใช้งานบัญชี หรือพบบัญชีถูกระงับ กรุณาติดต่อ:</p>
 
-      <div class="bg-gray-50 rounded-lg p-3 text-left mb-5 border border-gray-100 shadow-inner text-sm space-y-2">
-        <p class="text-gray-700"><i class="fa-solid fa-building text-gray-400 w-5"></i> <strong>หน่วยงาน:</strong> สำนักดิจิทัลการแพทย์</p>
-        <p class="text-gray-700"><i class="fa-solid fa-phone text-gray-400 w-5"></i> <strong>โทรศัพท์:</strong> 0-2590-6315</p>
-        <p class="text-gray-700"><i class="fa-solid fa-envelope text-gray-400 w-5"></i> <strong>อีเมล:</strong> saran.j@dms.mail.go.th</p>
+      <div class="bg-slate-50 dark:bg-slate-950/60 rounded-xl p-3 text-left mb-5 border border-slate-200/80 dark:border-slate-800 text-sm space-y-2">
+        <p class="text-slate-700 dark:text-slate-300"><i class="fa-solid fa-building text-slate-400 w-5"></i> <strong>หน่วยงาน:</strong> สำนักดิจิทัลการแพทย์</p>
+        <p class="text-slate-700 dark:text-slate-300"><i class="fa-solid fa-phone text-slate-400 w-5"></i> <strong>โทรศัพท์:</strong> 0-2590-6315</p>
+        <p class="text-slate-700 dark:text-slate-300"><i class="fa-solid fa-envelope text-slate-400 w-5"></i> <strong>อีเมล:</strong> saran.j@dms.mail.go.th</p>
       </div>
 
-      <button onclick="hideStaffPopup()" class="w-full bg-[#122e5a] text-white text-sm py-2.5 rounded-lg font-bold hover:bg-blue-900 transition">
+      <button onclick="hideStaffPopup()" class="w-full h-10 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 text-white text-xs rounded-xl font-bold transition">
         รับทราบและปิดหน้าต่าง
       </button>
     </div>
