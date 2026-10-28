@@ -144,7 +144,7 @@
             <button onclick="openAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl transition shadow-sm">
               <i class="fa-solid fa-plus mr-2 text-sm"></i> เพิ่มข้อมูล
             </button>
-            <button onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+            <button id="btnExportExcel" onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-600">
               <i class="fa-solid fa-file-excel mr-2 text-sm"></i> ดาวน์โหลด Excel
             </button>
           </div>
