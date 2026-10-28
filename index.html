@@ -173,14 +173,7 @@
           <table id="mainTable" class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th class="py-4 px-3 w-14 text-center">
-                  <div class="flex flex-col items-center">
-                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
-                    <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
-                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
-                  </div>
-                </th>
-                <th class="py-4 px-3 w-12 text-center">#</th>
+                <th class="py-4 px-4 w-14 text-center">#</th>
                 <th onclick="sortTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
                   สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
@@ -254,14 +247,7 @@
           <table class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th rowspan="2" class="py-4 px-3 w-12 text-center">
-                  <div class="flex flex-col items-center">
-                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
-                    <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
-                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
-                  </div>
-                </th>
-                <th rowspan="2" class="py-4 px-3 w-12 text-center">#</th>
+                <th rowspan="2" class="py-4 px-4 w-12 text-center">#</th>
                 <th rowspan="2" onclick="sortSummaryTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
                   สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
@@ -686,7 +672,6 @@
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets;
 
-        // รับข้อมูล User กลับมาจาก API เดียวกันเลย (ความเร็วอัปเกรดแล้ว)
         if (res.user) {
           userAgency = res.user.agency || "";
           userEmail = res.user.email || "";
@@ -775,7 +760,7 @@
       allRows.forEach(row => {
         const id = row.getAttribute('data-id');
         if (id) {
-          domActiveState[id] = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+          domActiveState[id] = row.querySelector('.status-select') ? (row.querySelector('.status-select').value === 'ใช้งาน') : false;
           domPdpaState[id] = row.querySelector('.pdpa-cb') ? row.querySelector('.pdpa-cb').checked : false;
         }
       });
@@ -868,7 +853,7 @@
         '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ' + (name ? ': ' + escapeHtml(name) : '');
 
       document.getElementById('edit_sysType').value = row.querySelector('.type-select').value;
-      // โหลด 4 ช่องเข้า Modal
+      
       document.getElementById('edit_swApp').value = row.querySelector('.swApp-val').value;
       document.getElementById('edit_swFe').value = row.querySelector('.swFe-val').value;
       document.getElementById('edit_swBe').value = row.querySelector('.swBe-val').value;
@@ -894,7 +879,7 @@
       if (!row) return;
 
       row.querySelector('.type-select').value = document.getElementById('edit_sysType').value;
-      // เซฟ 4 ช่องลง Hidden Input ในตาราง
+      
       row.querySelector('.swApp-val').value = document.getElementById('edit_swApp').value;
       row.querySelector('.swFe-val').value = document.getElementById('edit_swFe').value;
       row.querySelector('.swBe-val').value = document.getElementById('edit_swBe').value;
@@ -916,7 +901,6 @@
       closeEditModal();
     }
 
-    // 🟢 ใช้เทคนิค HTML Array ก้อนเดียว โหลดเร็วขึ้นหลายเท่า
     function renderMainTable() {
       const tbody = document.getElementById('mainTableBody');
       let count = 0;
@@ -935,7 +919,7 @@
             <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
           </select>`;
 
-        const isChecked = (currentStatus === 'ใช้งาน') ? 'checked' : '';
+        const isChecked = (currentStatus === 'ใช้งาน');
         const rowDisabledClass = isChecked ? '' : 'row-disabled';
         const fieldDisabled = isChecked ? '' : 'disabled';
 
@@ -945,10 +929,7 @@
 
         htmlRows.push(`
           <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
-            <td class="py-3 px-3 text-center">
-              <input type="checkbox" onchange="toggleRowActive(this)" class="active-cb w-4 h-4 text-emerald-600 rounded cursor-pointer" ${isChecked}>
-            </td>
-            <td class="py-3 px-3 text-center text-slate-400 font-mono">${++count}</td>
+            <td class="py-3 px-4 text-center text-slate-400 font-mono">${++count}</td>
             <td class="py-3 px-4 text-center">${statusSelectHtml}</td>
             <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell" data-original-contact="${escapeHtml(item.contact)}">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-4 text-center cell-type">${badgeType}</td>
@@ -963,12 +944,10 @@
               </button>
               <div class="hidden">
                 <select ${fieldDisabled} class="type-select">${sysTypeOptions}</select>
-                
                 <input type="hidden" ${fieldDisabled} class="swApp-val" value="${escapeHtml(item.swApp)}">
                 <input type="hidden" ${fieldDisabled} class="swFe-val" value="${escapeHtml(item.swFe)}">
                 <input type="hidden" ${fieldDisabled} class="swBe-val" value="${escapeHtml(item.swBe)}">
                 <input type="hidden" ${fieldDisabled} class="swDb-val" value="${escapeHtml(item.swDb)}">
-
                 <input type="text" ${fieldDisabled} value="${escapeHtml(item.note)}" class="note-input">
                 <input type="checkbox" ${fieldDisabled} class="pdpa-cb" ${item.pdpa ? 'checked' : ''}>
                 <select ${fieldDisabled} class="c-select">${ciaOpts(item.c)}</select>
@@ -981,7 +960,7 @@
       });
 
       if (htmlRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
       } else {
         tbody.innerHTML = htmlRows.join('');
       }
@@ -989,63 +968,16 @@
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         if (row.querySelector('.pdpa-cb')) updateImpact(row.querySelector('.pdpa-cb'), false);
       });
-      const masterCb = document.getElementById('selectAllCb');
-      if (masterCb) masterCb.checked = false;
     }
 
     function handleStatusChange(selectElement) {
       const row = selectElement.closest('tr');
-      const cb = row.querySelector('.active-cb');
-      const isConfirmed = selectElement.value === 'ใช้งาน';
-      if (cb && cb.checked !== isConfirmed) {
-        cb.checked = isConfirmed;
-        toggleRowActive(cb, true);
-      }
+      const isActive = selectElement.value === 'ใช้งาน';
+      toggleRowState(row, isActive, true);
     }
 
-    function sortTable(column) {
-      const tbody = document.getElementById('mainTableBody');
-      const rows = Array.from(tbody.querySelectorAll('.asset-row'));
-      sortDirection[column] = !sortDirection[column];
-      const asc = sortDirection[column];
-
-      rows.sort((a, b) => {
-        let valA = '', valB = '';
-        if (column === 'type') { valA = a.getAttribute('data-type'); valB = b.getAttribute('data-type'); }
-        if (column === 'status') { valA = a.querySelector('.status-select').value; valB = b.querySelector('.status-select').value; }
-        if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
-        if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
-        if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
-        if (column === 'name') { valA = a.querySelector('.cell-name').value; valB = b.querySelector('.cell-name').value; }
-        if (column === 'impact') { valA = parseInt(a.querySelector('.impact-badge').innerText); valB = parseInt(b.querySelector('.impact-badge').innerText); }
-        if (valA < valB) return asc ? -1 : 1;
-        if (valA > valB) return asc ? 1 : -1;
-        return 0;
-      });
-
-      rows.forEach(row => tbody.appendChild(row));
-      applyFilterAndPagination();
-    }
-
-    function toggleSelectAll(masterCb) {
-      const isChecked = masterCb.checked;
-      document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        if (row.style.display !== 'none') {
-          const cb = row.querySelector('.active-cb');
-          if (cb) {
-            cb.checked = isChecked;
-            toggleRowActive(cb, false);
-            row.classList.add('is-changed');
-          }
-        }
-      });
-      updateCardDashboard();
-    }
-
-    function toggleRowActive(cb, shouldUpdateDash = true) {
-      const row = cb.closest('tr');
-      const isActive = cb.checked;
-      const elements = row.querySelectorAll('input:not(.active-cb), select:not(.status-select), button.manage-btn');
+    function toggleRowState(row, isActive, shouldUpdateDash = true) {
+      const elements = row.querySelectorAll('input, select:not(.status-select), button.manage-btn');
       const statusSelect = row.querySelector('.status-select');
 
       if (isActive) {
@@ -1064,6 +996,29 @@
         }
       }
       if (shouldUpdateDash) updateCardDashboard();
+    }
+
+    function sortTable(column) {
+      const tbody = document.getElementById('mainTableBody');
+      const rows = Array.from(tbody.querySelectorAll('.asset-row'));
+      sortDirection[column] = !sortDirection[column];
+      const asc = sortDirection[column];
+
+      rows.sort((a, b) => {
+        let valA = '', valB = '';
+        if (column === 'type') { valA = a.getAttribute('data-type'); valB = b.getAttribute('data-type'); }
+        if (column === 'status') { valA = a.querySelector('.status-select').value; valB = b.querySelector('.status-select').value; }
+        if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
+        if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
+        if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
+        if (column === 'name') { valA = a.querySelector('.cell-name').value; valB = b.querySelector('.cell-name').value; }
+        if (valA < valB) return asc ? -1 : 1;
+        if (valA > valB) return asc ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+      applyFilterAndPagination();
     }
 
     function updateImpact(elem, shouldUpdateDash = true) {
@@ -1144,8 +1099,8 @@
     function prepareSummaryData() {
       summaryDataList = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
-        if (!isActive) return;
+        const statusVal = row.querySelector('.status-select').value;
+        if (statusVal !== 'ใช้งาน') return; // ดึงเฉพาะรายการที่เปิดใช้งาน
 
         const id = row.getAttribute('data-id');
         const asset = allAssets.find(a => String(a.id) === String(id));
@@ -1158,7 +1113,7 @@
           id: asset.id,
           isSaved: asset.isSaved,
           contact: contactNow,
-          statusVal: row.querySelector('.status-select') ? row.querySelector('.status-select').value : 'ใช้งาน',
+          statusVal: statusVal,
           ip: asset.ip,
           privateIp: asset.privateIp,
           domain: asset.domain,
@@ -1223,7 +1178,7 @@
       const totalFiltered = filteredSummaryDataList.length;
 
       if (totalFiltered === 0) {
-        summaryBody.innerHTML = '<tr><td colspan="19" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
+        summaryBody.innerHTML = '<tr><td colspan="18" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
         document.getElementById('summaryPaginationControls').style.display = 'none';
         return;
       }
@@ -1248,8 +1203,7 @@
 
         summaryBody.insertAdjacentHTML('beforeend', `
           <tr class="hover:bg-slate-50/80 transition">
-            <td class="py-3.5 px-3 text-center"><input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded"></td>
-            <td class="py-3.5 px-3 text-center text-slate-400 font-mono">${count}</td>
+            <td class="py-3.5 px-4 text-center text-slate-400 font-mono">${count}</td>
             <td class="py-3.5 px-4 text-center">${statusBadge}</td>
             <td class="py-3.5 px-4 text-slate-600 font-medium text-[11px]">${escapeHtml(data.contact) || '-'}</td>
             <td class="py-3.5 px-4 text-center">${badgeType}</td>
@@ -1285,8 +1239,8 @@
     function exportToExcel() {
       const excelData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
-        if (!isActive) return;
+        const statusVal = row.querySelector('.status-select').value;
+        if (statusVal !== 'ใช้งาน') return;
 
         const id = row.getAttribute('data-id');
         const asset = allAssets.find(a => String(a.id) === String(id));
@@ -1338,7 +1292,8 @@
     async function submitToDatabase() {
       const payloadData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+        const statusVal = row.querySelector('.status-select') ? row.querySelector('.status-select').value : 'ไม่ใช้งาน';
+        const isActive = statusVal === 'ใช้งาน';
         const id = row.getAttribute('data-id');
 
         if (id && (isActive || row.classList.contains('is-changed'))) {
