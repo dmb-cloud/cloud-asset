@@ -139,7 +139,7 @@
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
               <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
             </h2>
-
+            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "แก้ไข" เพื่อตรวจสอบ แก้ไขข้อมูล และบันทึกผลกระทบความเสี่ยง หรือกด "เพิ่มข้อมูล" เพื่อเพิ่มระบบใหม่</p>
           </div>
           <div class="flex gap-2 w-full sm:w-auto">
             <button onclick="openAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-4 py-2 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl transition shadow-sm">
@@ -160,9 +160,7 @@
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
-            <select id="typeFilterSelect" onchange="applyFilterAndPagination(true)" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
-              <option value="domain">Domain</option>
-            </select>
+            <!-- เอา Dropdown Filter Type ออกแล้ว -->
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             <div class="flex items-center gap-2.5">
               <span class="font-medium">แสดง:</span>
@@ -198,8 +196,11 @@
                 <th onclick="sortTable('ip')" class="py-4 px-4 min-w-[110px] th-sortable transition">
                   IP_Public <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
+                <th onclick="sortTable('os')" class="py-4 px-3 min-w-[90px] th-sortable transition">
+                  OS <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                </th>
                 <th class="py-4 px-4 min-w-[180px]">
-                  Software Stack
+                  Software <span class="font-normal opacity-70">(App | FE | BE | DB)</span>
                 </th>
                 <th onclick="sortTable('impact')" class="py-4 px-3 text-center min-w-[90px] th-sortable transition">
                   Impact <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
@@ -658,12 +659,6 @@
 
       $('edit_type').innerHTML = TYPES.map(([label, val]) =>
         `<option value="${escapeHtml(val.trim())}">${escapeHtml(label)}</option>`).join('');
-
-      let filterHtml = '<option value="domain">Domain</option>';
-      TYPES.forEach(([label, val]) => {
-        filterHtml += `<option value="${escapeHtml(val.trim().toLowerCase())}">${escapeHtml(label)}</option>`;
-      });
-      $('typeFilterSelect').innerHTML = filterHtml;
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
@@ -695,16 +690,21 @@
           }">${impact}</span>`;
         }
 
-        const os = item.os ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-gray-100 text-gray-700 border border-gray-300 truncate" title="OS: ${escapeHtml(item.os)}"><span class="font-bold mr-1 opacity-70">OS:</span> <span class="truncate">${escapeHtml(item.os)}</span></div>` : '';
-        const app = item.swApp ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-slate-100 text-slate-600 border border-slate-200 truncate" title="App: ${escapeHtml(item.swApp)}"><span class="font-bold mr-1 opacity-60">App:</span> <span class="truncate">${escapeHtml(item.swApp)}</span></div>` : '';
-        const fe = item.swFe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-sky-50 text-sky-700 border border-sky-200 truncate" title="Frontend: ${escapeHtml(item.swFe)}"><span class="font-bold mr-1 opacity-60">FE:</span> <span class="truncate">${escapeHtml(item.swFe)}</span></div>` : '';
-        const be = item.swBe ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-violet-50 text-violet-700 border border-violet-200 truncate" title="Backend: ${escapeHtml(item.swBe)}"><span class="font-bold mr-1 opacity-60">BE:</span> <span class="truncate">${escapeHtml(item.swBe)}</span></div>` : '';
-        const db = item.swDb ? `<div class="flex items-center px-1.5 py-0.5 rounded text-[9px] bg-amber-50 text-amber-700 border border-amber-200 truncate" title="Database: ${escapeHtml(item.swDb)}"><span class="font-bold mr-1 opacity-60">DB:</span> <span class="truncate">${escapeHtml(item.swDb)}</span></div>` : '';
+        // คอลัมน์ OS
+        const osHtml = item.os 
+          ? `<span class="truncate block w-full max-w-[100px]" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
+          : `<span class="text-slate-300">-</span>`;
+
+        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
+        const swParts = [];
+        if (item.swApp) swParts.push(escapeHtml(item.swApp));
+        if (item.swFe) swParts.push(escapeHtml(item.swFe));
+        if (item.swBe) swParts.push(escapeHtml(item.swBe));
+        if (item.swDb) swParts.push(escapeHtml(item.swDb));
         
-        let swStack = `<div class="flex flex-col gap-1 w-full max-w-[160px]">${os}${app}${fe}${be}${db}</div>`;
-        if (!os && !app && !fe && !be && !db) {
-          swStack = `<span class="text-slate-300 font-medium text-center block">-</span>`;
-        }
+        let swStack = swParts.length > 0 
+          ? `<div class="truncate w-full max-w-[180px] text-[10px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
+          : `<span class="text-slate-300 font-medium">-</span>`;
 
         let lastUpdateStr = '-', ts = 0;
         if (item.lastUpdate) {
@@ -724,7 +724,8 @@
             <td class="py-3 px-4"><div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div></td>
             <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
             <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip) || '-'}</td>
-            <td class="py-2 px-4 cell-sw">${swStack}</td>
+            <td class="py-3 px-3 text-slate-700 text-[10px] font-medium cell-os">${osHtml}</td>
+            <td class="py-3 px-4 cell-sw">${swStack}</td>
             <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact || 1) : 0}">${impactBadgeHtml}</td>
             <td class="py-3 px-3 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate" data-ts="${ts}">${lastUpdateStr}</td>
@@ -738,7 +739,7 @@
 
       $('mainTableBody').innerHTML = htmlRows.length
         ? htmlRows.join('')
-        : `<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล — ตรวจสอบว่าหน่วยงานในชีตตรงกับ "${escapeHtml(userAgency)}" และ OwnerGroup ของท่าน</td></tr>`;
+        : `<tr><td colspan="11" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล — ตรวจสอบว่าหน่วยงานในชีตตรงกับ "${escapeHtml(userAgency)}" และ OwnerGroup ของท่าน</td></tr>`;
     }
 
     function sortTable(column) {
@@ -758,6 +759,7 @@
         if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
         if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
         if (column === 'name') { valA = a.querySelector('.cell-name').innerText; valB = b.querySelector('.cell-name').innerText; }
+        if (column === 'os') { valA = a.querySelector('.cell-os').innerText; valB = b.querySelector('.cell-os').innerText; }
         if (column === 'impact') { valA = parseInt(a.querySelector('.cell-impact').getAttribute('data-impact')); valB = parseInt(b.querySelector('.cell-impact').getAttribute('data-impact')); }
         if (column === 'lastupdate') { valA = Number(a.querySelector('.cell-lastupdate').dataset.ts) || 0; valB = Number(b.querySelector('.cell-lastupdate').dataset.ts) || 0; }
 
@@ -774,14 +776,9 @@
     function applyFilterAndPagination(resetPage = false) {
       if (resetPage) currentPage = 1;
       const searchValue = $('searchInput').value.toLowerCase().trim();
-      const typeSel = $('typeFilterSelect').value;
       const rows = Array.from(document.querySelectorAll('#mainTableBody tr.asset-row'));
 
       const filteredRows = rows.filter((row) => {
-        const t = (row.querySelector('.cell-type').dataset.type || '').trim().toLowerCase();
-        
-        if (t !== typeSel) return false;
-        
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
         const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
         const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
@@ -818,7 +815,6 @@
     
     function resetFilters() {
       $('searchInput').value = '';
-      $('typeFilterSelect').value = 'domain';
       $('pageSizeSelect').value = '10';
       pageSize = 10;
       applyFilterAndPagination(true);
