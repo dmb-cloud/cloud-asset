@@ -643,7 +643,7 @@
 
       allAssets.forEach((item) => {
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        if (!isDomain) return;
+       //  if (!isDomain) return;
 
         // ไม่เอา checkbox ใช้ status เดิมถ้าเคยเป็น 'ใช้งาน' หรือไม่เคยเชฟจะเป็น 'ไม่ใช้งาน'
         const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
