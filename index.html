@@ -138,7 +138,7 @@
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
           <div>
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
-              <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด (Domain)
+              <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด
             </h2>
             <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "ประเมิน" เพื่อตรวจสอบข้อมูลและบันทึกผลกระทบความเสี่ยง</p>
           </div>
@@ -176,26 +176,34 @@
           <table id="mainTable" class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th onclick="sortTable('index')" class="py-4 px-3 w-12 text-center th-sortable transition">
+                <th onclick="sortTable('index')" class="py-4 px-3 w-10 text-center th-sortable transition">
                   # <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th onclick="sortTable('status')" class="py-4 px-4 min-w-[100px] text-center th-sortable transition">
-                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                <th onclick="sortTable('type')" class="py-4 px-3 text-center th-sortable transition min-w-[80px]">
+                  Type <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th onclick="sortTable('contact')" class="py-4 px-4 min-w-[130px] th-sortable transition">
-                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('ip')" class="py-4 px-4 min-w-[130px] th-sortable transition">
-                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                <th onclick="sortTable('name')" class="py-4 px-4 min-w-[160px] th-sortable transition">
+                  Resource_Name <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
                 <th onclick="sortTable('domain')" class="py-4 px-4 min-w-[150px] th-sortable transition">
-                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                  Domain_name <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th onclick="sortTable('name')" class="py-4 px-4 min-w-[200px] th-sortable transition">
-                  ชื่อระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                <th onclick="sortTable('ip')" class="py-4 px-4 min-w-[110px] th-sortable transition">
+                  IP_Public <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
-                <th class="py-4 px-4 text-center min-w-[100px]">ผลกระทบ</th>
-                <th class="py-4 px-4 text-center w-28">จัดการ</th>
+                <th class="py-4 px-4 min-w-[180px]">
+                  Software Stack
+                </th>
+                <th onclick="sortTable('impact')" class="py-4 px-3 text-center min-w-[90px] th-sortable transition">
+                  Impact <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                </th>
+                <th onclick="sortTable('contact')" class="py-4 px-3 min-w-[120px] th-sortable transition">
+                  Assessor <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                </th>
+                <th onclick="sortTable('lastupdate')" class="py-4 px-3 min-w-[100px] th-sortable transition text-center">
+                  Last_Update <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
+                </th>
+                <th class="py-4 px-3 text-center w-24">จัดการ</th>
               </tr>
             </thead>
             <tbody id="mainTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
@@ -208,7 +216,6 @@
             <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl">หน้า 1 / 1</span>
             <button onclick="changePage(1)" class="nextBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
           </div>
-          <!-- ถอดปุ่ม "ถัดไป (สรุปข้อมูล)" ออกไปเลย เพราะไม่ได้ใช้งาน Step 2 แล้ว -->
         </div>
       </div>
     </div>
@@ -229,51 +236,12 @@
           </div>
         </div>
       </div>
-
       <div class="p-5 overflow-y-auto text-xs text-slate-700 space-y-4 leading-relaxed">
         <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#122e5a] p-4 rounded-xl">
-          <p class="font-bold text-[#122e5a] text-sm">
-            <a href="https://drive.google.com/file/d/1ZmGmwWtDEY29vJaHtQrIgfctnI_FD0Th/view?usp=sharing" target="_blank" rel="noopener">
-              <i class="fa-solid fa-file-lines mr-2 text-slate-400"></i>
-            </a>
-            อ้างอิง: หนังสือ สธ 0212.07/ว7009 ลงวันที่ 13 สิงหาคม 2569
-          </p>
-          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน 3 ประการ</p>
-        </div>
-
-        <div class="space-y-3">
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-            <p class="font-bold text-rose-800 text-sm flex items-center">
-              <i class="fa-solid fa-key w-6 text-center mr-1"></i> 1. การบังคับเปลี่ยนรหัสผ่าน (Force Reset Password)
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">ให้หน่วยงานแจ้งผู้ดูแลระบบดำเนินการ
-              <strong class="text-rose-600">บังคับให้ผู้ใช้งานทุกรายทำการเปลี่ยนรหัสผ่านใหม่ทั้งหมดในทุกระดับสิทธิ์ทันที</strong>
-              เพื่อเป็นการตัดวงจรภัยคุกคาม
-            </p>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-            <p class="font-bold text-amber-800 text-sm flex items-center">
-              <i class="fa-solid fa-broom w-6 text-center mr-1"></i> 2. การทำความสะอาดระบบ (System Cleansing)
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">เร่งตรวจสอบระบบสารสนเทศ หากพบ
-              <strong class="text-amber-600">"ระบบเก่า" หรือ "ระบบร้าง"</strong> ที่ไม่มีการใช้งานแล้ว ให้ดำเนินการ
-              <strong>ปิดการเข้าถึงในระดับโครงสร้างระบบ (Back-end) อย่างถาวร ภายใน 15 วัน</strong>
-            </p>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-            <p class="font-bold text-sky-800 text-sm flex items-center">
-              <i class="fa-solid fa-shield-halved w-6 text-center mr-1"></i> 3. การยกระดับการยืนยันตัวตน (MFA) และการควบคุมการเข้าถึง
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA) เช่น Digital Identity (ThaID) มาใช้</p>
-          </div>
+          <p class="font-bold text-[#122e5a] text-sm">อ้างอิง: หนังสือ สธ 0212.07/ว7009</p>
+          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน</p>
         </div>
       </div>
-
       <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
         <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
           <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
@@ -339,7 +307,7 @@
               </div>
             </div>
 
-            <!-- ซอฟต์แวร์ที่ใช้ -->
+            <!-- ช่องกรอกข้อความ 4 ช่องแยกกันตามชีต -->
             <div class="space-y-3 mt-3 pt-3 border-t border-slate-200">
               <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</p>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -409,6 +377,7 @@
 
         <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
           <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">ยกเลิก</button>
+          <!-- ปุ่มนี้จะทำงานบันทึกแค่ ID เดียวเท่านั้น (ตรวจสอบแล้ว) -->
           <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-save mr-1"></i> บันทึกข้อมูลการประเมิน</button>
         </div>
       </form>
@@ -553,8 +522,6 @@
           overlay.classList.add('opacity-0');
           setTimeout(() => {
             overlay.classList.add('hidden');
-            const popup = document.getElementById('announcementPopup');
-            if (popup) popup.classList.remove('hidden');
           }, 300);
         }
       } else {
@@ -623,12 +590,6 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
-    const STATUS_ON_CLASS = "status-select bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
-    const STATUS_OFF_CLASS = "status-select bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
-    const FIELD_CLASS = "w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-800 outline-none focus:ring-1 focus:ring-sky-500";
-    const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
-    const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
-
     function initEditModal() {
       document.getElementById('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
@@ -642,19 +603,17 @@
       const htmlRows = [];
 
       allAssets.forEach((item) => {
+        // ดึงเฉพาะ Domain (ปรับได้ถ้าต้องการให้โชว์ทุกอย่าง)
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-       //  if (!isDomain) return;
+        if (!isDomain) return;
 
-        // ไม่เอา checkbox ใช้ status เดิมถ้าเคยเป็น 'ใช้งาน' หรือไม่เคยเชฟจะเป็น 'ไม่ใช้งาน'
         const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
         const isActive = currentStatus === 'ใช้งาน';
-
-        const statusSelectHtml = `
-          <select class="status-select bg-white border border-slate-300 rounded-xl text-[10px] font-bold py-1 px-2 focus:outline-none" disabled>
-            <option value="ใช้งาน" ${isActive ? 'selected' : ''}>✅ ใช้งาน</option>
-            <option value="ไม่ใช้งาน" ${!isActive ? 'selected' : ''}>❌ ไม่ใช้งาน</option>
-          </select>
-        `;
+        
+        // รูปแบบ badge ของประเภท (Type)
+        const badgeType = isDomain 
+          ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe"></i> Domain</span>`
+          : `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server"></i> Server</span>`;
 
         let impactBadgeHtml = "-";
         if (item.isSaved) {
@@ -664,21 +623,46 @@
           }">${impact}</span>`;
         }
 
+        // จัดรวมกลุ่มซอฟต์แวร์ให้อยู่คอลัมน์เดียวกัน
+        const swStack = `
+          <div class="text-[10px] space-y-0.5 leading-tight">
+            <div><span class="font-bold text-slate-500 mr-1">App:</span> ${escapeHtml(item.swApp) || '-'}</div>
+            <div><span class="font-bold text-slate-500 mr-1">FE:</span> ${escapeHtml(item.swFe) || '-'}</div>
+            <div><span class="font-bold text-slate-500 mr-1">BE:</span> ${escapeHtml(item.swBe) || '-'}</div>
+            <div><span class="font-bold text-slate-500 mr-1">DB:</span> ${escapeHtml(item.swDb) || '-'}</div>
+          </div>
+        `;
+
+        // แปลงวันที่ (ถ้ามีค่าส่งมาจาก Code.gs จะแสดง ถ้าไม่มีจะขึ้นขีด)
+        let lastUpdateStr = '-';
+        if (item.lastUpdate && item.lastUpdate !== "") {
+          const d = new Date(item.lastUpdate);
+          if (!isNaN(d)) {
+            lastUpdateStr = d.toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' }) + 
+                            ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+          }
+        }
+
+        // โครงสร้าง Table Row ตรงกับ Header ที่แก้ไข
         htmlRows.push(`
-          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
+          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${++count}</td>
-            <td class="py-3 px-4 text-center cell-status" data-status="${escapeHtml(currentStatus)}">${statusSelectHtml}</td>
-            <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
-            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
-            <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
+            <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
             <td class="py-3 px-4">
-              <span class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</span>
+              <div class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</div>
             </td>
-            <td class="py-3 px-4 text-center cell-impact" data-impact="${item.isSaved ? (item.impact||1) : 0}">
+            <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
+            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
+            
+            <td class="py-2 px-4 cell-sw">${swStack}</td>
+            
+            <td class="py-3 px-3 text-center cell-impact" data-impact="${item.isSaved ? (item.impact||1) : 0}">
               ${impactBadgeHtml}
             </td>
-            <td class="py-3 px-4 text-center">
-              <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-4 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center gap-1.5">
+            <td class="py-3 px-3 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
+            <td class="py-3 px-3 text-center text-slate-500 text-[10px] cell-lastupdate">${lastUpdateStr}</td>
+            <td class="py-3 px-3 text-center">
+              <button type="button" onclick="openEditModal('${escapeHtml(item.id)}')" class="px-3 py-2 bg-theme hover:opacity-90 text-white text-[11px] font-bold rounded-xl transition shadow-sm inline-flex items-center gap-1.5">
                 <i class="fa-solid fa-pen-to-square"></i> <span>ประเมิน</span>
               </button>
             </td>
@@ -686,7 +670,7 @@
       });
 
       if (htmlRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เป็น Domain</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เป็น Domain</td></tr>';
       } else {
         tbody.innerHTML = htmlRows.join('');
       }
@@ -704,13 +688,15 @@
           valA = parseInt(a.querySelector('.cell-index').textContent, 10) || 0;
           valB = parseInt(b.querySelector('.cell-index').textContent, 10) || 0;
         }
-        if (column === 'status') { valA = a.querySelector('.cell-status').getAttribute('data-status'); valB = b.querySelector('.cell-status').getAttribute('data-status'); }
+        if (column === 'type') { valA = a.querySelector('.cell-type').getAttribute('data-type'); valB = b.querySelector('.cell-type').getAttribute('data-type'); }
         if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
         if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
         if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
         if (column === 'name') { valA = a.querySelector('.cell-name').innerText; valB = b.querySelector('.cell-name').innerText; }
+        if (column === 'impact') { valA = parseInt(a.querySelector('.cell-impact').getAttribute('data-impact')); valB = parseInt(b.querySelector('.cell-impact').getAttribute('data-impact')); }
+        if (column === 'lastupdate') { valA = a.querySelector('.cell-lastupdate').innerText; valB = b.querySelector('.cell-lastupdate').innerText; }
         
-        if (column === 'index') return asc ? valA - valB : valB - valA;
+        if (column === 'index' || column === 'impact') return asc ? valA - valB : valB - valA;
         if (valA < valB) return asc ? -1 : 1;
         if (valA > valB) return asc ? 1 : -1;
         return 0;
@@ -800,7 +786,6 @@
       document.getElementById('edit_sysType').value = asset.sysType || "ระบบบริการ (Web Services)";
       document.getElementById('edit_note').value = asset.note || "";
       
-      // ดึง 4 ฟิลด์ (ต้องเช็คชื่อตัวแปรที่รับมาจาก backend ให้ตรงกัน คือ swApp, swFe, swBe, swDb)
       document.getElementById('edit_swApp').value = asset.swApp || "";
       document.getElementById('edit_swFe').value = asset.swFe || "";
       document.getElementById('edit_swBe').value = asset.swBe || "";
@@ -820,7 +805,7 @@
       editingAssetId = null;
     }
 
-    // บันทึกเฉพาะ 1 รายการนี้ ส่งไป API ทันที
+    // บันทึกเฉพาะ 1 รายการนี้ (ส่ง array 1 ชิ้น)
     async function saveSingleAssessment(e) {
       e.preventDefault();
       if (!editingAssetId) return;
@@ -837,7 +822,7 @@
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
-      // จัด Payload ให้ตรงกับฝั่ง backend (ใช้ swApp, swFe, swBe, swDb ให้ตรงกับ code.gs ล่าสุด)
+      // ระบบส่ง Payload แค่ 1 Object (ID ที่กำลังแก้เท่านั้น มั่นใจได้ว่าแก้เฉพาะ ID นี้)
       const payload = [{
         id: editingAssetId,
         resourceName: document.getElementById('edit_name').value,
@@ -861,7 +846,7 @@
       btn.disabled = false;
 
       if (res && res.success) {
-        // อัปเดตข้อมูลใน allAssets
+        // อัปเดตข้อมูลใน allAssets ในฝั่ง UI ด้วยค่าใหม่
         const assetIndex = allAssets.findIndex(a => String(a.id) === String(editingAssetId));
         if (assetIndex > -1) {
           allAssets[assetIndex].name = payload[0].resourceName;
@@ -879,6 +864,7 @@
           allAssets[assetIndex].impact = payload[0].impact;
           allAssets[assetIndex].isSaved = true;
           allAssets[assetIndex].contact = userName; // ผู้บันทึกล่าสุด
+          allAssets[assetIndex].lastUpdate = new Date().toISOString(); // อัปเดตเวลาจำลองบน UI
         }
 
         renderMainTable();
@@ -897,10 +883,8 @@
     // ---------- export ----------
     function exportToExcel() {
       const excelData = [];
-      
-      // ดึงข้อมูลทั้งหมดจาก allAssets มา Export
       allAssets.forEach(asset => {
-        if (!asset.typeFilter || asset.typeFilter.toLowerCase() !== 'domain') return; // เฉพาะ Domain
+        if (!asset.typeFilter || asset.typeFilter.toLowerCase() !== 'domain') return; 
 
         excelData.push({
           'หน่วยงาน': asset.agency || userAgency,
