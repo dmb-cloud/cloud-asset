@@ -74,10 +74,6 @@
             <i class="fa-solid fa-layer-group"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 flex gap-3 text-xs font-semibold text-slate-500">
-          <span id="cardTotalDomain"><i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: 0</span>
-          <span id="cardTotalServer"><i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: 0</span>
-        </div>
       </div>
 
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
@@ -90,10 +86,6 @@
             <i class="fa-solid fa-power-off"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">✅ ใช้งาน: <span id="cardActiveSub">0</span></span>
-          <span class="text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">❌ไม่ใช้งาน: <span id="cardInactive">0</span></span>
-        </div>
       </div>
 
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
@@ -105,10 +97,6 @@
           <div class="w-10 h-10 bg-sky-50 text-sky-600 rounded-xl flex items-center justify-center text-lg">
             <i class="fa-solid fa-clipboard-check"></i>
           </div>
-        </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">ประเมินแล้ว: <span id="cardAssessedSub">0</span></span>
-          <span class="text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full">รอประเมิน: <span id="cardPending">0</span></span>
         </div>
       </div>
 
@@ -123,11 +111,6 @@
             <i class="fa-solid fa-fingerprint"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
-          <span class="text-rose-600 flex items-center">
-            <i class="fa-solid fa-shield-halved mr-1.5"></i>ข้อมูลส่วนบุคคล
-          </span>
-        </div>
       </div>
     </div>
 
@@ -137,13 +120,18 @@
         <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-5">
           <div>
             <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2.5">
-              <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด (Domain)
+              <i class="fa-solid fa-layer-group text-sky-600"></i> รายการระบบสารสนเทศทั้งหมด (Domain ที่ใช้งาน)
             </h2>
-            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "ประเมิน" เพื่อตรวจสอบข้อมูลและบันทึกผลกระทบความเสี่ยง</p>
+            <p class="text-xs text-slate-500 mt-0.5">กดที่ปุ่ม "ประเมิน/แก้ไข" เพื่อจัดการข้อมูล หรือกด "เพิ่มระบบใหม่"</p>
           </div>
-          <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
-            <i class="fa-solid fa-file-excel mr-2 text-sm"></i> ดาวน์โหลด Excel
-          </button>
+          <div class="flex flex-col sm:flex-row gap-2">
+            <button onclick="openAddModal()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-plus mr-2 text-sm"></i> เพิ่มระบบใหม่
+            </button>
+            <button onclick="exportToExcel()" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm">
+              <i class="fa-solid fa-file-excel mr-2 text-sm"></i> ดาวน์โหลด Excel
+            </button>
+          </div>
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
@@ -151,7 +139,7 @@
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Domain..."
+            <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหาชื่อระบบ, โดเมน, IP..."
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
@@ -165,9 +153,6 @@
                 <option value="all">ทั้งหมด</option>
               </select>
             </div>
-            <button onclick="resetFilters()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition shadow-sm" title="ล้างการค้นหา">
-              <i class="fa-solid fa-rotate-right"></i>
-            </button>
           </div>
         </div>
 
@@ -175,25 +160,13 @@
           <table id="mainTable" class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th onclick="sortTable('index')" class="py-4 px-3 w-12 text-center th-sortable transition">
-                  # <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('status')" class="py-4 px-4 min-w-[100px] text-center th-sortable transition">
-                  สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('contact')" class="py-4 px-4 min-w-[130px] th-sortable transition">
-                  ผู้บันทึกล่าสุด <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('ip')" class="py-4 px-4 min-w-[130px] th-sortable transition">
-                  เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('domain')" class="py-4 px-4 min-w-[150px] th-sortable transition">
-                  โครงการ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th onclick="sortTable('name')" class="py-4 px-4 min-w-[200px] th-sortable transition">
-                  ชื่อระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
-                </th>
-                <th class="py-4 px-4 text-center min-w-[100px]">ผลกระทบ</th>
+                <th onclick="sortTable('index')" class="py-4 px-3 w-12 text-center th-sortable transition"># <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th onclick="sortTable('status')" class="py-4 px-4 min-w-[90px] text-center th-sortable transition">สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th onclick="sortTable('contact')" class="py-4 px-4 min-w-[130px] th-sortable transition">ผู้บันทึก <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th onclick="sortTable('domain')" class="py-4 px-4 min-w-[200px] th-sortable transition">โดเมน / เซิร์ฟเวอร์ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th onclick="sortTable('type')" class="py-4 px-4 min-w-[120px] th-sortable transition text-center">ประเภท Cloud <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th onclick="sortTable('name')" class="py-4 px-4 min-w-[200px] th-sortable transition">ชื่อระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i></th>
+                <th class="py-4 px-4 text-center min-w-[90px]">ผลกระทบ</th>
                 <th class="py-4 px-4 text-center w-28">จัดการ</th>
               </tr>
             </thead>
@@ -213,93 +186,52 @@
 
   </div>
 
-  <!-- Announcement Modal -->
-  <div id="announcementPopup" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200">
-      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0 border-b border-white/10">
-        <div class="flex items-center gap-3 text-white">
-          <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
-            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
-            <h2 class="text-base md:text-lg font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
-          </div>
-        </div>
-      </div>
-
-      <div class="p-5 overflow-y-auto text-xs text-slate-700 space-y-4 leading-relaxed">
-        <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#122e5a] p-4 rounded-xl">
-          <p class="font-bold text-[#122e5a] text-sm">
-            <a href="https://drive.google.com/file/d/1ZmGmwWtDEY29vJaHtQrIgfctnI_FD0Th/view?usp=sharing" target="_blank" rel="noopener">
-              <i class="fa-solid fa-file-lines mr-2 text-slate-400"></i>
-            </a>
-            อ้างอิง: หนังสือ สธ 0212.07/ว7009 ลงวันที่ 13 สิงหาคม 2569
-          </p>
-          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน 3 ประการ</p>
-        </div>
-
-        <div class="space-y-3">
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-            <p class="font-bold text-rose-800 text-sm flex items-center">
-              <i class="fa-solid fa-key w-6 text-center mr-1"></i> 1. การบังคับเปลี่ยนรหัสผ่าน (Force Reset Password)
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">ให้หน่วยงานแจ้งผู้ดูแลระบบดำเนินการ
-              <strong class="text-rose-600">บังคับให้ผู้ใช้งานทุกรายทำการเปลี่ยนรหัสผ่านใหม่ทั้งหมดในทุกระดับสิทธิ์ทันที</strong>
-              เพื่อเป็นการตัดวงจรภัยคุกคาม
-            </p>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-            <p class="font-bold text-amber-800 text-sm flex items-center">
-              <i class="fa-solid fa-broom w-6 text-center mr-1"></i> 2. การทำความสะอาดระบบ (System Cleansing)
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">เร่งตรวจสอบระบบสารสนเทศ หากพบ
-              <strong class="text-amber-600">"ระบบเก่า" หรือ "ระบบร้าง"</strong> ที่ไม่มีการใช้งานแล้ว ให้ดำเนินการ
-              <strong>ปิดการเข้าถึงในระดับโครงสร้างระบบ (Back-end) อย่างถาวร ภายใน 15 วัน</strong>
-            </p>
-          </div>
-
-          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-1 h-full bg-sky-500"></div>
-            <p class="font-bold text-sky-800 text-sm flex items-center">
-              <i class="fa-solid fa-shield-halved w-6 text-center mr-1"></i> 3. การยกระดับการยืนยันตัวตน (MFA) และการควบคุมการเข้าถึง
-            </p>
-            <p class="mt-2 ml-7 text-slate-600">นำระบบการยืนยันตัวตนแบบหลายปัจจัย (Multi-Factor Authentication: MFA) เช่น Digital Identity (ThaID) มาใช้</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
-          <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Edit Modal: ประเมินความเสี่ยงระบบ -->
-  <div id="editAssetModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <!-- Edit/Add Modal -->
+  <div id="assetModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
-
       <div class="bg-theme px-6 py-4 flex justify-between items-center text-white border-b border-white/10 shrink-0">
-        <h3 id="editModalTitle" class="text-sm font-bold flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ
+        <h3 id="modalTitle" class="text-sm font-bold flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square"></i> <span id="modalTitleText">เพิ่ม/แก้ไข ระบบ</span>
         </h3>
-        <button type="button" onclick="closeEditModal()" class="text-slate-400 hover:text-white font-bold text-2xl leading-none">&times;</button>
+        <button type="button" onclick="closeModalWindow()" class="text-slate-400 hover:text-white font-bold text-2xl leading-none">&times;</button>
       </div>
 
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
         <div class="p-5 space-y-4 overflow-y-auto">
-          
           <!-- 1. ข้อมูลระบบ -->
           <section class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-              <h4 class="font-bold text-slate-800">ข้อมูลระบบ (System Info)</h4>
+              <h4 class="font-bold text-slate-800">ข้อมูลระบบและการเชื่อมต่อ (System & Network Info)</h4>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">Domain Name <span class="text-red-500">*</span></label>
+                <input type="text" id="edit_domain" required placeholder="เช่น system.dms.go.th" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">IP Public</label>
+                <input type="text" id="edit_ip" placeholder="เช่น 203.157.x.x" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">Cloud Provider (Type)</label>
+                <select id="edit_type" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+                  <option value="GDCC">GDCC</option>
+                  <option value="Private Cloud DMS">Private Cloud DMS</option>
+                  <option value="AWS">AWS</option>
+                  <option value="Azure">Azure</option>
+                  <option value="Google Cloud">Google Cloud (GCP)</option>
+                  <option value="On-Premise">On-Premise (Server ภายใน)</option>
+                  <option value="อื่นๆ">อื่นๆ</option>
+                </select>
+              </div>
+              <div>
+                <label class="font-bold mb-1 block text-slate-700">SSL Expiry Date</label>
+                <input type="date" id="edit_ssl" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-200">
               <div class="md:col-span-2">
                 <label class="font-bold mb-1 block text-slate-700">ชื่อระบบงาน (Resource Name)</label>
                 <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
@@ -312,7 +244,7 @@
                 </select>
               </div>
               <div class="md:col-span-1">
-                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Type)</label>
+                <label class="font-bold mb-1 block text-slate-700">ประเภทระบบ (System Role)</label>
                 <select id="edit_sysType" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500"></select>
               </div>
               <div class="md:col-span-2">
@@ -390,7 +322,7 @@
         </div>
 
         <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-          <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">ยกเลิก</button>
+          <button type="button" onclick="closeModalWindow()" class="px-4 py-2.5 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">ยกเลิก</button>
           <button type="submit" id="btnSaveModal" class="px-5 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition"><i class="fa-solid fa-save mr-1"></i> บันทึกข้อมูลการประเมิน</button>
         </div>
       </form>
@@ -403,9 +335,9 @@
       <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <i class="fa-solid fa-check text-4xl text-green-500"></i>
       </div>
-      <h3 class="text-2xl font-bold text-gray-800 mb-2">บันทึกเสร็จสิ้น!</h3>
+      <h3 class="text-2xl font-bold text-gray-800 mb-2">สำเร็จ!</h3>
       <p id="successMessage" class="text-sm text-gray-600 mb-6">บันทึกข้อมูลลงฐานข้อมูลเรียบร้อยแล้ว</p>
-      <button onclick="closeSuccessPopup()" class="w-full py-2.5 bg-theme text-white rounded-xl font-bold text-sm shadow-sm">ตกลง</button>
+      <button onclick="document.getElementById('successPopup').classList.add('hidden');" class="w-full py-2.5 bg-theme text-white rounded-xl font-bold text-sm shadow-sm">ตกลง</button>
     </div>
   </div>
 
@@ -439,12 +371,11 @@
     let allAssets = [];
     let sessionTimerId = null;
 
-    // Dynamic State
     let currentPage = 1;
     let pageSize = 10;
     let sortDirection = {};
+    let editingAssetId = null;
 
-    // ---------- helpers ----------
     function getToken() { return sessionStorage.getItem('access_token') || ""; }
 
     function escapeHtml(v) {
@@ -459,7 +390,6 @@
       window.location.href = "auth.html";
     }
 
-    // ---------- API ----------
     async function callBackend(action, payload = {}) {
       try {
         payload.token = getToken();
@@ -493,7 +423,6 @@
       return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
     }
 
-    // ---------- bootstrap ----------
     document.addEventListener("DOMContentLoaded", async function () {
       const exp = parseInt(sessionStorage.getItem('token_exp') || "0", 10);
       if (!getToken() || exp <= Date.now()) {
@@ -561,11 +490,7 @@
 
         if (overlay) {
           overlay.classList.add('opacity-0');
-          setTimeout(() => {
-            overlay.classList.add('hidden');
-            const popup = document.getElementById('announcementPopup');
-            if (popup) popup.classList.remove('hidden');
-          }, 300);
+          setTimeout(() => overlay.classList.add('hidden'), 300);
         }
       } else {
         if (overlay) overlay.classList.add('hidden');
@@ -582,42 +507,30 @@
     function openLogoutModal() { document.getElementById('logoutModal').classList.remove('hidden'); }
     function closeLogoutModal() { document.getElementById('logoutModal').classList.add('hidden'); }
     function closeAnnouncement() { document.getElementById('announcementPopup').classList.add('hidden'); }
-    function closeSuccessPopup() { document.getElementById('successPopup').classList.add('hidden'); }
 
-    // ---------- dashboard ----------
     function updateCardDashboard() {
       const total = allAssets.length;
-      const totalDomain = allAssets.filter(item => item.typeFilter && item.typeFilter.toLowerCase() === 'domain').length;
-      const totalServer = total - totalDomain;
-
       let activeCount = 0, assessedCount = 0, pdpaCount = 0;
 
       allAssets.forEach(item => {
         const isActive = item.status === 'ใช้งาน';
-
         if (isActive) {
           activeCount++;
           if (item.pdpa) pdpaCount++;
-          if (item.isSaved) assessedCount++;
+          if (item.impact > 0 || item.c > 0) assessedCount++;
         }
       });
 
-      const inactiveCount = total - activeCount;
-      const pendingCount = activeCount - assessedCount;
-
       document.getElementById('cardTotal').textContent = total;
-      document.getElementById('cardTotalDomain').innerHTML = `<i class="fa-solid fa-globe text-blue-400 mr-1"></i> Domain: ${totalDomain}`;
-      document.getElementById('cardTotalServer').innerHTML = `<i class="fa-solid fa-server text-indigo-400 mr-1"></i> Server: ${totalServer}`;
       document.getElementById('cardActive').textContent = activeCount;
       document.getElementById('cardActiveSub').textContent = activeCount;
-      document.getElementById('cardInactive').textContent = inactiveCount < 0 ? 0 : inactiveCount;
+      document.getElementById('cardInactive').textContent = total - activeCount;
       document.getElementById('cardAssessed').textContent = assessedCount;
       document.getElementById('cardAssessedSub').textContent = assessedCount;
-      document.getElementById('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
+      document.getElementById('cardPending').textContent = activeCount - assessedCount;
       document.getElementById('cardPdpa').textContent = pdpaCount;
     }
 
-    // ---------- main table ----------
     const SYS_TYPES = [
       ["ระบบบริการ (Web Services)", "Web Services"],
       ["ระบบฐานข้อมูล (Database System)", "Database System"],
@@ -629,11 +542,10 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
-    function initEditModal() {
+    document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
-    }
-    document.addEventListener('DOMContentLoaded', initEditModal);
+    });
 
     function renderMainTable() {
       const tbody = document.getElementById('mainTableBody');
@@ -641,36 +553,41 @@
       let count = 0;
 
       allAssets.forEach((item) => {
-        const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
-        // แสดงเฉพาะรายการที่เป็น Domain
-        if (!isDomain) return;
+        const currentStatus = item.status || 'ไม่ใช้งาน';
+        
+        // กรองแสดงเฉพาะสถานะ ใช้งาน
+        if (currentStatus !== 'ใช้งาน') return;
 
-        const currentStatus = item.status || (item.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
-        const isActive = currentStatus === 'ใช้งาน';
-
-        const statusBadge = isActive 
-          ? `<span class="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border">✅ ใช้งาน</span>`
-          : `<span class="bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border">❌ ไม่ใช้งาน</span>`;
-
+        const impact = parseInt(item.impact) || 0;
         let impactBadgeHtml = "-";
-        if (item.isSaved) {
-          const impact = item.impact || 1;
+        if (impact > 0) {
           impactBadgeHtml = `<span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
             impact === 1 ? 'bg-emerald-500 text-white' : impact === 2 ? 'bg-amber-400 text-slate-900' : 'bg-rose-600 text-white'
           }">${impact}</span>`;
         }
 
+        // ยุบรวม Domain ไว้ด้านบน IP ไว้ด้านล่าง
+        const domainStr = item.domain || '-';
+        const ipStr = item.ip || '-';
+
         const rowHtml = `
-          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
+          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${++count}</td>
-            <td class="py-3 px-4 text-center cell-status" data-status="${escapeHtml(currentStatus)}">${statusBadge}</td>
+            <td class="py-3 px-4 text-center cell-status" data-status="${escapeHtml(currentStatus)}">
+              <span class="bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border">✅ ใช้งาน</span>
+            </td>
             <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell">${escapeHtml(item.contact) || '-'}</td>
-            <td class="py-3 px-4 font-mono font-semibold text-sky-600 cell-ip">${escapeHtml(item.ip || item.privateIp) || '-'}</td>
-            <td class="py-3 px-4 text-slate-700 font-medium cell-domain">${escapeHtml(item.domain) || '-'}</td>
+            <td class="py-3 px-4 cell-domain-ip">
+              <div class="font-bold text-sky-700 text-[13px] break-all">${escapeHtml(domainStr)}</div>
+              <div class="font-mono text-slate-500 text-[11px] mt-0.5"><i class="fa-solid fa-server text-[9px] mr-1"></i>${escapeHtml(ipStr)}</div>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <span class="inline-flex px-2.5 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 rounded-md text-[10px] font-bold cell-type">${escapeHtml(item.type || '-')}</span>
+            </td>
             <td class="py-3 px-4">
               <span class="cell-name text-slate-800 font-bold">${escapeHtml(item.name)}</span>
             </td>
-            <td class="py-3 px-4 text-center cell-impact" data-impact="${item.isSaved ? (item.impact||1) : 0}">
+            <td class="py-3 px-4 text-center cell-impact" data-impact="${impact}">
               ${impactBadgeHtml}
             </td>
             <td class="py-3 px-4 text-center">
@@ -683,7 +600,7 @@
       });
 
       if (count === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เป็น Domain</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบที่เปิดใช้งานอยู่</td></tr>';
       }
     }
 
@@ -701,9 +618,9 @@
         }
         if (column === 'status') { valA = a.querySelector('.cell-status').getAttribute('data-status'); valB = b.querySelector('.cell-status').getAttribute('data-status'); }
         if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
-        if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
-        if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
-        if (column === 'name') { valA = a.querySelector('.cell-name').innerText; valB = b.querySelector('.cell-name').innerText; }
+        if (column === 'domain') { valA = a.querySelector('.cell-domain-ip').innerText.toLowerCase(); valB = b.querySelector('.cell-domain-ip').innerText.toLowerCase(); }
+        if (column === 'type') { valA = a.querySelector('.cell-type').innerText.toLowerCase(); valB = b.querySelector('.cell-type').innerText.toLowerCase(); }
+        if (column === 'name') { valA = a.querySelector('.cell-name').innerText.toLowerCase(); valB = b.querySelector('.cell-name').innerText.toLowerCase(); }
         
         if (column === 'index') return asc ? valA - valB : valB - valA;
         if (valA < valB) return asc ? -1 : 1;
@@ -722,9 +639,9 @@
 
       const filteredRows = rows.filter((row) => {
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
-        const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
-        const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
-        return nameText.includes(searchValue) || domainText.includes(searchValue) || ipText.includes(searchValue);
+        const domainIpText = row.querySelector('.cell-domain-ip').innerText.toLowerCase();
+        const typeText = row.querySelector('.cell-type').innerText.toLowerCase();
+        return nameText.includes(searchValue) || domainIpText.includes(searchValue) || typeText.includes(searchValue);
       });
 
       rows.forEach(row => row.style.display = 'none');
@@ -761,14 +678,12 @@
       applyFilterAndPagination(true);
     }
 
-    // ---------- Edit modal (ประเมินความเสี่ยงระบบ) ----------
-    let editingAssetId = null;
-
+    // ---------- Modal Add / Edit ----------
     function calcImpact() {
       const hasPdpa = document.getElementById('edit_pdpa').checked;
-      const c = parseInt(document.getElementById('edit_c').value);
-      const i = parseInt(document.getElementById('edit_i').value);
-      const a = parseInt(document.getElementById('edit_a').value);
+      const c = parseInt(document.getElementById('edit_c').value) || 1;
+      const i = parseInt(document.getElementById('edit_i').value) || 1;
+      const a = parseInt(document.getElementById('edit_a').value) || 1;
       let impact = Math.max(c, i, a);
       if (hasPdpa && impact < 2) impact = 2;
       const map = {
@@ -781,17 +696,49 @@
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
     }
 
+    function openAddModal() {
+      editingAssetId = null;
+      document.getElementById('modalTitleText').textContent = "เพิ่มระบบงานใหม่";
+      
+      // Clear forms
+      document.getElementById('edit_domain').value = "";
+      document.getElementById('edit_ip').value = "";
+      document.getElementById('edit_type').value = "GDCC";
+      document.getElementById('edit_ssl').value = "";
+      
+      document.getElementById('edit_name').value = "";
+      document.getElementById('edit_status').value = "ใช้งาน";
+      document.getElementById('edit_sysType').value = "ระบบบริการ (Web Services)";
+      document.getElementById('edit_note').value = "";
+      
+      document.getElementById('edit_swApp').value = "";
+      document.getElementById('edit_swFe').value = "";
+      document.getElementById('edit_swBe').value = "";
+      document.getElementById('edit_swDb').value = "";
+
+      document.getElementById('edit_pdpa').checked = false;
+      document.getElementById('edit_c').value = 1;
+      document.getElementById('edit_i').value = 1;
+      document.getElementById('edit_a').value = 1;
+
+      calcImpact();
+      document.getElementById('assetModal').classList.remove('hidden');
+    }
+
     function openEditModal(id) {
       const asset = allAssets.find(a => String(a.id) === String(id));
       if (!asset) return;
       
       editingAssetId = id;
+      document.getElementById('modalTitleText').textContent = "แก้ไขและประเมินความเสี่ยง";
 
-      document.getElementById('editModalTitle').innerHTML =
-        '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยง: ' + escapeHtml(asset.name || asset.domain || asset.ip);
+      document.getElementById('edit_domain').value = asset.domain || "";
+      document.getElementById('edit_ip').value = asset.ip || "";
+      document.getElementById('edit_type').value = asset.type || "GDCC";
+      document.getElementById('edit_ssl').value = asset.sslExpiry || "";
 
       document.getElementById('edit_name').value = asset.name || "";
-      document.getElementById('edit_status').value = asset.status || (asset.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน');
+      document.getElementById('edit_status').value = asset.status || "ใช้งาน";
       document.getElementById('edit_sysType').value = asset.sysType || "ระบบบริการ (Web Services)";
       document.getElementById('edit_note').value = asset.note || "";
       
@@ -806,18 +753,16 @@
       document.getElementById('edit_a').value = asset.a || 1;
 
       calcImpact();
-      document.getElementById('editAssetModal').classList.remove('hidden');
+      document.getElementById('assetModal').classList.remove('hidden');
     }
 
-    function closeEditModal() {
-      document.getElementById('editAssetModal').classList.add('hidden');
+    function closeModalWindow() {
+      document.getElementById('assetModal').classList.add('hidden');
       editingAssetId = null;
     }
 
-    // บันทึกเฉพาะ 1 รายการนี้ ส่งไป API ทันที
     async function saveSingleAssessment(e) {
       e.preventDefault();
-      if (!editingAssetId) return;
 
       const btn = document.getElementById('btnSaveModal');
       const originalBtnHtml = btn.innerHTML;
@@ -825,27 +770,32 @@
       btn.disabled = true;
 
       const hasPdpa = document.getElementById('edit_pdpa').checked;
-      const cVal = parseInt(document.getElementById('edit_c').value);
-      const iVal = parseInt(document.getElementById('edit_i').value);
-      const aVal = parseInt(document.getElementById('edit_a').value);
+      const cVal = parseInt(document.getElementById('edit_c').value) || 1;
+      const iVal = parseInt(document.getElementById('edit_i').value) || 1;
+      const aVal = parseInt(document.getElementById('edit_a').value) || 1;
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
+      // จัดเรียง 22 Column
       const payload = [{
-        id: editingAssetId,
-        resourceName: document.getElementById('edit_name').value,
-        status: document.getElementById('edit_status').value,
+        id: editingAssetId, // ถ้าเป็น null คือการ Add
+        type: document.getElementById('edit_type').value,
+        resourceName: document.getElementById('edit_name').value.trim(),
+        domain: document.getElementById('edit_domain').value.trim(),
+        ip: document.getElementById('edit_ip').value.trim(),
+        sslExpiry: document.getElementById('edit_ssl').value,
         sysType: document.getElementById('edit_sysType').value,
-        note: document.getElementById('edit_note').value,
-        swApp: document.getElementById('edit_swApp').value,
-        swFe: document.getElementById('edit_swFe').value,
-        swBe: document.getElementById('edit_swBe').value,
-        swDb: document.getElementById('edit_swDb').value,
         pdpa: hasPdpa,
         c: cVal,
         i: iVal,
         a: aVal,
-        impact: impactVal
+        impact: impactVal,
+        status: document.getElementById('edit_status').value,
+        swApp: document.getElementById('edit_swApp').value,
+        swFe: document.getElementById('edit_swFe').value,
+        swBe: document.getElementById('edit_swBe').value,
+        swDb: document.getElementById('edit_swDb').value,
+        note: document.getElementById('edit_note').value
       }];
 
       const res = await callBackend("saveAssessmentData", { assets: payload });
@@ -854,34 +804,12 @@
       btn.disabled = false;
 
       if (res && res.success) {
-        // อัปเดตข้อมูลใน allAssets
-        const assetIndex = allAssets.findIndex(a => String(a.id) === String(editingAssetId));
-        if (assetIndex > -1) {
-          allAssets[assetIndex].name = payload[0].resourceName;
-          allAssets[assetIndex].status = payload[0].status;
-          allAssets[assetIndex].sysType = payload[0].sysType;
-          allAssets[assetIndex].note = payload[0].note;
-          allAssets[assetIndex].swApp = payload[0].swApp;
-          allAssets[assetIndex].swFe = payload[0].swFe;
-          allAssets[assetIndex].swBe = payload[0].swBe;
-          allAssets[assetIndex].swDb = payload[0].swDb;
-          allAssets[assetIndex].pdpa = payload[0].pdpa;
-          allAssets[assetIndex].c = payload[0].c;
-          allAssets[assetIndex].i = payload[0].i;
-          allAssets[assetIndex].a = payload[0].a;
-          allAssets[assetIndex].impact = payload[0].impact;
-          allAssets[assetIndex].isSaved = true;
-          allAssets[assetIndex].contact = userName; // ผู้บันทึกล่าสุด
-        }
-
-        renderMainTable();
-        updateCardDashboard();
-        applyFilterAndPagination();
-
-        closeEditModal();
-        
+        closeModalWindow();
         document.getElementById('successMessage').textContent = res.message || "บันทึกข้อมูลเรียบร้อยแล้ว";
         document.getElementById('successPopup').classList.remove('hidden');
+        
+        // โหลดข้อมูลใหม่ทั้งหมดเพื่ออัปเดต ID (กรณี Add) และข้อมูลในตาราง
+        loadDataFromCloud();
       } else {
         alert("เกิดข้อผิดพลาดในการบันทึก: " + (res.message || "ไม่ทราบสาเหตุ"));
       }
@@ -890,16 +818,16 @@
     // ---------- export ----------
     function exportToExcel() {
       const excelData = [];
-      
-      // ดึงข้อมูลทั้งหมดจาก allAssets มา Export
       allAssets.forEach(asset => {
-        if (!asset.typeFilter || asset.typeFilter.toLowerCase() !== 'domain') return; // เฉพาะ Domain
+        const currentStatus = asset.status || 'ไม่ใช้งาน';
+        if (currentStatus !== 'ใช้งาน') return; // ส่งออกเฉพาะ ใช้งาน
 
         excelData.push({
           'หน่วยงาน': asset.agency || userAgency,
-          'Type': asset.typeFilter,
-          'IP Address': asset.ip || asset.privateIp || '-',
+          'Cloud Provider': asset.type || '-',
           'Domain Name': asset.domain || '-',
+          'IP Address': asset.ip || '-',
+          'SSL Expiry': asset.sslExpiry || '-',
           'Resource_Name': asset.name || '-',
           'ประเภทระบบ': asset.sysType || '-',
           'Application': asset.swApp || '-',
@@ -911,7 +839,7 @@
           'Integrity (I)': asset.i || '',
           'Availability (A)': asset.a || '',
           'ระดับผลกระทบรวม': asset.impact || '',
-          'สถานะ': asset.status || (asset.isSaved ? 'ใช้งาน' : 'ไม่ใช้งาน'),
+          'สถานะ': currentStatus,
           'ผู้บันทึกล่าสุด': asset.contact || '-',
           'หมายเหตุ': asset.note || '-'
         });
@@ -928,8 +856,6 @@
       const safeName = String(userAgency).replace(/[^\u0E00-\u0E7Fa-zA-Z0-9_-]/g, '_');
       XLSX.writeFile(wb, `DMS_Cloud_Registry_${safeName}_${new Date().toISOString().slice(0, 10)}.xlsx`);
     }
-
   </script>
 </body>
-
 </html>
