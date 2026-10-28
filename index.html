@@ -173,7 +173,14 @@
           <table id="mainTable" class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th class="py-4 px-4 w-14 text-center">#</th>
+                <th class="py-4 px-3 w-14 text-center">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
+                    <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="เลือก/ไม่เลือก ทั้งหมด">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
+                  </div>
+                </th>
+                <th class="py-4 px-3 w-12 text-center">#</th>
                 <th onclick="sortTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
                   สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
@@ -247,7 +254,14 @@
           <table class="w-full text-xs text-left border-collapse">
             <thead>
               <tr class="bg-slate-800 text-white font-medium text-[11px] select-none">
-                <th rowspan="2" class="py-4 px-4 w-12 text-center">#</th>
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">
+                  <div class="flex flex-col items-center">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ใช้งาน</span>
+                    <input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded">
+                    <span class="text-[9px] text-slate-300 font-normal mt-0.5">ทั้งหมด</span>
+                  </div>
+                </th>
+                <th rowspan="2" class="py-4 px-3 w-12 text-center">#</th>
                 <th rowspan="2" onclick="sortSummaryTable('status')" class="py-4 px-4 min-w-[110px] text-center th-sortable transition">
                   สถานะ <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
@@ -268,7 +282,8 @@
                 </th>
                 <th rowspan="2" class="py-4 px-4 min-w-[190px]">ประเภทระบบ</th>
                 
-                <th colspan="4" class="py-3 px-3 text-center border-b border-slate-700">ข้อมูลซอฟต์แวร์</th>
+                <!-- ยุบรวมช่องซอฟต์แวร์เป็น 1 ช่อง -->
+                <th rowspan="2" class="py-4 px-4 min-w-[200px]">ซอฟต์แวร์และเวอร์ชัน</th>
 
                 <th rowspan="2" class="py-4 px-3 min-w-[110px] text-center font-normal">
                   <div class="flex items-center justify-center gap-1.5 text-white">
@@ -291,10 +306,6 @@
                 <th rowspan="2" class="py-4 px-4 min-w-[140px]">หมายเหตุ</th>
               </tr>
               <tr class="bg-slate-700 text-slate-200">
-                <th class="py-3 px-3 min-w-[150px] text-center text-sm font-semibold text-white">Software</th>
-                <th class="py-3 px-3 min-w-[150px] text-center text-sm font-semibold text-white">Frontend</th>
-                <th class="py-3 px-3 min-w-[150px] text-center text-sm font-semibold text-white">Backend</th>
-                <th class="py-3 px-3 min-w-[150px] text-center text-sm font-semibold text-white">Database</th>
                 <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
                     <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
@@ -468,27 +479,10 @@
               </div>
             </div>
 
-            <!-- ช่องกรอกข้อความ 4 ช่องแยกกันตามชีต -->
-            <div class="space-y-3 mt-3">
-              <p class="font-bold text-slate-700">ซอฟต์แวร์และเวอร์ชันที่ใช้</p>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="text-[11px] font-bold text-slate-500 mb-1 block">Software (Application)</label>
-                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress, Joomla..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="text-[11px] font-bold text-slate-500 mb-1 block">Frontend</label>
-                  <input type="text" id="edit_swFe" placeholder="เช่น HTML, React..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="text-[11px] font-bold text-slate-500 mb-1 block">Backend</label>
-                  <input type="text" id="edit_swBe" placeholder="เช่น PHP 8.1, Node.js..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-                <div>
-                  <label class="text-[11px] font-bold text-slate-500 mb-1 block">Database</label>
-                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL 8.0, PostgreSQL..." class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-                </div>
-              </div>
+            <!-- ซอฟต์แวร์ที่ใช้ -->
+            <div class="space-y-2 mt-3">
+              <label class="font-bold mb-1 block text-slate-700" for="edit_software">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</label>
+              <input type="text" id="edit_software" placeholder="ตัวอย่างเช่น php v8.2, MySQL v8.0, Laravel" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
             </div>
           </section>
 
@@ -636,6 +630,16 @@
       }
     }
 
+    async function whoAmIWithRetry(retries = 2, delayMs = 700) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        const res = await callBackend("whoAmI");
+        if (res.success) return res;
+        if (!res.networkError) return res;
+        if (attempt < retries) await new Promise(r => setTimeout(r, delayMs));
+      }
+      return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
+    }
+
     // ---------- bootstrap ----------
     document.addEventListener("DOMContentLoaded", async function () {
       const exp = parseInt(sessionStorage.getItem('token_exp') || "0", 10);
@@ -643,6 +647,32 @@
         forceLogin();
         return;
       }
+
+      const me = await whoAmIWithRetry();
+
+      if (!me.success) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (me.networkError) {
+          if (overlay) {
+            overlay.innerHTML =
+              '<i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>' +
+              '<h2 class="text-lg font-bold text-slate-800 mb-2">เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ</h2>' +
+              '<p class="text-sm text-slate-500 mb-4">กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p>' +
+              '<button onclick="location.reload()" class="px-5 py-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
+          }
+          return;
+        }
+        forceLogin(me.message || "เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
+        return;
+      }
+
+      userAgency = me.user.agency || "";
+      userEmail = me.user.email || "";
+      userName = me.user.fullname || "";
+
+      document.getElementById('profileName').textContent = userName;
+      document.getElementById('displayAgency').textContent = userAgency + (me.user.isAdmin ? " (ผู้ดูแล)" : "");
+
       startSessionWatch(exp);
       await loadDataFromCloud();
     });
@@ -672,14 +702,6 @@
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets;
 
-        if (res.user) {
-          userAgency = res.user.agency || "";
-          userEmail = res.user.email || "";
-          userName = res.user.fullname || "";
-          document.getElementById('profileName').textContent = userName;
-          document.getElementById('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
-        }
-
         renderMainTable();
         updateCardDashboard();
         applyFilterAndPagination(true);
@@ -693,12 +715,8 @@
           }, 300);
         }
       } else {
-        if (overlay) {
-          overlay.innerHTML =
-            '<i class="fa-solid fa-triangle-exclamation text-4xl text-amber-500 mb-4"></i>' +
-            '<h2 class="text-lg font-bold text-slate-800 mb-2">เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จหรือเซสชันหมดอายุ</h2>' +
-            '<button onclick="location.reload()" class="px-5 py-2 mt-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
-        }
+        if (overlay) overlay.classList.add('hidden');
+        if (res && res.message) alert("ไม่สามารถโหลดข้อมูลได้: " + res.message);
       }
     }
 
@@ -760,7 +778,7 @@
       allRows.forEach(row => {
         const id = row.getAttribute('data-id');
         if (id) {
-          domActiveState[id] = row.querySelector('.status-select') ? (row.querySelector('.status-select').value === 'ใช้งาน') : false;
+          domActiveState[id] = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
           domPdpaState[id] = row.querySelector('.pdpa-cb') ? row.querySelector('.pdpa-cb').checked : false;
         }
       });
@@ -853,12 +871,7 @@
         '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ' + (name ? ': ' + escapeHtml(name) : '');
 
       document.getElementById('edit_sysType').value = row.querySelector('.type-select').value;
-      
-      document.getElementById('edit_swApp').value = row.querySelector('.swApp-val').value;
-      document.getElementById('edit_swFe').value = row.querySelector('.swFe-val').value;
-      document.getElementById('edit_swBe').value = row.querySelector('.swBe-val').value;
-      document.getElementById('edit_swDb').value = row.querySelector('.swDb-val').value;
-
+      document.getElementById('edit_software').value = row.querySelector('.sw-val').value;
       document.getElementById('edit_note').value = row.querySelector('.note-input').value;
       document.getElementById('edit_pdpa').checked = row.querySelector('.pdpa-cb').checked;
       document.getElementById('edit_c').value = row.querySelector('.c-select').value;
@@ -879,12 +892,7 @@
       if (!row) return;
 
       row.querySelector('.type-select').value = document.getElementById('edit_sysType').value;
-      
-      row.querySelector('.swApp-val').value = document.getElementById('edit_swApp').value;
-      row.querySelector('.swFe-val').value = document.getElementById('edit_swFe').value;
-      row.querySelector('.swBe-val').value = document.getElementById('edit_swBe').value;
-      row.querySelector('.swDb-val').value = document.getElementById('edit_swDb').value;
-
+      row.querySelector('.sw-val').value = document.getElementById('edit_software').value;
       row.querySelector('.note-input').value = document.getElementById('edit_note').value;
       row.querySelector('.pdpa-cb').checked = document.getElementById('edit_pdpa').checked;
       row.querySelector('.c-select').value = document.getElementById('edit_c').value;
@@ -903,8 +911,8 @@
 
     function renderMainTable() {
       const tbody = document.getElementById('mainTableBody');
+      tbody.innerHTML = '';
       let count = 0;
-      const htmlRows = [];
 
       allAssets.forEach((item) => {
         const isDomain = item.typeFilter && item.typeFilter.toLowerCase() === 'domain';
@@ -919,7 +927,7 @@
             <option value="ไม่ใช้งาน" class="bg-white text-slate-800" ${currentStatus === 'ไม่ใช้งาน' ? 'selected' : ''}>ไม่ใช้งาน</option>
           </select>`;
 
-        const isChecked = (currentStatus === 'ใช้งาน');
+        const isChecked = (currentStatus === 'ใช้งาน') ? 'checked' : '';
         const rowDisabledClass = isChecked ? '' : 'row-disabled';
         const fieldDisabled = isChecked ? '' : 'disabled';
 
@@ -927,9 +935,16 @@
           `<option value="${escapeHtml(label)}" ${(item.sysType && item.sysType.includes(key)) ? 'selected' : ''}>${escapeHtml(label)}</option>`
         ).join('');
 
-        htmlRows.push(`
+        // ผสานข้อมูลซอฟต์แวร์เก่าจาก 4 ฟิลด์เดิม (กรณีฐานข้อมูลเก่ามีข้อมูล)
+        let oldSoftwareCombined = [item.swApp, item.swFe, item.swBe, item.swDb].filter(Boolean).join(', ');
+        let swVal = item.software || oldSoftwareCombined;
+
+        const rowHtml = `
           <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
-            <td class="py-3 px-4 text-center text-slate-400 font-mono">${++count}</td>
+            <td class="py-3 px-3 text-center">
+              <input type="checkbox" onchange="toggleRowActive(this)" class="active-cb w-4 h-4 text-emerald-600 rounded cursor-pointer" ${isChecked}>
+            </td>
+            <td class="py-3 px-3 text-center text-slate-400 font-mono">${++count}</td>
             <td class="py-3 px-4 text-center">${statusSelectHtml}</td>
             <td class="py-3 px-4 text-slate-600 font-medium text-[11px] contact-cell" data-original-contact="${escapeHtml(item.contact)}">${escapeHtml(item.contact) || '-'}</td>
             <td class="py-3 px-4 text-center cell-type">${badgeType}</td>
@@ -944,10 +959,7 @@
               </button>
               <div class="hidden">
                 <select ${fieldDisabled} class="type-select">${sysTypeOptions}</select>
-                <input type="hidden" ${fieldDisabled} class="swApp-val" value="${escapeHtml(item.swApp)}">
-                <input type="hidden" ${fieldDisabled} class="swFe-val" value="${escapeHtml(item.swFe)}">
-                <input type="hidden" ${fieldDisabled} class="swBe-val" value="${escapeHtml(item.swBe)}">
-                <input type="hidden" ${fieldDisabled} class="swDb-val" value="${escapeHtml(item.swDb)}">
+                <input type="hidden" ${fieldDisabled} class="sw-val" value="${escapeHtml(swVal)}">
                 <input type="text" ${fieldDisabled} value="${escapeHtml(item.note)}" class="note-input">
                 <input type="checkbox" ${fieldDisabled} class="pdpa-cb" ${item.pdpa ? 'checked' : ''}>
                 <select ${fieldDisabled} class="c-select">${ciaOpts(item.c)}</select>
@@ -956,28 +968,74 @@
                 <span class="impact-badge">${escapeHtml(item.impact || 1)}</span>
               </div>
             </td>
-          </tr>`);
+          </tr>`;
+        tbody.insertAdjacentHTML('beforeend', rowHtml);
       });
 
-      if (htmlRows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
-      } else {
-        tbody.innerHTML = htmlRows.join('');
+      if (count === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลระบบของหน่วยงานนี้</td></tr>';
       }
 
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
         if (row.querySelector('.pdpa-cb')) updateImpact(row.querySelector('.pdpa-cb'), false);
       });
+      const masterCb = document.getElementById('selectAllCb');
+      if (masterCb) masterCb.checked = false;
     }
 
     function handleStatusChange(selectElement) {
       const row = selectElement.closest('tr');
-      const isActive = selectElement.value === 'ใช้งาน';
-      toggleRowState(row, isActive, true);
+      const cb = row.querySelector('.active-cb');
+      const isConfirmed = selectElement.value === 'ใช้งาน';
+      if (cb && cb.checked !== isConfirmed) {
+        cb.checked = isConfirmed;
+        toggleRowActive(cb, true);
+      }
     }
 
-    function toggleRowState(row, isActive, shouldUpdateDash = true) {
-      const elements = row.querySelectorAll('input, select:not(.status-select), button.manage-btn');
+    function sortTable(column) {
+      const tbody = document.getElementById('mainTableBody');
+      const rows = Array.from(tbody.querySelectorAll('.asset-row'));
+      sortDirection[column] = !sortDirection[column];
+      const asc = sortDirection[column];
+
+      rows.sort((a, b) => {
+        let valA = '', valB = '';
+        if (column === 'type') { valA = a.getAttribute('data-type'); valB = b.getAttribute('data-type'); }
+        if (column === 'status') { valA = a.querySelector('.status-select').value; valB = b.querySelector('.status-select').value; }
+        if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
+        if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
+        if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
+        if (column === 'name') { valA = a.querySelector('.cell-name').value; valB = b.querySelector('.cell-name').value; }
+        if (column === 'impact') { valA = parseInt(a.querySelector('.impact-badge').innerText); valB = parseInt(b.querySelector('.impact-badge').innerText); }
+        if (valA < valB) return asc ? -1 : 1;
+        if (valA > valB) return asc ? 1 : -1;
+        return 0;
+      });
+
+      rows.forEach(row => tbody.appendChild(row));
+      applyFilterAndPagination();
+    }
+
+    function toggleSelectAll(masterCb) {
+      const isChecked = masterCb.checked;
+      document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
+        if (row.style.display !== 'none') {
+          const cb = row.querySelector('.active-cb');
+          if (cb) {
+            cb.checked = isChecked;
+            toggleRowActive(cb, false);
+            row.classList.add('is-changed');
+          }
+        }
+      });
+      updateCardDashboard();
+    }
+
+    function toggleRowActive(cb, shouldUpdateDash = true) {
+      const row = cb.closest('tr');
+      const isActive = cb.checked;
+      const elements = row.querySelectorAll('input:not(.active-cb), select:not(.status-select), button.manage-btn');
       const statusSelect = row.querySelector('.status-select');
 
       if (isActive) {
@@ -996,29 +1054,6 @@
         }
       }
       if (shouldUpdateDash) updateCardDashboard();
-    }
-
-    function sortTable(column) {
-      const tbody = document.getElementById('mainTableBody');
-      const rows = Array.from(tbody.querySelectorAll('.asset-row'));
-      sortDirection[column] = !sortDirection[column];
-      const asc = sortDirection[column];
-
-      rows.sort((a, b) => {
-        let valA = '', valB = '';
-        if (column === 'type') { valA = a.getAttribute('data-type'); valB = b.getAttribute('data-type'); }
-        if (column === 'status') { valA = a.querySelector('.status-select').value; valB = b.querySelector('.status-select').value; }
-        if (column === 'contact') { valA = a.querySelector('.contact-cell').textContent.trim().toLowerCase(); valB = b.querySelector('.contact-cell').textContent.trim().toLowerCase(); }
-        if (column === 'ip') { valA = a.querySelector('.cell-ip').innerText; valB = b.querySelector('.cell-ip').innerText; }
-        if (column === 'domain') { valA = a.querySelector('.cell-domain').innerText; valB = b.querySelector('.cell-domain').innerText; }
-        if (column === 'name') { valA = a.querySelector('.cell-name').value; valB = b.querySelector('.cell-name').value; }
-        if (valA < valB) return asc ? -1 : 1;
-        if (valA > valB) return asc ? 1 : -1;
-        return 0;
-      });
-
-      rows.forEach(row => tbody.appendChild(row));
-      applyFilterAndPagination();
     }
 
     function updateImpact(elem, shouldUpdateDash = true) {
@@ -1099,8 +1134,8 @@
     function prepareSummaryData() {
       summaryDataList = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const statusVal = row.querySelector('.status-select').value;
-        if (statusVal !== 'ใช้งาน') return; // ดึงเฉพาะรายการที่เปิดใช้งาน
+        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+        if (!isActive) return;
 
         const id = row.getAttribute('data-id');
         const asset = allAssets.find(a => String(a.id) === String(id));
@@ -1113,17 +1148,14 @@
           id: asset.id,
           isSaved: asset.isSaved,
           contact: contactNow,
-          statusVal: statusVal,
+          statusVal: row.querySelector('.status-select') ? row.querySelector('.status-select').value : 'ใช้งาน',
           ip: asset.ip,
           privateIp: asset.privateIp,
           domain: asset.domain,
           typeFilter: asset.typeFilter || '',
           nameVal: row.querySelector('.name-input').value,
           typeVal: row.querySelector('.type-select').value,
-          swApp: row.querySelector('.swApp-val').value,
-          swFe: row.querySelector('.swFe-val').value,
-          swBe: row.querySelector('.swBe-val').value,
-          swDb: row.querySelector('.swDb-val').value,
+          softwareVal: row.querySelector('.sw-val').value, // <--- ใช้ตัวนี้ตัวเดียวแล้ว
           noteVal: row.querySelector('.note-input').value,
           hasPdpa: row.querySelector('.pdpa-cb').checked,
           c: row.querySelector('.c-select').value,
@@ -1178,7 +1210,7 @@
       const totalFiltered = filteredSummaryDataList.length;
 
       if (totalFiltered === 0) {
-        summaryBody.innerHTML = '<tr><td colspan="18" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
+        summaryBody.innerHTML = '<tr><td colspan="16" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
         document.getElementById('summaryPaginationControls').style.display = 'none';
         return;
       }
@@ -1203,7 +1235,8 @@
 
         summaryBody.insertAdjacentHTML('beforeend', `
           <tr class="hover:bg-slate-50/80 transition">
-            <td class="py-3.5 px-4 text-center text-slate-400 font-mono">${count}</td>
+            <td class="py-3.5 px-3 text-center"><input type="checkbox" checked disabled class="w-4 h-4 text-emerald-600 rounded"></td>
+            <td class="py-3.5 px-3 text-center text-slate-400 font-mono">${count}</td>
             <td class="py-3.5 px-4 text-center">${statusBadge}</td>
             <td class="py-3.5 px-4 text-slate-600 font-medium text-[11px]">${escapeHtml(data.contact) || '-'}</td>
             <td class="py-3.5 px-4 text-center">${badgeType}</td>
@@ -1211,10 +1244,7 @@
             <td class="py-3.5 px-4 text-slate-700 font-medium">${escapeHtml(data.domain) || '-'}</td>
             <td class="py-3.5 px-4 text-slate-900 font-bold">${escapeHtml(data.nameVal)}</td>
             <td class="py-3.5 px-4 text-slate-600">${escapeHtml(data.typeVal)}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[150px] break-words">${escapeHtml(data.swApp) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[150px] break-words">${escapeHtml(data.swFe) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[150px] break-words">${escapeHtml(data.swBe) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[150px] break-words">${escapeHtml(data.swDb) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[200px] break-words">${escapeHtml(data.softwareVal) || '-'}</td>
             <td class="py-3.5 px-3 text-center font-bold ${data.hasPdpa ? 'text-sky-600' : 'text-slate-400'}">${data.hasPdpa ? '✔️ มี' : '-'}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.c)}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.i)}</td>
@@ -1239,8 +1269,8 @@
     function exportToExcel() {
       const excelData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const statusVal = row.querySelector('.status-select').value;
-        if (statusVal !== 'ใช้งาน') return;
+        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
+        if (!isActive) return;
 
         const id = row.getAttribute('data-id');
         const asset = allAssets.find(a => String(a.id) === String(id));
@@ -1253,10 +1283,7 @@
           'Domain Name': asset.domain || '-',
           'Resource_Name': row.querySelector('.name-input').value,
           'ประเภทระบบ': row.querySelector('.type-select').value,
-          'Software': row.querySelector('.swApp-val').value || '-',
-          'Frontend': row.querySelector('.swFe-val').value || '-',
-          'Backend': row.querySelector('.swBe-val').value || '-',
-          'Database': row.querySelector('.swDb-val').value || '-',
+          'ซอฟต์แวร์และเวอร์ชัน': row.querySelector('.sw-val').value || '-',
           'PDPA': row.querySelector('.pdpa-cb').checked ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': row.querySelector('.c-select').value,
           'Integrity (I)': row.querySelector('.i-select').value,
@@ -1292,8 +1319,7 @@
     async function submitToDatabase() {
       const payloadData = [];
       document.querySelectorAll('#mainTableBody tr.asset-row').forEach(row => {
-        const statusVal = row.querySelector('.status-select') ? row.querySelector('.status-select').value : 'ไม่ใช้งาน';
-        const isActive = statusVal === 'ใช้งาน';
+        const isActive = row.querySelector('.active-cb') ? row.querySelector('.active-cb').checked : false;
         const id = row.getAttribute('data-id');
 
         if (id && (isActive || row.classList.contains('is-changed'))) {
@@ -1301,10 +1327,7 @@
             id: id,
             resourceName: row.querySelector('.name-input').value,
             sysType: row.querySelector('.type-select').value,
-            swApp: row.querySelector('.swApp-val').value, 
-            swFe: row.querySelector('.swFe-val').value,   
-            swBe: row.querySelector('.swBe-val').value,   
-            swDb: row.querySelector('.swDb-val').value,   
+            software: row.querySelector('.sw-val').value, // <--- ใช้ software เป็น key เดียว
             note: row.querySelector('.note-input').value,
             pdpa: row.querySelector('.pdpa-cb').checked,
             c: row.querySelector('.c-select').value,
