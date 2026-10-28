@@ -217,7 +217,7 @@
         </th>
         
         <th class="py-3.5 px-4 text-center min-w-[220px]">
-          Software <span class="font-normal opacity-70 ml-1">(App | FE | BE | DB)</span>
+          Software
         </th>
         
         <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
@@ -792,10 +792,9 @@
     }
 
     function renderMainTable() {
-      // เพิ่มบรรทัดนี้เพื่อคัดเฉพาะรายการที่สถานะไม่ใช่ 'ไม่ใช้งาน'
+      // กรองเอาเฉพาะข้อมูลที่ไม่ใช่ 'ไม่ใช้งาน' (แสดงแค่ 'ใช้งาน' หรือ 'ช่องว่าง')
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
-      // เปลี่ยนจากการใช้ allAssets มาเป็น filteredAssets 
       const htmlRows = filteredAssets.map((item, idx) => {
         const badgeType = getCloudBadgeHtml(item.typeFilter);
 
@@ -807,14 +806,14 @@
           }">${impact}</span>`;
         }
 
-        // คอลัมน์ OS - จัดให้อยู่กึ่งกลางด้วย mx-auto
+        // คอลัมน์ OS
         const osHasEof = item.os && item.os.toUpperCase().includes('EOF');
         const osClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700';
         const osHtml = item.os 
           ? `<span class="truncate block w-full max-w-[100px] mx-auto ${osClass}" title="${escapeHtml(item.os)}">${escapeHtml(item.os)}</span>` 
           : `<span class="text-slate-300">-</span>`;
 
-        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย | จัดกึ่งกลางด้วย mx-auto
+        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย |
         const swParts = [];
         if (item.swApp) swParts.push(escapeHtml(item.swApp));
         if (item.swFe) swParts.push(escapeHtml(item.swFe));
@@ -835,9 +834,9 @@
           }
         }
 
-        const inactive = item.status !== 'ใช้งาน' ? ' row-disabled' : '';
+        // เนื่องจากเรากรองเอาเฉพาะที่ใช้งานมาแล้ว จึงไม่ต้องใส่คลาส row-disabled ทำสีทึบอีก
         return `
-          <tr class="asset-row hover:bg-slate-50/80 transition${inactive}" data-id="${escapeHtml(item.id)}">
+          <tr class="asset-row hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}">
             <td class="py-3 px-3 text-center text-slate-400 font-mono cell-index">${idx + 1}</td>
             <td class="py-3 px-3 text-center cell-type" data-type="${escapeHtml(item.typeFilter)}">${badgeType}</td>
             <td class="py-3 px-4 text-center"><div class="cell-name text-slate-800 font-bold mx-auto">${escapeHtml(item.name)}</div></td>
@@ -858,7 +857,7 @@
 
       $('mainTableBody').innerHTML = htmlRows.length
         ? htmlRows.join('')
-        : `<tr><td colspan="11" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล — ตรวจสอบว่าหน่วยงานในชีตตรงกับ "${escapeHtml(userAgency)}" และ OwnerGroup ของท่าน</td></tr>`;
+        : `<tr><td colspan="11" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล (ไม่มีระบบที่กำลังใช้งานในหน่วยงานของท่าน)</td></tr>`;
     }
 
     function sortTable(column) {
