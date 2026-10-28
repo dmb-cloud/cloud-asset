@@ -281,7 +281,10 @@
                   ระบบงาน <i class="fa-solid fa-sort ml-1 text-slate-400 opacity-70"></i>
                 </th>
                 <th rowspan="2" class="py-4 px-4 min-w-[190px]">ประเภทระบบ</th>
-                <th colspan="4" class="py-3 px-3 text-center border-b border-slate-700">ซอฟต์แวร์ที่ใช้ (Software)</th>
+                
+                <!-- ยุบรวมช่องซอฟต์แวร์เป็น 1 ช่อง -->
+                <th rowspan="2" class="py-4 px-4 min-w-[200px]">ซอฟต์แวร์และเวอร์ชัน</th>
+
                 <th rowspan="2" class="py-4 px-3 min-w-[110px] text-center font-normal">
                   <div class="flex items-center justify-center gap-1.5 text-white">
                     <span>ข้อมูล PDPA</span>
@@ -303,10 +306,6 @@
                 <th rowspan="2" class="py-4 px-4 min-w-[140px]">หมายเหตุ</th>
               </tr>
               <tr class="bg-slate-700 text-slate-200">
-                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Application</th>
-                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Frontend</th>
-                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Backend</th>
-                <th class="py-3 px-3 min-w-[160px] text-center text-sm font-semibold text-white">Database</th>
                 <th class="py-3 px-3 min-w-[130px] text-center font-normal">
                   <div class="flex flex-col items-center justify-center gap-0.5">
                     <div class="flex items-center gap-1.5 text-sm font-semibold text-white">
@@ -481,9 +480,9 @@
             </div>
 
             <!-- ซอฟต์แวร์ที่ใช้ -->
-            <div class="space-y-2">
-              <p class="font-bold text-slate-700">ซอฟต์แวร์ที่ใช้ (Software)</p>
-              <div id="editSoftwareBox" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            <div class="space-y-2 mt-3">
+              <label class="font-bold mb-1 block text-slate-700" for="edit_software">ซอฟต์แวร์และเวอร์ชัน (Software & Version)</label>
+              <input type="text" id="edit_software" placeholder="ตัวอย่างเช่น php v8.2, MySQL v8.0, Laravel" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
             </div>
           </section>
 
@@ -610,7 +609,7 @@
     // ---------- API ----------
     async function callBackend(action, payload = {}) {
       try {
-        payload.token = getToken();   // ✅ แนบ session token ทุกครั้ง
+        payload.token = getToken();
         const response = await fetch(BACKEND_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -627,19 +626,15 @@
         }
         return res.data || { success: false, message: "เกิดข้อผิดพลาด" };
       } catch (err) {
-        // ✅ แยกให้ชัดว่านี่คือ "เน็ต/เซิร์ฟเวอร์สะดุดชั่วคราว" ไม่ใช่ "token ไม่ถูกต้อง"
-        // เพื่อไม่ให้ bootstrap เข้าใจผิดแล้วเคลียร์ session ทิ้งทั้งที่ token ยังใช้ได้อยู่
         return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
       }
     }
 
-    // เรียก whoAmI พร้อม retry สั้นๆ กันเคส cold-start/เน็ตสะดุดตอนหน้าเพิ่งโหลด
-    // (พบบ่อยตอน redirect มาจาก auth.html รอบแรกทันที)
     async function whoAmIWithRetry(retries = 2, delayMs = 700) {
       for (let attempt = 0; attempt <= retries; attempt++) {
         const res = await callBackend("whoAmI");
         if (res.success) return res;
-        if (!res.networkError) return res;   // ล้มเหลวแบบมีคำตอบจาก server แล้ว ไม่ต้อง retry
+        if (!res.networkError) return res;
         if (attempt < retries) await new Promise(r => setTimeout(r, delayMs));
       }
       return { success: false, networkError: true, message: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้" };
@@ -653,8 +648,6 @@
         return;
       }
 
-      // ✅ ยืนยันตัวตนกับ server ก่อน แล้วใช้ค่าที่ server คืนมาแสดงผล
-      // ถ้าล้มเหลวเพราะเน็ต/เซิร์ฟเวอร์สะดุดชั่วคราว จะไม่เคลียร์ token ทิ้ง (ป้องกันบั๊ก "ต้อง login 2 รอบ")
       const me = await whoAmIWithRetry();
 
       if (!me.success) {
@@ -667,9 +660,8 @@
               '<p class="text-sm text-slate-500 mb-4">กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่</p>' +
               '<button onclick="location.reload()" class="px-5 py-2 bg-theme text-white text-sm font-bold rounded-lg">โหลดหน้านี้ใหม่</button>';
           }
-          return; // ❗ ไม่ forceLogin เพราะ token อาจยังใช้ได้อยู่ แค่เน็ตสะดุด
+          return;
         }
-        // เหตุผลอื่น (token ไม่ถูกต้องจริง/ถูก revoke) — ค่อยเคลียร์แล้วกลับหน้า login
         forceLogin(me.message || "เซสชันไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
         return;
       }
@@ -708,7 +700,6 @@
       const res = await callBackend("getAllRiskCloudData");
 
       if (res && res.success && Array.isArray(res.assets)) {
-        // ✅ server กรองตามหน่วยงานให้แล้ว ไม่ต้องกรองซ้ำที่ฝั่ง client
         allAssets = res.assets;
 
         renderMainTable();
@@ -745,7 +736,7 @@
         content: `<p class="font-semibold text-sky-700">ทำไมต้องประเมิน PDPA?</p>
                   <p>เพื่อระบุว่าระบบสารสนเทศนี้มีการจัดเก็บ เก็บรวบรวม ใช้ หรือเปิดเผย <strong>ข้อมูลส่วนบุคคล (Personal Data)</strong> หรือไม่</p>
                   <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-xs text-amber-900 mt-2">
-                      <strong>กฎการประเมิน:</strong> หากระบบมีข้อมูล PDPA ระดับผลกระทบรวม (Overall Impact) จะถูกปรับให้อย่างน้อยเป็น <strong>MEDIUM (ระดับ 2)</strong> ทันที
+                    <strong>กฎการประเมิน:</strong> หากระบบมีข้อมูล PDPA ระดับผลกระทบรวม (Overall Impact) จะถูกปรับให้อย่างน้อยเป็น <strong>MEDIUM (ระดับ 2)</strong> ทันที
                   </div>`
       },
       cia: {
@@ -834,36 +825,12 @@
       ["ระบบวิเคราะห์และสนับสนุนการบริหาร (Analytics & Support)", "Analytics"]
     ];
 
-    // layout: ชุดคลาสที่ใช้ซ้ำของ pill สถานะ / badge ประเภท / ช่องกรอก
     const STATUS_ON_CLASS = "status-select bg-emerald-50 text-emerald-700 border-emerald-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
     const STATUS_OFF_CLASS = "status-select bg-amber-50 text-amber-700 border-amber-200 px-3 py-1 rounded-full text-[10px] font-bold border focus:outline-none cursor-pointer";
     const FIELD_CLASS = "w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-slate-800 outline-none focus:ring-1 focus:ring-sky-500";
     const BADGE_DOMAIN = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200/80"><i class="fa-solid fa-globe text-[9px]"></i> Domain</span>`;
     const BADGE_SERVER = `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80"><i class="fa-solid fa-server text-[9px]"></i> Server</span>`;
 
-    // ---------- Software (Application / Frontend / Backend / Database) ----------
-    const SW_OPTIONS = {
-      app: { label: "Application", items: ["WordPress", "ownCloud", "Joomla", "CRM", "ERP", "XAMPP"] },
-      fe:  { label: "Frontend",    items: ["HTML", "TypeScript", "React", "Vue.js", "Angular", "Next.js", "Nuxt.js", "Tailwind CSS", "Bootstrap"] },
-      be:  { label: "Backend",     items: ["Django", "Node.js", "Laravel", "Python", "PHP", "Ruby", "C#", "Java", "Go"] },
-      db:  { label: "Database",    items: ["MySQL", "PostgreSQL", "Microsoft SQL Server (MSSQL)", "MongoDB", "Redis", "Oracle"] }
-    };
-    const SW_FIELD = { app: "swApp", fe: "swFe", be: "swBe", db: "swDb" };
-
-    // รับได้ทั้ง array หรือ string คั่นด้วย , หรือ ;
-    function parseSwList(v) {
-      if (Array.isArray(v)) return v.map(x => String(x).trim()).filter(Boolean);
-      if (v === null || v === undefined) return [];
-      return String(v).split(/\s*[,;]\s*/).map(x => x.trim()).filter(Boolean);
-    }
-
-    // อ่านค่าซอฟต์แวร์ของแถว (เก็บไว้ใน hidden input ของแถว) เป็นข้อความเดียว เช่น "WordPress, CRM"
-    function getSwValues(row, key) {
-      const el = row.querySelector(`.sw-val[data-sw="${key}"]`);
-      return el ? el.value : '';
-    }
-
-    // ตัวเลือก 1-3 ของ C / I / A (ช่องเก็บค่าแบบซ่อนในแถว)
     function ciaOpts(v) {
       return [1, 2, 3].map(n => `<option value="${n}" ${v == n ? 'selected' : ''}>${n}</option>`).join('');
     }
@@ -871,56 +838,11 @@
     // ---------- Edit modal (ประเมินความเสี่ยงระบบ) ----------
     let editingRow = null;
 
-    function buildEditModal() {
+    function initEditModal() {
       document.getElementById('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
         `<option value="${escapeHtml(label)}">${escapeHtml(label)}</option>`).join('');
-
-      const itemCls = "flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-slate-100 cursor-pointer text-slate-600";
-      document.getElementById('editSoftwareBox').innerHTML = ['app', 'fe', 'be', 'db'].map(key => {
-        const opt = SW_OPTIONS[key];
-        const boxes = opt.items.map(v =>
-          `<label class="${itemCls}"><input type="checkbox" name="sw_${key}[]" value="${escapeHtml(v)}" class="sw-cb w-4 h-4 text-sky-600 rounded cursor-pointer"> ${escapeHtml(v)}</label>`
-        ).join('');
-        return `
-          <div class="space-y-2" data-sw="${key}">
-            <label class="font-bold block text-slate-700">${opt.label}</label>
-            <details data-ph="เลือก ${opt.label}" onchange="updateSw(this)" class="group">
-              <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer w-full flex items-center justify-between gap-2 border border-slate-300 bg-white p-2.5 rounded-xl">
-                <span data-label class="truncate text-slate-500">เลือก ${opt.label}</span>
-                <span class="text-slate-400 transition group-open:rotate-180">▾</span>
-              </summary>
-              <div class="mt-1 max-h-44 overflow-y-auto bg-white border border-slate-200 rounded-xl p-1.5 space-y-0.5">
-                ${boxes}
-                <label class="${itemCls}"><input type="checkbox" onchange="toggleOther(this)" class="sw-other-cb w-4 h-4 text-sky-600 rounded cursor-pointer"> อื่นๆ (ระบุ)</label>
-              </div>
-            </details>
-            <input type="text" maxlength="100" placeholder="ระบุ ${opt.label} อื่นๆ" oninput="updateSw(this.closest('[data-sw]').querySelector('details'))" class="sw-other-txt hidden w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl outline-none focus:ring-1 focus:ring-sky-500">
-          </div>`;
-      }).join('');
     }
-    document.addEventListener('DOMContentLoaded', buildEditModal);
-
-    function modalSwValues(group) {
-      const vals = Array.from(group.querySelectorAll('input.sw-cb:checked')).map(c => c.value);
-      const otherCb = group.querySelector('.sw-other-cb');
-      const otherTxt = group.querySelector('.sw-other-txt');
-      if (otherCb.checked && otherTxt.value.trim()) vals.push(otherTxt.value.trim());
-      return vals;
-    }
-
-    function updateSw(details) {
-      const group = details.closest('[data-sw]');
-      const vals = modalSwValues(group);
-      const label = details.querySelector('[data-label]');
-      label.textContent = vals.length ? vals.join(', ') : details.dataset.ph;
-      label.classList.toggle('text-slate-500', vals.length === 0);
-      label.classList.toggle('text-slate-800', vals.length > 0);
-    }
-
-    function toggleOther(cb) {
-      const group = cb.closest('[data-sw]');
-      group.querySelector('.sw-other-txt').classList.toggle('hidden', !cb.checked);
-    }
+    document.addEventListener('DOMContentLoaded', initEditModal);
 
     function calcImpact() {
       const hasPdpa = document.getElementById('edit_pdpa').checked;
@@ -949,26 +871,12 @@
         '<i class="fa-solid fa-pen-to-square"></i> ประเมินความเสี่ยงระบบ' + (name ? ': ' + escapeHtml(name) : '');
 
       document.getElementById('edit_sysType').value = row.querySelector('.type-select').value;
+      document.getElementById('edit_software').value = row.querySelector('.sw-val').value;
       document.getElementById('edit_note').value = row.querySelector('.note-input').value;
       document.getElementById('edit_pdpa').checked = row.querySelector('.pdpa-cb').checked;
       document.getElementById('edit_c').value = row.querySelector('.c-select').value;
       document.getElementById('edit_i').value = row.querySelector('.i-select').value;
       document.getElementById('edit_a').value = row.querySelector('.a-select').value;
-
-      document.querySelectorAll('#editSoftwareBox [data-sw]').forEach(group => {
-        const key = group.dataset.sw;
-        const list = parseSwList(getSwValues(row, key));
-        const known = SW_OPTIONS[key].items;
-        group.querySelectorAll('input.sw-cb').forEach(cb => { cb.checked = list.includes(cb.value); });
-        const others = list.filter(v => !known.includes(v));
-        const otherCb = group.querySelector('.sw-other-cb');
-        const otherTxt = group.querySelector('.sw-other-txt');
-        otherCb.checked = others.length > 0;
-        otherTxt.value = others.join(', ');
-        otherTxt.classList.toggle('hidden', !otherCb.checked);
-        updateSw(group.querySelector('details'));
-        group.querySelector('details').open = false;
-      });
 
       calcImpact();
       document.getElementById('editAssetModal').classList.remove('hidden');
@@ -979,25 +887,20 @@
       editingRow = null;
     }
 
-    // นำค่าในฟอร์มกลับไปใส่ที่แถว (บันทึกลงฐานข้อมูลตอนกด "ยืนยันบันทึกข้อมูล" ในขั้นตอนที่ 2 เหมือนเดิม)
     function applyEditModal() {
       const row = editingRow;
       if (!row) return;
 
       row.querySelector('.type-select').value = document.getElementById('edit_sysType').value;
+      row.querySelector('.sw-val').value = document.getElementById('edit_software').value;
       row.querySelector('.note-input').value = document.getElementById('edit_note').value;
       row.querySelector('.pdpa-cb').checked = document.getElementById('edit_pdpa').checked;
       row.querySelector('.c-select').value = document.getElementById('edit_c').value;
       row.querySelector('.i-select').value = document.getElementById('edit_i').value;
       row.querySelector('.a-select').value = document.getElementById('edit_a').value;
-      document.querySelectorAll('#editSoftwareBox [data-sw]').forEach(group => {
-        const el = row.querySelector(`.sw-val[data-sw="${group.dataset.sw}"]`);
-        if (el) el.value = modalSwValues(group).join(', ');
-      });
 
       updateImpact(row.querySelector('.pdpa-cb'), false);
 
-      // เหมือนการแก้ไขในตารางเดิม: ทำเครื่องหมายแถวว่าแก้ไข + ประทับชื่อผู้บันทึกล่าสุด
       row.classList.add('is-changed');
       const contactCell = row.querySelector('.contact-cell');
       if (contactCell) contactCell.textContent = userName || '-';
@@ -1032,7 +935,10 @@
           `<option value="${escapeHtml(label)}" ${(item.sysType && item.sysType.includes(key)) ? 'selected' : ''}>${escapeHtml(label)}</option>`
         ).join('');
 
-        // ✅ escape ค่าทุกช่องที่มาจากฐานข้อมูล กัน HTML/attribute injection
+        // ผสานข้อมูลซอฟต์แวร์เก่าจาก 4 ฟิลด์เดิม (กรณีฐานข้อมูลเก่ามีข้อมูล)
+        let oldSoftwareCombined = [item.swApp, item.swFe, item.swBe, item.swDb].filter(Boolean).join(', ');
+        let swVal = item.software || oldSoftwareCombined;
+
         const rowHtml = `
           <tr class="asset-row ${rowDisabledClass} hover:bg-slate-50/80 transition" data-id="${escapeHtml(item.id)}" data-type="${escapeHtml(item.typeFilter)}">
             <td class="py-3 px-3 text-center">
@@ -1053,13 +959,13 @@
               </button>
               <div class="hidden">
                 <select ${fieldDisabled} class="type-select">${sysTypeOptions}</select>
+                <input type="hidden" ${fieldDisabled} class="sw-val" value="${escapeHtml(swVal)}">
                 <input type="text" ${fieldDisabled} value="${escapeHtml(item.note)}" class="note-input">
                 <input type="checkbox" ${fieldDisabled} class="pdpa-cb" ${item.pdpa ? 'checked' : ''}>
                 <select ${fieldDisabled} class="c-select">${ciaOpts(item.c)}</select>
                 <select ${fieldDisabled} class="i-select">${ciaOpts(item.i)}</select>
                 <select ${fieldDisabled} class="a-select">${ciaOpts(item.a)}</select>
                 <span class="impact-badge">${escapeHtml(item.impact || 1)}</span>
-                ${['app', 'fe', 'be', 'db'].map(k => `<input type="hidden" class="sw-val" data-sw="${k}" value="${escapeHtml(parseSwList(item[SW_FIELD[k]]).join(', '))}">`).join('')}
               </div>
             </td>
           </tr>`;
@@ -1235,9 +1141,6 @@
         const asset = allAssets.find(a => String(a.id) === String(id));
         if (!asset) return;
 
-        // ✅ อ่าน "ผู้บันทึกล่าสุด" จากเซลล์ในตาราง ไม่ใช่จาก asset.contact ตรงๆ
-        // เพราะถ้าแถวนี้ถูกแก้ไขในรอบนี้ เซลล์จะถูกอัปเดตเป็นชื่อผู้ใช้ปัจจุบันแล้ว (ดู change listener ด้านล่าง)
-        // แถวที่ไม่ได้ถูกแตะเลยจะยังคงเป็นชื่อเดิมจากฐานข้อมูล
         const contactCell = row.querySelector('.contact-cell');
         const contactNow = contactCell ? contactCell.textContent.trim() : (asset.contact || '');
 
@@ -1252,10 +1155,7 @@
           typeFilter: asset.typeFilter || '',
           nameVal: row.querySelector('.name-input').value,
           typeVal: row.querySelector('.type-select').value,
-          swApp: getSwValues(row, 'app'),
-          swFe: getSwValues(row, 'fe'),
-          swBe: getSwValues(row, 'be'),
-          swDb: getSwValues(row, 'db'),
+          softwareVal: row.querySelector('.sw-val').value, // <--- ใช้ตัวนี้ตัวเดียวแล้ว
           noteVal: row.querySelector('.note-input').value,
           hasPdpa: row.querySelector('.pdpa-cb').checked,
           c: row.querySelector('.c-select').value,
@@ -1310,7 +1210,7 @@
       const totalFiltered = filteredSummaryDataList.length;
 
       if (totalFiltered === 0) {
-        summaryBody.innerHTML = '<tr><td colspan="19" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
+        summaryBody.innerHTML = '<tr><td colspan="16" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูลที่ค้นหา หรือ ไม่มีระบบถูกเลือกใช้งาน</td></tr>';
         document.getElementById('summaryPaginationControls').style.display = 'none';
         return;
       }
@@ -1344,10 +1244,7 @@
             <td class="py-3.5 px-4 text-slate-700 font-medium">${escapeHtml(data.domain) || '-'}</td>
             <td class="py-3.5 px-4 text-slate-900 font-bold">${escapeHtml(data.nameVal)}</td>
             <td class="py-3.5 px-4 text-slate-600">${escapeHtml(data.typeVal)}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swApp) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swFe) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swBe) || '-'}</td>
-            <td class="py-3.5 px-4 text-slate-600 max-w-[180px] break-words">${escapeHtml(data.swDb) || '-'}</td>
+            <td class="py-3.5 px-4 text-slate-600 max-w-[200px] break-words">${escapeHtml(data.softwareVal) || '-'}</td>
             <td class="py-3.5 px-3 text-center font-bold ${data.hasPdpa ? 'text-sky-600' : 'text-slate-400'}">${data.hasPdpa ? '✔️ มี' : '-'}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.c)}</td>
             <td class="py-3.5 px-3 text-center font-mono font-semibold text-slate-700">${escapeHtml(data.i)}</td>
@@ -1386,10 +1283,7 @@
           'Domain Name': asset.domain || '-',
           'Resource_Name': row.querySelector('.name-input').value,
           'ประเภทระบบ': row.querySelector('.type-select').value,
-          'Application': getSwValues(row, 'app') || '-',
-          'Frontend': getSwValues(row, 'fe') || '-',
-          'Backend': getSwValues(row, 'be') || '-',
-          'Database': getSwValues(row, 'db') || '-',
+          'ซอฟต์แวร์และเวอร์ชัน': row.querySelector('.sw-val').value || '-',
           'PDPA': row.querySelector('.pdpa-cb').checked ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': row.querySelector('.c-select').value,
           'Integrity (I)': row.querySelector('.i-select').value,
@@ -1413,8 +1307,6 @@
     }
 
     // ---------- change tracking ----------
-    // ✅ ทันทีที่มีการแก้ไขแถวใดๆ (รวมถึงติ๊ก/ยกเลิกติ๊กใช้งาน) ให้ประทับชื่อ "ผู้บันทึกล่าสุด"
-    // เป็นชื่อผู้ใช้ปัจจุบันเท่านั้น (คนที่กำลังทำรายการ) แถวที่ไม่ได้แตะยังคงแสดงชื่อเดิม
     document.getElementById('mainTableBody').addEventListener('change', function (e) {
       const row = e.target.closest('tr.asset-row');
       if (!row) return;
@@ -1435,10 +1327,7 @@
             id: id,
             resourceName: row.querySelector('.name-input').value,
             sysType: row.querySelector('.type-select').value,
-            swApp: getSwValues(row, 'app'),
-            swFe: getSwValues(row, 'fe'),
-            swBe: getSwValues(row, 'be'),
-            swDb: getSwValues(row, 'db'),
+            software: row.querySelector('.sw-val').value, // <--- ใช้ software เป็น key เดียว
             note: row.querySelector('.note-input').value,
             pdpa: row.querySelector('.pdpa-cb').checked,
             c: row.querySelector('.c-select').value,
@@ -1459,7 +1348,6 @@
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> กำลังบันทึก...';
       btn.disabled = true;
 
-      // ✅ ไม่ส่ง agency/assessor แล้ว — server ใช้ค่าจาก session เท่านั้น
       const res = await callBackend("saveAssessmentData", { assets: payloadData });
 
       if (res && res.success) {
