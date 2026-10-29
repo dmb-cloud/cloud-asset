@@ -1104,7 +1104,7 @@
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
     }
 
-    // ฟังก์ชันช่วยจัดการข้อมูล "ชื่อ + Version" ของ Dropdown
+
     function setComboValue(baseId, fullValue) {
         const sel = document.getElementById(`edit_${baseId}`);
         const other = document.getElementById(`edit_${baseId}_other`);
@@ -1117,28 +1117,58 @@
             return;
         }
         
-        // เช็คว่าค่าเดิม ตรงกับตัวเลือกหลักหรือไม่
-        let exists = Array.from(sel.options).some(opt => opt.value !== 'อื่นๆ' && opt.value !== '' && fullValue.toLowerCase().startsWith(opt.value.toLowerCase()));
+       
+        let exists = false;
+        let bestMatch = "";
+        
+        Array.from(sel.options).forEach(opt => {
+            if (opt.value !== 'อื่นๆ' && opt.value !== '') {
+             
+                if (fullValue.toLowerCase().startsWith(opt.value.toLowerCase())) {
+                    exists = true;
+                   
+                    if (opt.value.length > bestMatch.length) {
+                        bestMatch = opt.value;
+                    }
+                }
+            }
+        });
         
         if (exists) {
-            let bestMatch = "";
-            Array.from(sel.options).forEach(opt => {
-                if (opt.value !== 'อื่นๆ' && opt.value !== '' && fullValue.toLowerCase().startsWith(opt.value.toLowerCase())) {
-                    if (opt.value.length > bestMatch.length) bestMatch = opt.value;
-                }
-            });
-            
+          
             sel.value = bestMatch;
             if (other) { other.value = ''; other.classList.add('hidden'); }
-            if (ver) ver.value = fullValue.substring(bestMatch.length).trim();
+            if (ver) {
+                
+                ver.value = fullValue.substring(bestMatch.length).trim();
+            }
         } else {
-            // ไม่ตรงกับตัวเลือกใดๆ ให้ลงช่องอื่นๆ
+        
             sel.value = 'อื่นๆ';
             if (other) {
-                other.value = fullValue;
+                let namePart = fullValue;
+                let verPart = '';
+
+              
+                if (ver) {
+                    const lastSpaceIdx = fullValue.lastIndexOf(' '); 
+                    if (lastSpaceIdx !== -1) {
+                        const lastWord = fullValue.substring(lastSpaceIdx + 1);
+                      
+                        if (/^[vV]?\d/.test(lastWord) || lastWord.toUpperCase().includes('EOF')) {
+                            namePart = fullValue.substring(0, lastSpaceIdx).trim();
+                            verPart = lastWord;
+                        }
+                    }
+                }
+
+                other.value = namePart;
                 other.classList.remove('hidden');
+                
+                if (ver) ver.value = verPart;
+            } else {
+                if (ver) ver.value = '';
             }
-            if (ver) ver.value = '';
         }
         
         if (baseId === 'os') handleOsColor(sel);
