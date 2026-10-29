@@ -151,6 +151,7 @@
           </div>
         </div>
 
+        <!-- เครื่องมือค้นหาและล้างการค้นหา -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
           <div class="relative w-full sm:w-80">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
@@ -159,24 +160,14 @@
             <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Domain..."
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
-          <div class="flex items-center justify-between w-full sm:w-auto gap-3 text-slate-600">
-            <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
-            <div class="flex items-center gap-2.5">
-              <span class="font-medium">แสดง:</span>
-              <select id="pageSizeSelect" onchange="changePageSize()" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm">
-                <option value="5">5 แถว</option>
-                <option value="10" selected>10 แถว</option>
-                <option value="20">20 แถว</option>
-                <option value="all">ทั้งหมด</option>
-              </select>
-            </div>
-            <button onclick="resetFilters()" class="px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition shadow-sm" title="ล้างการค้นหา">
-              <i class="fa-solid fa-rotate-right"></i>
+          <div class="flex items-center justify-end w-full sm:w-auto">
+            <button onclick="resetFilters()" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition shadow-sm flex items-center gap-2" title="ล้างการค้นหา">
+              <i class="fa-solid fa-rotate-right"></i> ล้างการค้นหา
             </button>
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5 shadow-sm">
+        <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
           <table id="mainTable" class="w-full text-xs border-collapse">
             <thead>
               <tr class="bg-theme text-white font-medium text-[12px] select-none whitespace-nowrap tracking-wide">
@@ -232,11 +223,24 @@
           </table>
         </div>
 
-        <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-100">
+        <!-- แถบด้านล่างตาราง (Pagination & Page Size) -->
+        <div class="flex flex-col lg:flex-row justify-between items-center gap-4 pt-4 border-t border-slate-200 mt-4 text-xs text-slate-600">
+          <div class="flex flex-wrap items-center justify-center gap-4">
+            <span>แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span> รายการ</span>
+            <div class="flex items-center gap-2.5">
+              <span class="font-medium">แสดง:</span>
+              <select id="pageSizeSelect" onchange="changePageSize()" class="px-3.5 py-2 font-semibold bg-white border border-slate-300 rounded-xl outline-none cursor-pointer shadow-sm focus:ring-2 focus:ring-sky-500 transition">
+                <option value="5">5 แถว</option>
+                <option value="10" selected>10 แถว</option>
+                <option value="20">20 แถว</option>
+                <option value="all">ทั้งหมด</option>
+              </select>
+            </div>
+          </div>
           <div id="paginationControls" class="flex items-center gap-2 text-xs">
-            <button onclick="changePage(-1)" class="prevBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ก่อนหน้า</button>
-            <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl">หน้า 1 / 1</span>
-            <button onclick="changePage(1)" class="nextBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition">ถัดไป</button>
+            <button onclick="changePage(-1)" class="prevBtn px-4 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition shadow-sm">ก่อนหน้า</button>
+            <span class="pageInfo px-4 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl shadow-sm">หน้า 1 / 1</span>
+            <button onclick="changePage(1)" class="nextBtn px-4 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition shadow-sm">ถัดไป</button>
           </div>
         </div>
       </div>
@@ -440,7 +444,7 @@
                   <label class="font-bold text-slate-500 text-[10px] uppercase">Frontend</label>
                   <select id="edit_swFe" onchange="handleSelectChange(this, 'edit_swFe_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
                     <option value="">-- ไม่ระบุ --</option>
-                    <option value="HTML/CSS/JS">HTML/CSS/JS (Native)</option>
+                    <option value="HTML/CSS/JS (Native)">HTML/CSS/JS (Native)</option>
                     <option value="React">React</option>
                     <option value="Vue">Vue</option>
                     <option value="Angular">Angular</option>
@@ -829,7 +833,7 @@
       if (tl === 'huawei') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80"><i class="fa-solid fa-cloud"></i> Huawei</span>`;
       if (tl === 'gpc') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80"><i class="fa-solid fa-cloud"></i> GPC</span>`;
       if (tl === 'inet') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200/80"><i class="fa-solid fa-cloud"></i> INET</span>`;
-      if (tl === 'private cloud') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300"><i class="fa-solid fa-server"></i> Private Cloud</span>`;
+      if (tl === 'private cloud' || tl === 'on-premise') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300"><i class="fa-solid fa-server"></i> ${escapeHtml(t)}</span>`;
       
       return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/80"><i class="fa-solid fa-cloud"></i> ${escapeHtml(t || 'Server')}</span>`;
     }
