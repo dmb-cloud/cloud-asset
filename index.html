@@ -1046,7 +1046,16 @@
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
         const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
         const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
-        return nameText.includes(searchValue) || domainText.includes(searchValue) || ipText.includes(searchValue);
+        
+        // ดึงข้อความจากคลาส contact-cell มาเช็คด้วย
+        const contactElem = row.querySelector('.contact-cell');
+        const contactText = contactElem ? contactElem.innerText.toLowerCase() : '';
+
+        // เพิ่ม contactText.includes(searchValue) ต่อท้าย
+        return nameText.includes(searchValue) || 
+               domainText.includes(searchValue) || 
+               ipText.includes(searchValue) || 
+               contactText.includes(searchValue);
       });
 
       rows.forEach(row => row.style.display = 'none');
