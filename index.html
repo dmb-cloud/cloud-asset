@@ -19,6 +19,27 @@
     tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
     .th-sortable { cursor: pointer; user-select: none; }
     .th-sortable:hover { background-color: #334155; }
+    /* แต่ง Scrollbar สำหรับตาราง */
+    .custom-scrollbar {
+      scrollbar-width: thin; /* สำหรับ Firefox */
+      scrollbar-color: #cbd5e1 transparent;
+    }
+    
+    /* สำหรับ Chrome, Edge, Safari */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent; 
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1; /* สี slate-300 */
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #94a3b8; /* สี slate-400 เมื่อเอาเมาส์ชี้ */
+    }
   </style>
 </head>
 
@@ -189,9 +210,11 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-slate-200 mb-5 shadow-sm">
-          <table id="mainTable" class="w-full text-xs border-collapse">
-            <thead>
+<!-- เพิ่ม overflow-y-auto และ max-h-[65vh] -->
+<div class="custom-scrollbar overflow-x-auto overflow-y-auto max-h-[65vh] rounded-xl border border-slate-200 mb-5 shadow-sm">
+  <table id="mainTable" class="w-full text-xs border-collapse">
+    <!-- เพิ่ม sticky top-0 z-20 ที่ thead เพื่อล็อคหัวตาราง -->
+    <thead class="sticky top-0 z-20 shadow-sm">
               <tr class="bg-theme text-white font-medium text-[12px] select-none whitespace-nowrap tracking-wide">
                 <th onclick="sortTable('index')" class="py-3.5 px-3 w-12 text-center th-sortable transition">
                   <div class="flex items-center justify-center gap-1.5">
@@ -521,29 +544,29 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <!-- C -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
-                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> ข้อมูลรั่วไหล (C)</label>
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> การรักษาความลับ (C)</label>
                 <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">LOW (หลุดรอดได้ ไม่รุนแรง)</option>
-                  <option value="2">MEDIUM (กระทบชื่อเสียง)</option>
-                  <option value="3">HIGH (ความลับองค์กร)</option>
+                  <option value="1">LOW (ข้อมูลทั่วไป / ผลกระทบระดับต่ำ)</option>
+                  <option value="2">MEDIUM (ข้อมูลภายใน / กระทบความน่าเชื่อถือ)</option>
+                  <option value="3">HIGH (ความลับองค์กร/PDPA / ผลกระทบรุนแรง)</option>
                 </select>
               </div>
               <!-- I -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
-                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ถูกแก้ไขปลอมแปลง (I)</label>
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ความถูกต้องสมบูรณ์ (I)</label>
                 <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">LOW (เจตนาทำร้ายต่ำ)</option>
-                  <option value="2">MEDIUM (กระทบความถูกต้อง)</option>
-                  <option value="3">HIGH (ธุรกรรมเสียหาย/ทุจริต)</option>
+                  <option value="1">LOW (กู้คืนได้ง่าย / กระทบการทำงานระดับต่ำ)</option>
+                  <option value="2">MEDIUM (ข้อมูลคลาดเคลื่อน / กระทบกระบวนการทำงาน)</option>
+                  <option value="3">HIGH (ธุรกรรมเสียหาย / ผลกระทบรุนแรง)</option>
                 </select>
               </div>
               <!-- A -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
-                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ระบบล่มใช้งานไม่ได้ (A)</label>
+                <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ความพร้อมใช้งาน (A)</label>
                 <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
-                  <option value="1">LOW (หยุดได้เกิน 24 ชม.)</option>
-                  <option value="2">MEDIUM (หยุดได้ไม่เกิน 4 ชม.)</option>
-                  <option value="3">HIGH (พร้อมใช้ 24/7 ล่มไม่ได้)</option>
+                  <option value="1">LOW (ยอมรับ Downtime ได้ > 24 ชม.)</option>
+                  <option value="2">MEDIUM (ยอมรับ Downtime ได้ไม่เกิน 4 ชม.)</option>
+                  <option value="3">HIGH (Mission Critical / ห้ามระบบหยุดให้บริการ)</option>
                 </select>
               </div>
             </div>
