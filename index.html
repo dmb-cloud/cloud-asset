@@ -35,7 +35,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.1.0</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.2.0</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -211,7 +211,7 @@
           </div>
         </th>
         <th class="py-3.5 px-4 text-center min-w-[220px]">
-          Software
+          Framework
         </th>
         <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
           <div class="flex items-center justify-center gap-1.5">
@@ -244,34 +244,6 @@
 
   </div>
 
-  <!-- Announcement Modal -->
-  <div id="announcementPopup" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200">
-      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0 border-b border-white/10">
-        <div class="flex items-center gap-3 text-white">
-          <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
-            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
-            <h2 class="text-base md:text-lg font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
-          </div>
-        </div>
-      </div>
-      <div class="p-5 overflow-y-auto text-xs text-slate-700 space-y-4 leading-relaxed">
-        <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#122e5a] p-4 rounded-xl">
-          <p class="font-bold text-[#122e5a] text-sm">อ้างอิง: หนังสือ สธ 0212.07/ว7009</p>
-          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน</p>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
-          <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Info Modal -->
   <div id="infoModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
@@ -302,7 +274,6 @@
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
         <div class="p-5 space-y-5 overflow-y-auto bg-slate-50/50">
 
-          <!-- Hidden inputs เพื่อไม่ให้บันทึกข้อมูลเสีย -->
           <input type="hidden" id="edit_agency">
           <input type="hidden" id="edit_status" value="ใช้งาน">
           <input type="hidden" id="edit_owners">
@@ -312,14 +283,15 @@
             <h4 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
               <i class="fa-solid fa-server text-sky-500"></i> ข้อมูลระบบ (System Info)
             </h4>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <!-- Type (4 cols) -->
+              <!-- Type (4 cols) + อื่นๆ -->
               <div class="md:col-span-4">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Type</label>
-                <select id="edit_type" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm"></select>
+                <select id="edit_type" onchange="toggleOther('edit_type')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm"></select>
+                <input type="text" id="edit_type_other" maxlength="100" placeholder="ระบุ Type อื่นๆ" class="hidden mt-2 w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm">
               </div>
-              
+
               <!-- Resource Name (8 cols) -->
               <div class="md:col-span-8">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
@@ -331,19 +303,17 @@
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Domain Name & SSL Expiry</label>
                 <div class="flex border border-slate-300 bg-slate-50 rounded-xl focus-within:ring-2 focus-within:ring-sky-500 focus-within:bg-white focus-within:border-sky-500 transition shadow-sm overflow-hidden group">
                   <input type="text" id="edit_domain" maxlength="300" class="w-full p-2.5 outline-none bg-transparent" placeholder="example.com">
-                  
-                  <!-- ส่วนเลือก SSL แบบฝังอยู่ใน Input -->
+
                   <div class="flex items-center border-l border-slate-200 bg-slate-100 px-3 relative cursor-pointer hover:bg-slate-200 transition group-focus-within:border-sky-300">
                     <div class="flex items-center gap-2">
                       <span id="ssl_display" class="text-[10px] font-bold text-slate-400 whitespace-nowrap">ระบุ SSL</span>
                       <i class="fa-solid fa-calendar-day text-slate-500 group-hover:text-sky-600 transition"></i>
                     </div>
-                    <!-- ซ่อน input date ไว้ข้างบนให้กดโดนเสมอ -->
-                    <input type="date" id="edit_ssl" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    <input type="date" id="edit_ssl" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                            onchange="
-                             let d = this.value; 
+                             let d = this.value;
                              let disp = document.getElementById('ssl_display');
-                             if(d) { disp.innerText = d; disp.classList.add('text-sky-600'); disp.classList.remove('text-slate-400'); } 
+                             if(d) { disp.innerText = d; disp.classList.add('text-sky-600'); disp.classList.remove('text-slate-400'); }
                              else { disp.innerText = 'ระบุ SSL'; disp.classList.remove('text-sky-600'); disp.classList.add('text-slate-400'); }
                            ">
                   </div>
@@ -374,15 +344,14 @@
               <h5 class="font-bold text-slate-700 text-[12px] mb-3 flex items-center gap-1.5">
                 <i class="fa-brands fa-stack-overflow text-indigo-500"></i> ซอฟต์แวร์และเวอร์ชัน (Software Stack)
               </h5>
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-                
-                <!-- OS (4 cols) -->
-                <div class="md:col-span-4">
-                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">OS (ระบบปฏิบัติการ)</label>
-                  <select id="edit_os" onchange="handleOsColor(this)" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+
+              <!-- OS -->
+              <div class="mb-4">
+                <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">OS (ระบบปฏิบัติการ)</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <select id="edit_os" onchange="toggleOther('edit_os'); handleOsColor()" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
                     <option value="">-- ไม่ระบุ --</option>
                     <optgroup label="Linux">
-                      <option value="Ubuntu 20.04">Ubuntu 20.04</option>
                       <option value="Ubuntu 22.04">Ubuntu 22.04</option>
                       <option value="Ubuntu 24.04">Ubuntu 24.04</option>
                       <option value="CentOS 7 (EOF)">CentOS 7 (EOF)</option>
@@ -404,32 +373,12 @@
                       <option value="อื่นๆ">อื่นๆ</option>
                     </optgroup>
                   </select>
-                </div>
-                
-                <!-- App (4 cols) -->
-                <div class="md:col-span-4">
-                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Application</label>
-                  <input type="text" id="edit_swApp" placeholder="เช่น WordPress v6.0" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                </div>
-                
-                <!-- Frontend (4 cols) -->
-                <div class="md:col-span-4">
-                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Frontend</label>
-                  <input type="text" id="edit_swFe" placeholder="เช่น React v18, HTML" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                </div>
-                
-                <!-- Backend (6 cols) -->
-                <div class="md:col-span-6">
-                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Backend</label>
-                  <input type="text" id="edit_swBe" placeholder="เช่น php v8.2, Node.js" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                </div>
-                
-                <!-- Database (6 cols) -->
-                <div class="md:col-span-6">
-                  <label class="font-bold mb-1.5 block text-slate-500 text-[10px] uppercase">Database</label>
-                  <input type="text" id="edit_swDb" placeholder="เช่น MySQL 8.0, PostgreSQL" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                  <input type="text" id="edit_os_other" maxlength="100" oninput="handleOsColor()" placeholder="ระบุ OS อื่นๆ (เช่น Ubuntu 20.04 (EOF))" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
                 </div>
               </div>
+
+              <!-- Application / Frontend / Backend / Database / Web Server (สร้างด้วย JavaScript) -->
+              <div id="stackContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
           </section>
 
@@ -442,7 +391,6 @@
               <span id="edit_impactBadge" class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm transition">Impact: LOW</span>
             </div>
 
-            <!-- PDPA Card Toggle -->
             <label class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-sky-300 hover:bg-sky-50/30 cursor-pointer transition group">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm group-hover:border-sky-300 group-hover:text-sky-500 transition">
@@ -456,9 +404,7 @@
               <input type="checkbox" id="edit_pdpa" onchange="calcImpact()" class="w-5 h-5 text-sky-600 rounded cursor-pointer border-slate-300 focus:ring-sky-500 transition">
             </label>
 
-            <!-- CIA Grids -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- C -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> ข้อมูลรั่วไหล (C)</label>
                 <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -467,7 +413,6 @@
                   <option value="3">HIGH (ความลับองค์กร)</option>
                 </select>
               </div>
-              <!-- I -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ถูกแก้ไขปลอมแปลง (I)</label>
                 <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -476,7 +421,6 @@
                   <option value="3">HIGH (ธุรกรรมเสียหาย/ทุจริต)</option>
                 </select>
               </div>
-              <!-- A -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ระบบล่มใช้งานไม่ได้ (A)</label>
                 <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -489,7 +433,6 @@
           </section>
         </div>
 
-        <!-- Footer Buttons -->
         <div class="flex justify-end gap-3 px-5 py-4 border-t border-slate-200 bg-white shrink-0">
           <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition shadow-sm">ยกเลิก</button>
           <button type="submit" id="btnSaveModal" class="px-6 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5"><i class="fa-solid fa-save"></i> บันทึกข้อมูล</button>
@@ -535,6 +478,7 @@
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
 
     const $ = id => document.getElementById(id);
+    const OTHER = "อื่นๆ";
 
     let userAgency = "";
     let userEmail = "";
@@ -543,7 +487,6 @@
     let allAssets = [];
     let sessionTimerId = null;
 
-    // Dynamic State
     let currentPage = 1;
     let pageSize = 10;
     let sortDirection = {};
@@ -662,72 +605,63 @@
 
     function openLogoutModal() { $('logoutModal').classList.remove('hidden'); }
     function closeLogoutModal() { $('logoutModal').classList.add('hidden'); }
-    function closeAnnouncement() { $('announcementPopup').classList.add('hidden'); }
+
     function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
     function closeModal() { $('infoModal').classList.add('hidden'); }
 
     // ---------- dashboard ----------
     function updateCardDashboard() {
-      // 1. คัดเฉพาะรายการที่ 'ใช้งาน' มาคำนวณ Dashboard ให้ตรงกับตาราง
       const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
       const totalActive = activeAssets.length;
-      
+
       const typeCounts = {};
       let eofCount = 0;
       let assessedCount = 0;
       let pdpaCount = 0;
 
       activeAssets.forEach(item => {
-        // นับ Cloud Type
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
 
-        // นับจำนวน OS ที่มีสถานะ EOF
         if (item.os && item.os.toUpperCase().includes('EOF')) {
           eofCount++;
         }
 
-        // นับอื่นๆ
         if (item.isSaved) assessedCount++;
         if (item.pdpa) pdpaCount++;
       });
 
-      // สร้าง HTML แสดงผลบน Card ที่ 1
       let cloudStatsHtml = '';
-      const allTypes = ["Domain", ...TYPES.map(t => t[1].trim())]; 
-      
+      const allTypes = ["Domain", ...TYPES.map(t => t[1].trim())];
+
       allTypes.forEach(type => {
         if (typeCounts[type]) {
            let icon = type.toLowerCase() === 'domain' ? 'fa-globe text-blue-500' : 'fa-cloud text-indigo-500';
-           cloudStatsHtml += `<span><i class="fa-solid ${icon} mr-1"></i>${type}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
+           cloudStatsHtml += `<span><i class="fa-solid ${icon} mr-1"></i>${escapeHtml(type)}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
            delete typeCounts[type];
         }
       });
       Object.keys(typeCounts).forEach(type => {
-         cloudStatsHtml += `<span><i class="fa-solid fa-server text-slate-400 mr-1"></i>${type}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
+         cloudStatsHtml += `<span><i class="fa-solid fa-server text-slate-400 mr-1"></i>${escapeHtml(type)}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
       });
 
-      // อัปเดตตัวเลขลงในการ์ดทั้ง 4 ใบ
       $('cardTotal').textContent = totalActive;
       const statsContainer = document.getElementById('cloudTypeStats');
       if (statsContainer) statsContainer.innerHTML = cloudStatsHtml;
 
-      // Card 2: OS EOF
       if($('cardEof')) $('cardEof').textContent = eofCount;
       if($('cardEofSub')) $('cardEofSub').textContent = eofCount;
       if($('cardSafeOs')) $('cardSafeOs').textContent = totalActive - eofCount;
 
-      // Card 3: Assessed
       const pendingCount = totalActive - assessedCount;
       $('cardAssessed').textContent = assessedCount;
       $('cardAssessedSub').textContent = assessedCount;
       if($('cardPending')) $('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
 
-      // Card 4: PDPA
       $('cardPdpa').textContent = pdpaCount;
     }
 
-    // ---------- main table ----------
+    // ---------- constants ----------
     const SYS_TYPES = [
       ["ระบบบริการ (Web Services)", "Web Services"],
       ["ระบบฐานข้อมูล (Database System)", "Database System"],
@@ -746,8 +680,21 @@
       ["GPC", "GPC"],
       ["INET", "INET"],
       ["Private Cloud", "Private Cloud"],
+      ["On-Premise", "On-Premise"],
       ["อื่นๆ", "อื่นๆ"]
     ];
+
+    // รายการ Software Stack: dropdown + (อื่นๆ = พิมพ์เอง) + เวอร์ชัน → บันทึกเป็น "ชื่อ เวอร์ชัน"
+    // field = key ที่ส่งไป backend (swWs = Web Server เพิ่มใหม่)
+    const STACK_FIELDS = [
+      { field: 'swApp', label: 'Application', icon: 'fa-cube', opts: ['WordPress', 'Joomla', 'Drupal', 'Moodle', 'Laravel', 'Odoo', 'Nextcloud', 'Custom Application'], ph: 'เช่น 6.0' },
+      { field: 'swFe',  label: 'Frontend',    icon: 'fa-display', opts: ['HTML/CSS/JS', 'React', 'Angular', 'Vue.js', 'Next.js', 'Nuxt.js', 'Bootstrap', 'jQuery'], ph: 'เช่น 18' },
+      { field: 'swBe',  label: 'Backend',     icon: 'fa-code', opts: ['PHP', 'Node.js', 'Python', 'Java', '.NET', 'Go', 'Ruby'], ph: 'เช่น 8.2' },
+      { field: 'swDb',  label: 'Database',    icon: 'fa-database', opts: ['MySQL', 'MariaDB', 'PostgreSQL', 'Microsoft SQL Server', 'Oracle', 'MongoDB', 'Redis', 'SQLite'], ph: 'เช่น 8.0' },
+      { field: 'swWs',  label: 'Web Server',  icon: 'fa-globe', opts: ['Apache', 'Nginx', 'IIS', 'Tomcat', 'LiteSpeed', 'Caddy'], ph: 'เช่น 2.4' }
+    ];
+
+    const INPUT_CLS = "border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs";
 
     function initEditModal() {
       $('edit_sysType').innerHTML = SYS_TYPES.map(([label]) =>
@@ -755,9 +702,90 @@
 
       $('edit_type').innerHTML = TYPES.map(([label, val]) =>
         `<option value="${escapeHtml(val.trim())}">${escapeHtml(label)}</option>`).join('');
+
+      $('stackContainer').innerHTML = STACK_FIELDS.map(f => `
+        <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-200">
+          <label class="font-bold mb-1.5 flex items-center gap-1.5 text-slate-500 text-[10px] uppercase">
+            <i class="fa-solid ${f.icon} text-indigo-400"></i> ${f.label}
+          </label>
+          <div class="flex gap-2">
+            <select id="edit_${f.field}_sel" onchange="toggleOther('edit_${f.field}_sel', 'edit_${f.field}_other')" class="flex-1 min-w-0 bg-white ${INPUT_CLS}">
+              <option value="">-- ไม่ระบุ --</option>
+              ${f.opts.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('')}
+              <option value="${OTHER}">${OTHER}</option>
+            </select>
+            <input type="text" id="edit_${f.field}_ver" maxlength="50" placeholder="${f.ph}" title="เวอร์ชัน" class="w-28 bg-white ${INPUT_CLS}">
+          </div>
+          <input type="text" id="edit_${f.field}_other" maxlength="100" placeholder="ระบุ ${f.label} อื่นๆ" class="hidden mt-2 w-full bg-white ${INPUT_CLS}">
+        </div>`).join('');
     }
     document.addEventListener('DOMContentLoaded', initEditModal);
 
+    // ---------- dropdown "อื่นๆ" helpers ----------
+    // toggleOther('edit_type') → ใช้ id "edit_type_other"; หรือระบุ otherId เอง
+    function toggleOther(selId, otherId) {
+      const sel = $(selId);
+      const other = $(otherId || (selId + '_other'));
+      if (!sel || !other) return;
+      const show = sel.value === OTHER;
+      other.classList.toggle('hidden', !show);
+      if (!show) other.value = '';
+      else other.focus();
+    }
+
+    // อ่านค่าจาก dropdown (+ ช่องอื่นๆ)
+    function readSelectOther(selId, otherId, fallbackOther) {
+      const v = $(selId).value;
+      if (v === OTHER) return $(otherId).value.trim() || (fallbackOther || '');
+      return v;
+    }
+
+    // ตั้งค่า dropdown: ถ้าค่าไม่อยู่ในรายการ → เลือก "อื่นๆ" และใส่ข้อความในช่องพิมพ์
+    function writeSelectOther(selId, otherId, value) {
+      const sel = $(selId), other = $(otherId);
+      const val = String(value || '').trim();
+      const has = Array.from(sel.options).some(o => o.value === val);
+      if (!val) { sel.value = ''; other.value = ''; }
+      else if (has) { sel.value = val; other.value = ''; }
+      else { sel.value = OTHER; other.value = val; }
+      other.classList.toggle('hidden', sel.value !== OTHER);
+    }
+
+    // แยกค่าที่บันทึกไว้ "ชื่อ เวอร์ชัน" กลับเป็น dropdown + version
+    function splitNameVersion(value, opts) {
+      const val = String(value || '').trim();
+      if (!val) return { sel: '', other: '', ver: '' };
+      const lv = val.toLowerCase();
+      let best = '';
+      opts.forEach(o => {
+        const lo = o.toLowerCase();
+        if ((lv === lo || lv.startsWith(lo + ' ')) && o.length > best.length) best = o;
+      });
+      if (best) return { sel: best, other: '', ver: val.slice(best.length).trim() };
+      const m = val.match(/^(.*\S)\s+(v?\d\S*)$/i);
+      return m ? { sel: OTHER, other: m[1], ver: m[2] } : { sel: OTHER, other: val, ver: '' };
+    }
+
+    function setStackField(f, value) {
+      const p = splitNameVersion(value, f.opts);
+      $(`edit_${f.field}_sel`).value = p.sel;
+      $(`edit_${f.field}_other`).value = p.other;
+      $(`edit_${f.field}_ver`).value = p.ver;
+      toggleOtherKeep(`edit_${f.field}_sel`, `edit_${f.field}_other`);
+    }
+
+    function toggleOtherKeep(selId, otherId) {
+      $(otherId).classList.toggle('hidden', $(selId).value !== OTHER);
+    }
+
+    function getStackValue(f) {
+      const name = readSelectOther(`edit_${f.field}_sel`, `edit_${f.field}_other`, '');
+      if (!name) return '';
+      const ver = $(`edit_${f.field}_ver`).value.trim();
+      return (name + ' ' + ver).trim();
+    }
+
+    // ---------- main table ----------
     function getCloudBadgeHtml(typeRaw) {
       const t = String(typeRaw || '').trim();
       const tl = t.toLowerCase();
@@ -770,23 +798,24 @@
       if (tl === 'gpc') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80"><i class="fa-solid fa-cloud"></i> GPC</span>`;
       if (tl === 'inet') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-200/80"><i class="fa-solid fa-cloud"></i> INET</span>`;
       if (tl === 'private cloud') return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300"><i class="fa-solid fa-server"></i> Private Cloud</span>`;
-      
+
       return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/80"><i class="fa-solid fa-cloud"></i> ${escapeHtml(t || 'Server')}</span>`;
     }
 
-    // ฟังก์ชันจัดการสีของ OS dropdown ถ้าระบุ EOF จะเป็นสีแดง
-    function handleOsColor(el) {
-      if (el.value.toUpperCase().includes('EOF')) {
+    // สี OS: ถ้ามีคำว่า EOF (จาก dropdown หรือช่องพิมพ์เอง) จะเป็นสีแดง
+    function handleOsColor() {
+      const el = $('edit_os');
+      const val = readSelectOther('edit_os', 'edit_os_other', '');
+      if (val.toUpperCase().includes('EOF')) {
         el.classList.add('text-rose-600', 'font-bold', 'bg-rose-50');
-        el.classList.remove('bg-white', 'text-slate-800');
+        el.classList.remove('bg-slate-50', 'text-slate-800');
       } else {
         el.classList.remove('text-rose-600', 'font-bold', 'bg-rose-50');
-        el.classList.add('bg-white', 'text-slate-800');
+        el.classList.add('bg-slate-50');
       }
     }
 
     function renderMainTable() {
-      // กรองเอาเฉพาะข้อมูลที่ไม่ใช่ 'ไม่ใช้งาน'
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
       const htmlRows = filteredAssets.map((item, idx) => {
@@ -796,20 +825,19 @@
         if (item.isSaved) {
           const impact = item.impact || 1;
           const impactText = impact === 1 ? 'LOW' : impact === 2 ? 'MEDIUM' : 'HIGH';
-          const impactClass = impact === 1 ? 'bg-emerald-100 text-emerald-700 border-emerald-300' : 
-                              impact === 2 ? 'bg-amber-100 text-amber-700 border-amber-300' : 
+          const impactClass = impact === 1 ? 'bg-emerald-100 text-emerald-700 border-emerald-300' :
+                              impact === 2 ? 'bg-amber-100 text-amber-700 border-amber-300' :
                               'bg-rose-100 text-rose-700 border-rose-300';
-                              
+
           impactBadgeHtml = `<span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold border ${impactClass}">${impactText}</span>`;
         }
 
-        // คอลัมน์ OS พร้อม Icon + Tooltip + Truncate
         let osHtml = `<span class="text-slate-300">-</span>`;
         if (item.os) {
           const osUpper = item.os.toUpperCase();
           const osHasEof = osUpper.includes('EOF');
           const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
-          
+
           let iconClass = "fa-solid fa-compact-disc text-slate-400";
           if (osUpper.includes("UBUNTU")) iconClass = "fa-brands fa-ubuntu text-orange-500";
           else if (osUpper.includes("WINDOWS")) iconClass = "fa-brands fa-windows text-sky-500";
@@ -821,7 +849,7 @@
           else if (osUpper.includes("ROCKY")) iconClass = "fa-brands fa-linux text-emerald-600";
           else if (osUpper.includes("DEBIAN")) iconClass = "fa-brands fa-linux text-rose-600";
           else if (osUpper.includes("LINUX")) iconClass = "fa-brands fa-linux text-slate-700";
-          
+
           if (osHasEof) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
 
           osHtml = `
@@ -832,18 +860,14 @@
           `;
         }
 
-        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย | + Tooltip + Truncate
+        // Software Stack (เพิ่ม Web Server)
         const swParts = [];
-        if (item.swApp) swParts.push(escapeHtml(item.swApp));
-        if (item.swFe) swParts.push(escapeHtml(item.swFe));
-        if (item.swBe) swParts.push(escapeHtml(item.swBe));
-        if (item.swDb) swParts.push(escapeHtml(item.swDb));
-        
-        let swStack = swParts.length > 0 
+        [item.swApp, item.swFe, item.swBe, item.swDb, item.swWs].forEach(v => { if (v) swParts.push(escapeHtml(v)); });
+
+        let swStack = swParts.length > 0
           ? `<div class="truncate w-full max-w-[160px] mx-auto text-[11px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
           : `<span class="text-slate-300 font-medium">-</span>`;
 
-        // วันที่อัปเดตล่าสุด
         let lastUpdateStr = '-', ts = 0;
         if (item.lastUpdate) {
           const d = new Date(item.lastUpdate);
@@ -854,20 +878,19 @@
           }
         }
 
-        // คอลัมน์ข้อความอื่นๆ + Tooltip + Truncate
         const resNameHtml = `<div class="truncate w-full max-w-[180px] mx-auto text-slate-800 font-bold cell-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>`;
-        const domainHtml = item.domain 
-          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-700 font-medium cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>` 
+        const domainHtml = item.domain
+          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-700 font-medium cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>`
           : `<span class="text-slate-300 cell-domain">-</span>`;
-        const ipHtml = item.ip 
+        const ipHtml = item.ip
           ? `<div class="truncate w-full max-w-[110px] mx-auto font-mono font-semibold text-sky-600 cell-ip" title="${escapeHtml(item.ip)}">${escapeHtml(item.ip)}</div>`
           : `<span class="text-slate-300 cell-ip">-</span>`;
-          
-        const contactName = item.contact 
+
+        const contactName = item.contact
           ? `<div class="truncate w-full max-w-[120px] mx-auto text-slate-700 font-bold contact-cell" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
           : `<div class="text-slate-300 contact-cell">-</div>`;
         const dateStr = `<div class="text-[9px] text-slate-500 mt-0.5" title="${lastUpdateStr}"><i class="fa-regular fa-clock"></i> ${lastUpdateStr}</div>`;
-        
+
         const combinedUpdateHtml = `
           <div class="flex flex-col items-center justify-center cell-lastupdate" data-ts="${ts}">
             ${contactName}
@@ -898,7 +921,6 @@
         ? htmlRows.join('')
         : `<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล (ไม่มีระบบที่กำลังใช้งานในหน่วยงานของท่าน)</td></tr>`;
 
-      // ปิดปุ่มดาวน์โหลด Excel ถ้าตารางว่าง
       const btnExport = $('btnExportExcel');
       if (btnExport) {
         btnExport.disabled = htmlRows.length === 0;
@@ -974,7 +996,7 @@
 
     function changePageSize() { pageSize = $('pageSizeSelect').value; applyFilterAndPagination(true); }
     function changePage(direction) { currentPage += direction; applyFilterAndPagination(); }
-    
+
     function resetFilters() {
       $('searchInput').value = '';
       $('pageSizeSelect').value = '10';
@@ -990,13 +1012,13 @@
       const a = parseInt($('edit_a').value);
       let impact = Math.max(c, i, a);
       if (hasPdpa && impact < 2) impact = 2;
-      
+
       const map = {
         1: ['Impact: LOW', 'bg-emerald-100 text-emerald-700 border-emerald-300'],
         2: ['Impact: MEDIUM', 'bg-amber-100 text-amber-700 border-amber-300'],
         3: ['Impact: HIGH', 'bg-rose-100 text-rose-700 border-rose-300']
       };
-      
+
       const badge = $('edit_impactBadge');
       badge.textContent = map[impact][0];
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
@@ -1007,12 +1029,14 @@
       $('edit_owners').value = a.owners || "";
       $('edit_status').value = a.status || 'ใช้งาน';
 
-      $('edit_type').value = (a.typeFilter || "").trim();
+      // Type (พิมพ์เองได้เมื่อเลือก อื่นๆ)
+      writeSelectOther('edit_type', 'edit_type_other', (a.typeFilter || "").trim());
+
       $('edit_name').value = a.name || "";
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
       $('edit_ssl').value = a.sslExpiry || "";
-      
+
       let sslDisp = document.getElementById('ssl_display');
       if (a.sslExpiry) {
         sslDisp.innerText = a.sslExpiry;
@@ -1023,25 +1047,17 @@
         sslDisp.classList.remove('text-sky-600');
         sslDisp.classList.add('text-slate-400');
       }
-      
+
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
-      
-      // ตั้งค่า OS และเช็คสี
-      let osSelect = $('edit_os');
-      let osVal = a.os || "";
-      
-      let exists = Array.from(osSelect.options).some(opt => opt.value === osVal);
-      if (!exists && osVal) {
-        osSelect.add(new Option(osVal, osVal));
-      }
-      osSelect.value = osVal;
-      handleOsColor(osSelect);
-      
-      $('edit_swApp').value = a.swApp || "";
-      $('edit_swFe').value = a.swFe || "";
-      $('edit_swBe').value = a.swBe || "";
-      $('edit_swDb').value = a.swDb || "";
+
+      // OS (พิมพ์เองได้เมื่อเลือก อื่นๆ)
+      writeSelectOther('edit_os', 'edit_os_other', a.os || "");
+      handleOsColor();
+
+      // Software Stack
+      STACK_FIELDS.forEach(f => setStackField(f, a[f.field]));
+
       $('edit_pdpa').checked = a.pdpa === true;
       $('edit_c').value = a.c || 1;
       $('edit_i').value = a.i || 1;
@@ -1054,7 +1070,7 @@
       editingAssetId = null;
       $('edit_agency').value = userAgency;
       $('edit_status').value = 'ใช้งาน';
-      
+
       setForm({ agency: userAgency, typeFilter: 'GDCC', status: 'ใช้งาน' });
       $('editAssetModal').classList.remove('hidden');
     }
@@ -1090,19 +1106,23 @@
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
       const item = {
-        type: v('edit_type'), resourceName: v('edit_name'), status: v('edit_status'),
+        type: readSelectOther('edit_type', 'edit_type_other', OTHER),
+        resourceName: v('edit_name'), status: v('edit_status'),
         domain: v('edit_domain'), ip: v('edit_ip'), sslExpiry: v('edit_ssl'),
         sysType: $('edit_sysType').value, note: v('edit_note'),
-        os: v('edit_os'), swApp: v('edit_swApp'), swFe: v('edit_swFe'), swBe: v('edit_swBe'), swDb: v('edit_swDb'),
+        os: readSelectOther('edit_os', 'edit_os_other', OTHER),
         pdpa: hasPdpa, c: cVal, i: iVal, a: aVal, impact: impactVal
       };
+      // swApp / swFe / swBe / swDb / swWs  =  "ชื่อ" + " " + "เวอร์ชัน"
+      STACK_FIELDS.forEach(f => { item[f.field] = getStackValue(f); });
+
       if (userIsAdmin) { item.agency = v('edit_agency'); item.owners = v('edit_owners'); }
 
       let res;
       if (isAdd) {
         res = await callBackend("addAssetData", { asset: item });
       } else {
-        item.id = editingAssetId; // ส่งเฉพาะ id ที่กำลังแก้
+        item.id = editingAssetId;
         res = await callBackend("saveAssessmentData", { assets: [item] });
       }
 
@@ -1130,8 +1150,6 @@
     // ---------- export ----------
     function exportToExcel() {
       const excelData = [];
-      
-      // กรองข้อมูล: คัดเอาเฉพาะรายการที่สถานะไม่ใช่ 'ไม่ใช้งาน'
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
       filteredAssets.forEach(asset => {
@@ -1148,6 +1166,7 @@
           'Frontend': asset.swFe || '-',
           'Backend': asset.swBe || '-',
           'Database': asset.swDb || '-',
+          'Web Server': asset.swWs || '-',
           'PDPA': asset.pdpa ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': asset.c || '',
           'Integrity (I)': asset.i || '',
