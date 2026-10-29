@@ -142,7 +142,7 @@
 
             <!-- ================= REGISTER ================= -->
             <form id="registerForm" class="hidden space-y-4 text-xs" onsubmit="submitRegister(event)" autocomplete="off">
-              <h2 class="text-base font-bold text-slate-900 dark:text-white text-center"><i class="fa-solid fa-user-plus text-slate-500 dark:text-slate-400 mr-2"></i> สมัครบัญชีผู้ใช้งาน</h2>
+
 
               <div class="space-y-1.5">
                 <label class="block font-medium text-slate-700 dark:text-slate-300">หน่วยงาน / สังกัด <span class="text-rose-500">*</span></label>
@@ -158,18 +158,24 @@
                   class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
               </div>
 
-              <div class="space-y-1.5">
-                <label class="block font-medium text-slate-700 dark:text-slate-300">อีเมล <span class="text-rose-500">*</span></label>
-                <input type="email" id="regEmail" required maxlength="254" placeholder="name@domain.go.th"
-                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
-              </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <!-- ช่องกรอกอีเมล -->
+  <div class="space-y-1.5">
+    <label class="block font-medium text-slate-700 dark:text-slate-300">อีเมล <span class="text-rose-500">*</span></label>
+    <input type="email" id="regEmail" required maxlength="254" placeholder="name@domain.go.th"
+      class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 shadow-sm">
+  </div>
 
-              <div class="space-y-1.5">
-                <label class="block font-medium text-slate-700 dark:text-slate-300">เบอร์โทรศัพท์ (10 หลัก) <span class="text-rose-500">*</span></label>
-                <input type="tel" id="regPhone" required maxlength="10" inputmode="numeric"
-                  oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
-                  class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 font-mono tracking-wider shadow-sm">
-              </div>
+  <!-- ช่องกรอกเบอร์โทรศัพท์ -->
+  <div class="space-y-1.5">
+    <label class="block font-medium text-slate-700 dark:text-slate-300">เบอร์โทรศัพท์ (10 หลัก) <span class="text-rose-500">*</span></label>
+    <input type="tel" id="regPhone" required maxlength="10" inputmode="numeric"
+      oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="08xxxxxxxx"
+      class="w-full h-10 px-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-slate-900 dark:focus:ring-slate-100 text-slate-800 dark:text-slate-200 font-mono tracking-wider shadow-sm">
+  </div>
+</div>
+
+
 
               <div id="regError" class="hidden p-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs rounded-xl border border-rose-200 dark:border-rose-900 text-center font-medium"></div>
               <div id="regSuccess" class="hidden p-2.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs rounded-xl border border-emerald-200 dark:border-emerald-900 text-center font-bold"></div>
