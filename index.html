@@ -606,7 +606,7 @@
 
     // Dynamic State
     let currentPage = 1;
-    let pageSize = 10;
+    let pageSize = 5;
     let sortDirection = {};
     let editingAssetId = null;
     let editMode = 'edit'; // 'edit' | 'add'
@@ -1056,8 +1056,8 @@
     
     function resetFilters() {
       $('searchInput').value = '';
-      $('pageSizeSelect').value = '10';
-      pageSize = 10;
+      $('pageSizeSelect').value = '5';
+      pageSize = 5;
       applyFilterAndPagination(true);
     }
 
