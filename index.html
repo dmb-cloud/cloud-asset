@@ -1298,8 +1298,16 @@
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
+      // ฟังก์ชันช่วยอ่านค่าที่แยกส่วนชื่อ
+      const getComboName = (baseId) => {
+          const sel = $(`edit_${baseId}`);
+          const other = $(`edit_${baseId}_other`);
+          let name = sel ? sel.value : '';
+          return name === 'อื่นๆ' && other ? other.value.trim() : name;
+      };
+
       const item = {
-        type: getComboValue('type'), 
+        type: getComboName('type'),
         resourceName: v('edit_name'), 
         status: v('edit_status'),
         domain: v('edit_domain'), 
@@ -1307,15 +1315,20 @@
         sslExpiry: v('edit_ssl'),
         sysType: $('edit_sysType').value, 
         note: v('edit_note'),
-        os: getComboValue('os'), 
-        swWs: getComboValue('swWs'), 
-        swApp: getComboValue('swApp'), 
-        swFe: getComboValue('swFe'), 
-        swBe: getComboValue('swBe'), 
-        swDb: getComboValue('swDb'),
+        
+        // แยกส่งชื่อ และ เวอร์ชัน ออกเป็น 2 คอลัมน์
+        os: getComboName('os'),         osVer: v('edit_os_ver'),
+        swWs: getComboName('swWs'),     swWsVer: v('edit_swWs_ver'),
+        swApp: getComboName('swApp'),   swAppVer: v('edit_swApp_ver'),
+        swFe: getComboName('swFe'),     swFeVer: v('edit_swFe_ver'),
+        swBe: getComboName('swBe'),     swBeVer: v('edit_swBe_ver'),
+        swDb: getComboName('swDb'),     swDbVer: v('edit_swDb_ver'),
+
         pdpa: hasPdpa, c: cVal, i: iVal, a: aVal, impact: impactVal
       };
       if (userIsAdmin) { item.agency = v('edit_agency'); item.owners = v('edit_owners'); }
+
+      // ... (ส่วนการส่ง API ข้อมูลยังเหมือนเดิม)
 
       let res;
       if (isAdd) {
