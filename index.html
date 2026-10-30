@@ -19,13 +19,12 @@
     tr.row-disabled { background-color: #f1f5f9 !important; opacity: 0.5; }
     .th-sortable { cursor: pointer; user-select: none; }
     .th-sortable:hover { background-color: #334155; }
+    
     /* แต่ง Scrollbar สำหรับตาราง */
     .custom-scrollbar {
-      scrollbar-width: thin; /* สำหรับ Firefox */
+      scrollbar-width: thin; 
       scrollbar-color: #cbd5e1 transparent;
     }
-    
-    /* สำหรับ Chrome, Edge, Safari */
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -34,11 +33,11 @@
       background: transparent; 
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1; /* สี slate-300 */
+      background-color: #cbd5e1;
       border-radius: 10px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background-color: #94a3b8; /* สี slate-400 เมื่อเอาเมาส์ชี้ */
+      background-color: #94a3b8; 
     }
   </style>
 </head>
@@ -56,7 +55,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.1.0</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.2.0</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -101,7 +100,6 @@
         </div>
       </div>
 
-      <!-- Card 2: OS ที่หมดอายุ -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -172,18 +170,15 @@
           </div>
         </div>
 
-        <!-- แถบเครื่องมือ: ค้นหา, เลือกจำนวนแถว, หน้าก่อน-หน้าถัดไป ย้ายมารวมกันตรงนี้ -->
         <div class="flex flex-col xl:flex-row items-center justify-between gap-4 mb-5 bg-slate-50/80 p-4 rounded-xl border border-slate-200/80 text-xs">
-          <!-- กล่องค้นหา -->
           <div class="relative w-full xl:w-80 shrink-0">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <i class="fa-solid fa-magnifying-glass"></i>
             </div>
-            <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP หรือ Domain..."
+            <input type="text" id="searchInput" onkeyup="applyFilterAndPagination(true)" placeholder="ค้นหา Resource, IP, Domain หรือ ผู้ประเมิน..."
               class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 text-slate-800 placeholder:text-slate-400 text-xs shadow-sm">
           </div>
           
-          <!-- ปุ่มควบคุมทั้งหมด -->
           <div class="flex flex-wrap items-center justify-end w-full gap-3 text-slate-600">
             <span class="hidden sm:inline">แสดง <strong id="visibleCount" class="text-slate-800">0</strong> จาก <span id="totalCount">0</span></span>
             
@@ -197,7 +192,6 @@
               </select>
             </div>
 
-            <!-- Pagination ย้ายมาไว้ตรงนี้ -->
             <div id="paginationControls" class="flex items-center gap-2 text-xs">
               <button onclick="changePage(-1)" class="prevBtn px-3.5 py-2 bg-slate-100 border border-slate-300 rounded-xl font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition shadow-sm">ก่อนหน้า</button>
               <span class="pageInfo px-3.5 py-2 font-medium text-slate-700 bg-white border border-slate-200 rounded-xl shadow-sm">หน้า 1 / 1</span>
@@ -210,11 +204,9 @@
           </div>
         </div>
 
-<!-- เพิ่ม overflow-y-auto และ max-h-[65vh] -->
-<div class="custom-scrollbar overflow-x-auto overflow-y-auto max-h-[65vh] rounded-xl border border-slate-200 mb-5 shadow-sm">
-  <table id="mainTable" class="w-full text-xs border-collapse">
-    <!-- เพิ่ม sticky top-0 z-20 ที่ thead เพื่อล็อคหัวตาราง -->
-    <thead class="sticky top-0 z-20 shadow-sm">
+        <div class="custom-scrollbar overflow-x-auto overflow-y-auto max-h-[65vh] rounded-xl border border-slate-200 mb-5 shadow-sm">
+          <table id="mainTable" class="w-full text-xs border-collapse">
+            <thead class="sticky top-0 z-20 shadow-sm">
               <tr class="bg-theme text-white font-medium text-[12px] select-none whitespace-nowrap tracking-wide">
                 <th onclick="sortTable('index')" class="py-3.5 px-3 w-12 text-center th-sortable transition">
                   <div class="flex items-center justify-center gap-1.5">
@@ -627,14 +619,12 @@
     let allAssets = [];
     let sessionTimerId = null;
 
-    // Dynamic State
     let currentPage = 1;
-    let pageSize = 5;
+    let pageSize = 5; 
     let sortDirection = {};
     let editingAssetId = null;
-    let editMode = 'edit'; // 'edit' | 'add'
+    let editMode = 'edit'; 
 
-    // ---------- helpers ----------
     function getToken() { return sessionStorage.getItem('access_token') || ""; }
 
     function escapeHtml(v) {
@@ -649,7 +639,6 @@
       window.location.href = "auth.html";
     }
 
-    // ---------- API ----------
     async function callBackend(action, payload = {}) {
       try {
         payload.token = getToken();
@@ -673,7 +662,6 @@
       }
     }
 
-    // ---------- bootstrap ----------
     document.addEventListener("DOMContentLoaded", async function () {
       const exp = parseInt(sessionStorage.getItem('token_exp') || "0", 10);
       if (!getToken() || exp <= Date.now()) {
@@ -724,9 +712,7 @@
 
         if (overlay) {
           overlay.classList.add('opacity-0');
-          setTimeout(() => {
-            overlay.classList.add('hidden');
-          }, 300);
+          setTimeout(() => { overlay.classList.add('hidden'); }, 300);
         }
       } else {
         if (overlay) {
@@ -750,9 +736,7 @@
     function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
     function closeModal() { $('infoModal').classList.add('hidden'); }
 
-    // ---------- dashboard ----------
     function updateCardDashboard() {
-      // 1. คัดเฉพาะรายการที่ 'ใช้งาน' มาคำนวณ Dashboard ให้ตรงกับตาราง
       const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
       const totalActive = activeAssets.length;
       
@@ -762,21 +746,17 @@
       let pdpaCount = 0;
 
       activeAssets.forEach(item => {
-        // นับ Cloud Type
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
 
-        // นับจำนวน OS ที่มีสถานะ EOF
-        if (item.os && item.os.toUpperCase().includes('EOF')) {
+        if (item.osVer && item.osVer.toUpperCase().includes('EOF')) {
           eofCount++;
         }
 
-        // นับอื่นๆ
         if (item.isSaved) assessedCount++;
         if (item.pdpa) pdpaCount++;
       });
 
-      // สร้าง HTML แสดงผลบน Card ที่ 1
       let cloudStatsHtml = '';
       const allTypes = ["Domain", ...TYPES.map(t => t[1].trim())]; 
       
@@ -791,27 +771,22 @@
          cloudStatsHtml += `<span><i class="fa-solid fa-server text-slate-400 mr-1"></i>${type}: <span class="text-slate-800">${typeCounts[type]}</span></span>`;
       });
 
-      // อัปเดตตัวเลขลงในการ์ดทั้ง 4 ใบ
       $('cardTotal').textContent = totalActive;
       const statsContainer = document.getElementById('cloudTypeStats');
       if (statsContainer) statsContainer.innerHTML = cloudStatsHtml;
 
-      // Card 2: OS EOF
       if($('cardEof')) $('cardEof').textContent = eofCount;
       if($('cardEofSub')) $('cardEofSub').textContent = eofCount;
       if($('cardSafeOs')) $('cardSafeOs').textContent = totalActive - eofCount;
 
-      // Card 3: Assessed
       const pendingCount = totalActive - assessedCount;
       $('cardAssessed').textContent = assessedCount;
       $('cardAssessedSub').textContent = assessedCount;
       if($('cardPending')) $('cardPending').textContent = pendingCount < 0 ? 0 : pendingCount;
 
-      // Card 4: PDPA
       $('cardPdpa').textContent = pdpaCount;
     }
 
-    // ---------- main table ----------
     const SYS_TYPES = [
       ["ระบบบริการ (Web Services)", "Web Services"],
       ["ระบบฐานข้อมูล (Database System)", "Database System"],
@@ -862,7 +837,6 @@
       return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-700 border border-gray-200/80"><i class="fa-solid fa-cloud"></i> ${escapeHtml(t || 'Server')}</span>`;
     }
 
-    // แสดง/ซ่อนช่องพิมพ์ข้อความเมื่อเลือก "อื่นๆ"
     function handleSelectChange(selectElem, otherId) {
       const otherInput = document.getElementById(otherId);
       if (!otherInput) return;
@@ -875,7 +849,6 @@
       }
     }
 
-    // ฟังก์ชันจัดการสีของ OS dropdown ถ้าระบุ EOF จะเป็นสีแดง
     function handleOsColor(el) {
       if (el.value.toUpperCase().includes('EOF')) {
         el.classList.add('text-rose-600', 'font-bold', 'bg-rose-50');
@@ -887,8 +860,12 @@
     }
 
     function renderMainTable() {
-      // กรองเอาเฉพาะข้อมูลที่ไม่ใช่ 'ไม่ใช้งาน'
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
+
+      const combineSw = (name, ver) => {
+          if (!name) return "";
+          return escapeHtml(name) + (ver ? ' ' + escapeHtml(ver) : '');
+      };
 
       const htmlRows = filteredAssets.map((item, idx) => {
         const badgeType = getCloudBadgeHtml(item.typeFilter);
@@ -904,12 +881,13 @@
           impactBadgeHtml = `<span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-bold border ${impactClass}">${impactText}</span>`;
         }
 
-        // คอลัมน์ OS พร้อม Icon + Tooltip + Truncate
         let osHtml = `<span class="text-slate-300">-</span>`;
-        if (item.os) {
-          const osUpper = item.os.toUpperCase();
-          const osHasEof = osUpper.includes('EOF');
-          const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-800 font-medium';
+        let fullOs = combineSw(item.os, item.osVer);
+        
+        if (fullOs) {
+          const osUpper = fullOs.toUpperCase();
+          const osHasEof = item.osVer && item.osVer.toUpperCase().includes('EOF');
+          const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
           
           let iconClass = "fa-solid fa-compact-disc text-slate-400";
           if (osUpper.includes("UBUNTU")) iconClass = "fa-brands fa-ubuntu text-orange-500";
@@ -926,26 +904,24 @@
           if (osHasEof) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
 
           osHtml = `
-            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${escapeHtml(item.os)}">
+            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${fullOs}">
               <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
-              <span class="truncate w-full text-[10px] ${osTextClass}">${escapeHtml(item.os)}</span>
+              <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
             </div>
           `;
         }
 
-        // คอลัมน์ Software เป็นแถวเดียวคั่นด้วย | + Tooltip + Truncate
         const swParts = [];
-        if (item.swWs) swParts.push(escapeHtml(item.swWs)); // เพิ่ม Web Server ด้วย
-        if (item.swApp) swParts.push(escapeHtml(item.swApp));
-        if (item.swFe) swParts.push(escapeHtml(item.swFe));
-        if (item.swBe) swParts.push(escapeHtml(item.swBe));
-        if (item.swDb) swParts.push(escapeHtml(item.swDb));
+        if (item.swWs) swParts.push(combineSw(item.swWs, item.swWsVer));
+        if (item.swApp) swParts.push(combineSw(item.swApp, item.swAppVer));
+        if (item.swFe) swParts.push(combineSw(item.swFe, item.swFeVer));
+        if (item.swBe) swParts.push(combineSw(item.swBe, item.swBeVer));
+        if (item.swDb) swParts.push(combineSw(item.swDb, item.swDbVer));
         
         let swStack = swParts.length > 0 
-          ? `<div class="truncate w-full max-w-[160px] mx-auto text-[11px] text-slate-700" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
+          ? `<div class="truncate w-full max-w-[160px] mx-auto text-[11px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
           : `<span class="text-slate-300 font-medium">-</span>`;
 
-        // วันที่อัปเดตล่าสุด
         let lastUpdateStr = '-', ts = 0;
         if (item.lastUpdate) {
           const d = new Date(item.lastUpdate);
@@ -956,19 +932,18 @@
           }
         }
 
-        // คอลัมน์ข้อความอื่นๆ + Tooltip + Truncate
         const resNameHtml = `<div class="truncate w-full max-w-[180px] mx-auto text-slate-800 font-bold cell-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>`;
         const domainHtml = item.domain 
-          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-800 font-medium cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>` 
-          : `<span class="text-slate-300 cell-domain">-</span>`;
+          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-800 font-bold cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>` 
+          : `<span class="text-slate-300 font-bold cell-domain">-</span>`;
         const ipHtml = item.ip 
-          ? `<div class="truncate w-full max-w-[110px] mx-auto font-mono font-semibold text-slate-800 cell-ip" title="${escapeHtml(item.ip)}">${escapeHtml(item.ip)}</div>`
+          ? `<div class="truncate w-full max-w-[110px] mx-auto font-mono font-semibold text-sky-600 cell-ip" title="${escapeHtml(item.ip)}">${escapeHtml(item.ip)}</div>`
           : `<span class="text-slate-300 cell-ip">-</span>`;
           
         const contactName = item.contact 
-          ? `<div class="truncate w-full max-w-[120px] mx-auto text-slate-800 font-bold contact-cell" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
+          ? `<div class="truncate w-full max-w-[120px] mx-auto text-slate-700 font-bold contact-cell" title="${escapeHtml(item.contact)}">${escapeHtml(item.contact)}</div>`
           : `<div class="text-slate-300 contact-cell">-</div>`;
-        const dateStr = `<div class="text-[9px] text-slate-700 mt-0.5" title="${lastUpdateStr}"><i class="fa-regular fa-clock"></i> ${lastUpdateStr}</div>`;
+        const dateStr = `<div class="text-[9px] text-slate-500 mt-0.5" title="${lastUpdateStr}"><i class="fa-regular fa-clock"></i> ${lastUpdateStr}</div>`;
         
         const combinedUpdateHtml = `
           <div class="flex flex-col items-center justify-center cell-lastupdate" data-ts="${ts}">
@@ -1000,7 +975,6 @@
         ? htmlRows.join('')
         : `<tr><td colspan="10" class="text-center py-12 text-slate-400 font-medium">ไม่พบข้อมูล (ไม่มีระบบที่กำลังใช้งานในหน่วยงานของท่าน)</td></tr>`;
 
-      // ปิดปุ่มดาวน์โหลด Excel ถ้าตารางว่าง
       const btnExport = $('btnExportExcel');
       if (btnExport) {
         btnExport.disabled = htmlRows.length === 0;
@@ -1046,16 +1020,10 @@
         const nameText = row.querySelector('.cell-name').innerText.toLowerCase();
         const domainText = row.querySelector('.cell-domain').innerText.toLowerCase();
         const ipText = row.querySelector('.cell-ip').innerText.toLowerCase();
-        
-        // ดึงข้อความจากคลาส contact-cell มาเช็คด้วย
         const contactElem = row.querySelector('.contact-cell');
         const contactText = contactElem ? contactElem.innerText.toLowerCase() : '';
 
-        // เพิ่ม contactText.includes(searchValue) ต่อท้าย
-        return nameText.includes(searchValue) || 
-               domainText.includes(searchValue) || 
-               ipText.includes(searchValue) || 
-               contactText.includes(searchValue);
+        return nameText.includes(searchValue) || domainText.includes(searchValue) || ipText.includes(searchValue) || contactText.includes(searchValue);
       });
 
       rows.forEach(row => row.style.display = 'none');
@@ -1093,7 +1061,6 @@
       applyFilterAndPagination(true);
     }
 
-    // ---------- Edit / Add modal ----------
     function calcImpact() {
       const hasPdpa = $('edit_pdpa').checked;
       const c = parseInt($('edit_c').value);
@@ -1113,95 +1080,32 @@
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
     }
 
-
-    function setComboValue(baseId, fullValue) {
+    const setComboSep = (baseId, valName, valVer) => {
         const sel = document.getElementById(`edit_${baseId}`);
         const other = document.getElementById(`edit_${baseId}_other`);
         const ver = document.getElementById(`edit_${baseId}_ver`);
         
-        if (!fullValue) {
+        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName || '').toLowerCase());
+        if (exists && valName !== 'อื่นๆ' && valName !== '') {
+            sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === String(valName).toLowerCase()).value;
+            if (other) { other.value = ''; other.classList.add('hidden'); }
+        } else if (valName) {
+            sel.value = 'อื่นๆ';
+            if (other) { other.value = valName; other.classList.remove('hidden'); }
+        } else {
             sel.value = '';
             if (other) { other.value = ''; other.classList.add('hidden'); }
-            if (ver) ver.value = '';
-            return;
         }
-        
-       
-        let exists = false;
-        let bestMatch = "";
-        
-        Array.from(sel.options).forEach(opt => {
-            if (opt.value !== 'อื่นๆ' && opt.value !== '') {
-             
-                if (fullValue.toLowerCase().startsWith(opt.value.toLowerCase())) {
-                    exists = true;
-                   
-                    if (opt.value.length > bestMatch.length) {
-                        bestMatch = opt.value;
-                    }
-                }
-            }
-        });
-        
-        if (exists) {
-          
-            sel.value = bestMatch;
-            if (other) { other.value = ''; other.classList.add('hidden'); }
-            if (ver) {
-                
-                ver.value = fullValue.substring(bestMatch.length).trim();
-            }
-        } else {
-        
-            sel.value = 'อื่นๆ';
-            if (other) {
-                let namePart = fullValue;
-                let verPart = '';
-
-              
-                if (ver) {
-                    const lastSpaceIdx = fullValue.lastIndexOf(' '); 
-                    if (lastSpaceIdx !== -1) {
-                        const lastWord = fullValue.substring(lastSpaceIdx + 1);
-                      
-                        if (/^[vV]?\d/.test(lastWord) || lastWord.toUpperCase().includes('EOF')) {
-                            namePart = fullValue.substring(0, lastSpaceIdx).trim();
-                            verPart = lastWord;
-                        }
-                    }
-                }
-
-                other.value = namePart;
-                other.classList.remove('hidden');
-                
-                if (ver) ver.value = verPart;
-            } else {
-                if (ver) ver.value = '';
-            }
-        }
-        
+        if (ver) ver.value = valVer || '';
         if (baseId === 'os') handleOsColor(sel);
-    }
-
-    // ฟังก์ชันรวบรวมค่าจาก Dropdown "ชื่อ + Version" ก่อนบันทึก
-    function getComboValue(baseId) {
-        const sel = document.getElementById(`edit_${baseId}`);
-        const other = document.getElementById(`edit_${baseId}_other`);
-        const ver = document.getElementById(`edit_${baseId}_ver`);
-        
-        let name = sel ? sel.value : '';
-        if (name === 'อื่นๆ' && other) name = other.value.trim();
-        
-        let version = ver ? ver.value.trim() : '';
-        return (name + (version ? ' ' + version : '')).trim();
-    }
+    };
 
     function setForm(a) {
       $('edit_agency').value = a.agency || userAgency || "";
       $('edit_owners').value = a.owners || "";
       $('edit_status').value = a.status || 'ใช้งาน';
 
-      $('edit_type').value = (a.typeFilter || "").trim();
+      setComboSep('type', a.typeFilter || "");
       
       $('edit_name').value = a.name || "";
       $('edit_domain').value = a.domain || "";
@@ -1222,28 +1126,6 @@
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
-      // ฟังก์ชันช่วยเซ็ตค่า Dropdown ที่มีตัวเลือก "อื่นๆ" แยกคอลัมน์
-      const setComboSep = (baseId, valName, valVer) => {
-        const sel = $(`edit_${baseId}`);
-        const other = $(`edit_${baseId}_other`);
-        const ver = $(`edit_${baseId}_ver`);
-        
-        let exists = Array.from(sel.options).some(opt => opt.value === valName);
-        if (exists && valName !== 'อื่นๆ' && valName !== '') {
-            sel.value = valName;
-            if (other) { other.value = ''; other.classList.add('hidden'); }
-        } else if (valName) {
-            sel.value = 'อื่นๆ';
-            if (other) { other.value = valName; other.classList.remove('hidden'); }
-        } else {
-            sel.value = '';
-            if (other) { other.value = ''; other.classList.add('hidden'); }
-        }
-        if (ver) ver.value = valVer || '';
-        if (baseId === 'os') handleOsColor(sel);
-      };
-
-      // เซ็ตค่าโดยอ่านจาก 2 คอลัมน์ (ชื่อ และ เวอร์ชัน)
       setComboSep('os', a.os, a.osVer);
       setComboSep('swWs', a.swWs, a.swWsVer);
       setComboSep('swApp', a.swApp, a.swAppVer);
@@ -1298,7 +1180,6 @@
       let impactVal = Math.max(cVal, iVal, aVal);
       if (hasPdpa && impactVal < 2) impactVal = 2;
 
-      // ฟังก์ชันช่วยอ่านค่าที่แยกส่วนชื่อ
       const getComboName = (baseId) => {
           const sel = $(`edit_${baseId}`);
           const other = $(`edit_${baseId}_other`);
@@ -1307,7 +1188,7 @@
       };
 
       const item = {
-        type: getComboName('type'),
+        type: getComboName('type'), 
         resourceName: v('edit_name'), 
         status: v('edit_status'),
         domain: v('edit_domain'), 
@@ -1316,7 +1197,6 @@
         sysType: $('edit_sysType').value, 
         note: v('edit_note'),
         
-        // แยกส่งชื่อ และ เวอร์ชัน ออกเป็น 2 คอลัมน์
         os: getComboName('os'),         osVer: v('edit_os_ver'),
         swWs: getComboName('swWs'),     swWsVer: v('edit_swWs_ver'),
         swApp: getComboName('swApp'),   swAppVer: v('edit_swApp_ver'),
@@ -1327,8 +1207,6 @@
         pdpa: hasPdpa, c: cVal, i: iVal, a: aVal, impact: impactVal
       };
       if (userIsAdmin) { item.agency = v('edit_agency'); item.owners = v('edit_owners'); }
-
-      // ... (ส่วนการส่ง API ข้อมูลยังเหมือนเดิม)
 
       let res;
       if (isAdd) {
@@ -1359,12 +1237,11 @@
       }
     }
 
-    // ---------- export ----------
     function exportToExcel() {
       const excelData = [];
-      
-      // กรองข้อมูล: คัดเอาเฉพาะรายการที่สถานะไม่ใช่ 'ไม่ใช้งาน'
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
+
+      const combineExport = (name, ver) => name ? (name + (ver ? ' ' + ver : '')) : '-';
 
       filteredAssets.forEach(asset => {
         excelData.push({
@@ -1375,12 +1252,12 @@
           'Resource_Name': asset.name || '-',
           'SSL Expiry': asset.sslExpiry || '-',
           'ประเภทระบบ': asset.sysType || '-',
-          'OS': asset.os || '-',
-          'Web Server': asset.swWs || '-', // ส่งออก Web Server ด้วย
-          'Application': asset.swApp || '-',
-          'Frontend': asset.swFe || '-',
-          'Backend': asset.swBe || '-',
-          'Database': asset.swDb || '-',
+          'OS': combineExport(asset.os, asset.osVer),
+          'Web Server': combineExport(asset.swWs, asset.swWsVer),
+          'Application': combineExport(asset.swApp, asset.swAppVer),
+          'Frontend': combineExport(asset.swFe, asset.swFeVer),
+          'Backend': combineExport(asset.swBe, asset.swBeVer),
+          'Database': combineExport(asset.swDb, asset.swDbVer),
           'PDPA': asset.pdpa ? 'ใช่' : 'ไม่ใช่',
           'Confidentiality (C)': asset.c || '',
           'Integrity (I)': asset.i || '',
