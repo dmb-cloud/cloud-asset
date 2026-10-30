@@ -85,6 +85,7 @@
 
     <!-- Dashboard Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card 1: ระบบที่กำลังใช้งาน -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -100,22 +101,24 @@
         </div>
       </div>
 
+      <!-- Card 2: Software ที่ควรอัปเกรด (รวม OS EOF, PHP2Shell, Node2Shell) -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-bold text-rose-500 uppercase tracking-wider">OS หมดระยะสนับสนุน (EOF)</p>
-            <h3 id="cardEof" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider" title="ตรวจสอบ PHP2Shell, Node2Shell และ OS EOF">Software ที่ควรอัปเกรด</p>
+            <h3 id="cardUpgrade" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
           <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+            <i class="fa-solid fa-bug"></i>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ ควรปรับปรุง: <span id="cardEofSub">0</span></span>
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-shield-check"></i> ปกติ: <span id="cardSafeOs">0</span></span>
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ เสี่ยง/ควรอัปเกรด: <span id="cardUpgradeSub">0</span></span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-shield-check"></i> ปกติ: <span id="cardSafeSw">0</span></span>
         </div>
       </div>
 
+      <!-- Card 3: ประเมินแล้ว -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -132,6 +135,7 @@
         </div>
       </div>
 
+      <!-- Card 4: PDPA -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
         <div class="flex justify-between items-start relative z-10">
@@ -741,18 +745,60 @@
       const totalActive = activeAssets.length;
       
       const typeCounts = {};
-      let eofCount = 0;
+      let upgradeCount = 0;
       let assessedCount = 0;
       let pdpaCount = 0;
+
+      const isLess = (ver, target) => {
+          if (!ver) return true; 
+          const vP = ver.split('.').map(Number);
+          const tP = target.split('.').map(Number);
+          for (let i = 0; i < Math.max(vP.length, tP.length); i++) {
+              const v = vP[i] || 0, t = tP[i] || 0;
+              if (v < t) return true;
+              if (v > t) return false;
+          }
+          return false;
+      };
 
       activeAssets.forEach(item => {
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
 
-        if (item.osVer && item.osVer.toUpperCase().includes('EOF')) {
-          eofCount++;
+        let isVuln = false;
+
+        if (item.osVer && item.osVer.toUpperCase().includes('EOF')) isVuln = true;
+
+        const be = (item.swBe || '').toUpperCase();
+        const beVer = (item.swBeVer || '').trim();
+
+        if (be.includes('PHP')) {
+            if (!beVer) isVuln = true;
+            else if (beVer.startsWith('8.2') && isLess(beVer, '8.2.35')) isVuln = true;
+            else if (beVer.startsWith('8.3') && isLess(beVer, '8.3.36')) isVuln = true;
+            else if (beVer.startsWith('8.4') && isLess(beVer, '8.4.27')) isVuln = true;
+            else if (beVer.startsWith('8.5') && isLess(beVer, '8.5.12')) isVuln = true;
+            else {
+                const majorMinor = parseFloat(beVer.split('.').slice(0,2).join('.'));
+                if (majorMinor <= 8.1) isVuln = true;
+            }
+        } 
+        
+        if (be.includes('NODE')) {
+            if (!beVer) isVuln = true;
+            else {
+                const major = parseFloat(beVer.split('.')[0]);
+                if (isNaN(major) || major <= 25) isVuln = true;
+            }
         }
 
+        const allSw = `${item.swWs} ${item.swApp} ${item.swFe} ${item.swBe}`.toUpperCase();
+        if (allSw.includes('PYTHON') || allSw.includes('.NET') || allSw.includes('C#') || 
+            allSw.includes('POWERSHELL') || allSw.includes('VISUAL STUDIO')) {
+            isVuln = true; 
+        }
+
+        if (isVuln) upgradeCount++;
         if (item.isSaved) assessedCount++;
         if (item.pdpa) pdpaCount++;
       });
@@ -775,9 +821,9 @@
       const statsContainer = document.getElementById('cloudTypeStats');
       if (statsContainer) statsContainer.innerHTML = cloudStatsHtml;
 
-      if($('cardEof')) $('cardEof').textContent = eofCount;
-      if($('cardEofSub')) $('cardEofSub').textContent = eofCount;
-      if($('cardSafeOs')) $('cardSafeOs').textContent = totalActive - eofCount;
+      if($('cardUpgrade')) $('cardUpgrade').textContent = upgradeCount;
+      if($('cardUpgradeSub')) $('cardUpgradeSub').textContent = upgradeCount;
+      if($('cardSafeSw')) $('cardSafeSw').textContent = totalActive - upgradeCount;
 
       const pendingCount = totalActive - assessedCount;
       $('cardAssessed').textContent = assessedCount;
@@ -934,8 +980,8 @@
 
         const resNameHtml = `<div class="truncate w-full max-w-[180px] mx-auto text-slate-800 font-bold cell-name" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</div>`;
         const domainHtml = item.domain 
-          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-800 font-bold cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>` 
-          : `<span class="text-slate-300 font-bold cell-domain">-</span>`;
+          ? `<div class="truncate w-full max-w-[160px] mx-auto text-slate-800 font-medium cell-domain" title="${escapeHtml(item.domain)}">${escapeHtml(item.domain)}</div>` 
+          : `<span class="text-slate-300 cell-domain">-</span>`;
         const ipHtml = item.ip 
           ? `<div class="truncate w-full max-w-[110px] mx-auto font-mono font-semibold text-sky-600 cell-ip" title="${escapeHtml(item.ip)}">${escapeHtml(item.ip)}</div>`
           : `<span class="text-slate-300 cell-ip">-</span>`;
