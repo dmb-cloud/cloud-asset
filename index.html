@@ -1201,7 +1201,7 @@
       $('edit_owners').value = a.owners || "";
       $('edit_status').value = a.status || 'ใช้งาน';
 
-      setComboValue('type', a.typeFilter || "");
+      $('edit_type').value = (a.typeFilter || "").trim();
       
       $('edit_name').value = a.name || "";
       $('edit_domain').value = a.domain || "";
@@ -1222,13 +1222,34 @@
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
-      // ตั้งค่า Software Stack ด้วยระบบ Combo
-      setComboValue('os', a.os || "");
-      setComboValue('swWs', a.swWs || ""); // Web Server
-      setComboValue('swApp', a.swApp || "");
-      setComboValue('swFe', a.swFe || "");
-      setComboValue('swBe', a.swBe || "");
-      setComboValue('swDb', a.swDb || "");
+      // ฟังก์ชันช่วยเซ็ตค่า Dropdown ที่มีตัวเลือก "อื่นๆ" แยกคอลัมน์
+      const setComboSep = (baseId, valName, valVer) => {
+        const sel = $(`edit_${baseId}`);
+        const other = $(`edit_${baseId}_other`);
+        const ver = $(`edit_${baseId}_ver`);
+        
+        let exists = Array.from(sel.options).some(opt => opt.value === valName);
+        if (exists && valName !== 'อื่นๆ' && valName !== '') {
+            sel.value = valName;
+            if (other) { other.value = ''; other.classList.add('hidden'); }
+        } else if (valName) {
+            sel.value = 'อื่นๆ';
+            if (other) { other.value = valName; other.classList.remove('hidden'); }
+        } else {
+            sel.value = '';
+            if (other) { other.value = ''; other.classList.add('hidden'); }
+        }
+        if (ver) ver.value = valVer || '';
+        if (baseId === 'os') handleOsColor(sel);
+      };
+
+      // เซ็ตค่าโดยอ่านจาก 2 คอลัมน์ (ชื่อ และ เวอร์ชัน)
+      setComboSep('os', a.os, a.osVer);
+      setComboSep('swWs', a.swWs, a.swWsVer);
+      setComboSep('swApp', a.swApp, a.swAppVer);
+      setComboSep('swFe', a.swFe, a.swFeVer);
+      setComboSep('swBe', a.swBe, a.swBeVer);
+      setComboSep('swDb', a.swDb, a.swDbVer);
       
       $('edit_pdpa').checked = a.pdpa === true;
       $('edit_c').value = a.c || 1;
