@@ -39,6 +39,42 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background-color: #94a3b8; 
     }
+    
+    /* Tooltip */
+    .tooltip-container { position: relative; display: inline-flex; align-items: center; }
+    .tooltip-container .tooltip-text {
+      visibility: hidden;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 6px 10px;
+      position: absolute;
+      z-index: 50;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.2s;
+      white-space: nowrap;
+      font-size: 10px;
+      font-weight: 500;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    .tooltip-container .tooltip-text::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+    .tooltip-container:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -55,7 +91,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.2.0</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.0 (Dynamic Rules)</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -96,23 +132,22 @@
           </div>
         </div>
         <div id="cloudTypeStats" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-y-2 gap-x-1 text-[10px] font-semibold text-slate-600">
-          <!-- ข้อมูลสถิติประเภทคลาวด์จะถูกสร้างตรงนี้ด้วย JavaScript -->
         </div>
       </div>
 
-      <!-- Card 2: Software ที่ควรอัปเกรด -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
-        <div class="flex justify-between items-start">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
+        <div class="flex justify-between items-start relative z-10">
           <div>
-            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider" title="ตรวจสอบ PHP2Shell, Node2Shell และ OS EOF">Software ที่ควรอัปเกรด</p>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">Software ที่ควรอัปเกรด</p>
             <h3 id="cardUpgrade" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
-            <i class="fa-solid fa-bug"></i>
+          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-shield-virus"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
-          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ เสี่ยง/ควรอัปเกรด: <span id="cardUpgradeSub">0</span></span>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold relative z-10">
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ เสี่ยง/หมดอายุ: <span id="cardUpgradeSub">0</span></span>
           <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-shield-check"></i> ปกติ: <span id="cardSafeSw">0</span></span>
         </div>
       </div>
@@ -144,7 +179,7 @@
             <i class="fa-solid fa-fingerprint"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold relative z-10">
           <span class="text-emerald-600 flex items-center">
             <i class="fa-solid fa-shield-halved mr-1.5"></i>ข้อมูลส่วนบุคคล
           </span>
@@ -234,12 +269,12 @@
                     IP Public <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
                   </div>
                 </th>
-                <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
+                <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[120px]">
                   <div class="flex items-center justify-center gap-1.5">
                     OS <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
                   </div>
                 </th>
-                <th class="py-3.5 px-4 text-center min-w-[220px]">
+                <th class="py-3.5 px-4 text-center min-w-[240px]">
                   Software <span class="font-normal opacity-70 ml-1">(WS | App | FE | BE | DB)</span>
                 </th>
                 <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
@@ -398,114 +433,10 @@
                 <i class="fa-brands fa-stack-overflow text-indigo-500"></i> ซอฟต์แวร์และเวอร์ชัน (Software Stack)
               </h5>
               
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="swConfigContainer">
                 
-                <!-- OS -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">OS (ระบบปฏิบัติการ)</label>
-                  <select id="edit_os" onchange="handleOsColor(this); handleSelectChange(this, 'edit_os_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <optgroup label="Linux">
-                      <option value="Ubuntu">Ubuntu</option>
-                      <option value="CentOS">CentOS</option>
-                      <option value="AlmaLinux">AlmaLinux</option>
-                      <option value="Rocky Linux">Rocky Linux</option>
-                      <option value="Debian">Debian</option>
-                      <option value="RedHat">RedHat</option>
-                      <option value="SUSE">SUSE</option>
-                    </optgroup>
-                    <optgroup label="Windows">
-                      <option value="Windows Server">Windows Server</option>
-                    </optgroup>
-                    <optgroup label="อื่นๆ">
-                      <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                    </optgroup>
-                  </select>
-                  <input type="text" id="edit_os_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ OS">
-                  <input type="text" id="edit_os_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เช่น 22.04, 2019, EOF)">
-                </div>
-
-                <!-- Web Server -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">Web Server</label>
-                  <select id="edit_swWs" onchange="handleSelectChange(this, 'edit_swWs_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <option value="Nginx">Nginx</option>
-                    <option value="Apache">Apache</option>
-                    <option value="IIS">IIS</option>
-                    <option value="LiteSpeed">LiteSpeed</option>
-                    <option value="Tomcat">Tomcat</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                  </select>
-                  <input type="text" id="edit_swWs_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Web Server">
-                  <input type="text" id="edit_swWs_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-                </div>
-
-                <!-- Application -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">Application</label>
-                  <select id="edit_swApp" onchange="handleSelectChange(this, 'edit_swApp_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <option value="WordPress">WordPress</option>
-                    <option value="Joomla">Joomla</option>
-                    <option value="Drupal">Drupal</option>
-                    <option value="Moodle">Moodle</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                  </select>
-                  <input type="text" id="edit_swApp_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Application">
-                  <input type="text" id="edit_swApp_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-                </div>
-
-                <!-- Frontend -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">Frontend</label>
-                  <select id="edit_swFe" onchange="handleSelectChange(this, 'edit_swFe_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <option value="HTML/CSS/JS">HTML/CSS/JS (Native)</option>
-                    <option value="React">React</option>
-                    <option value="Vue">Vue</option>
-                    <option value="Angular">Angular</option>
-                    <option value="Next.js">Next.js</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                  </select>
-                  <input type="text" id="edit_swFe_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Frontend">
-                  <input type="text" id="edit_swFe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-                </div>
-
-                <!-- Backend -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">Backend</label>
-                  <select id="edit_swBe" onchange="handleSelectChange(this, 'edit_swBe_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <option value="PHP">PHP</option>
-                    <option value="Node.js">Node.js</option>
-                    <option value="Python">Python</option>
-                    <option value="Java">Java</option>
-                    <option value="Go">Go</option>
-                    <option value="C# .NET">C# .NET</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                  </select>
-                  <input type="text" id="edit_swBe_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Backend">
-                  <input type="text" id="edit_swBe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-                </div>
-
-                <!-- Database -->
-                <div class="flex flex-col gap-1.5">
-                  <label class="font-bold text-slate-500 text-[10px] uppercase">Database</label>
-                  <select id="edit_swDb" onchange="handleSelectChange(this, 'edit_swDb_other')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                    <option value="">-- ไม่ระบุ --</option>
-                    <option value="MySQL">MySQL</option>
-                    <option value="PostgreSQL">PostgreSQL</option>
-                    <option value="MongoDB">MongoDB</option>
-                    <option value="SQL Server">SQL Server</option>
-                    <option value="Oracle">Oracle</option>
-                    <option value="MariaDB">MariaDB</option>
-                    <option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>
-                  </select>
-                  <input type="text" id="edit_swDb_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Database">
-                  <input type="text" id="edit_swDb_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-                </div>
-
+                <!-- Dynamic Elements will be injected here via JS -->
+                
               </div>
             </div>
           </section>
@@ -618,6 +549,7 @@
     let userName = "";
     let userIsAdmin = false;
     let allAssets = [];
+    let swConfig = [];
     let sessionTimerId = null;
 
     let currentPage = 1;
@@ -670,6 +602,7 @@
         return;
       }
       startSessionWatch(exp);
+      initEditModal(); 
       await loadDataFromCloud();
     });
 
@@ -697,6 +630,7 @@
 
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets;
+        if (res.swConfig) swConfig = res.swConfig;
 
         if (res.user) {
           userAgency = res.user.agency || "";
@@ -706,7 +640,8 @@
           $('profileName').textContent = userName;
           $('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
         }
-
+        
+        buildDynamicSwForm();
         renderMainTable();
         updateCardDashboard();
         applyFilterAndPagination(true);
@@ -737,62 +672,65 @@
     function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
     function closeModal() { $('infoModal').classList.add('hidden'); }
 
-    // ฟังก์ชันช่วยเปรียบเทียบเวอร์ชัน (Return true ถ้า ver น้อยกว่า target)
-    const isVersionLess = (ver, target) => {
-        if (!ver) return true; // ถ้าไม่ระบุ ถือว่ามีความเสี่ยง
-        const vP = ver.split('.').map(Number);
-        const tP = target.split('.').map(Number);
-        for (let i = 0; i < Math.max(vP.length, tP.length); i++) {
-            const v = vP[i] || 0, t = tP[i] || 0;
-            if (v < t) return true;
-            if (v > t) return false;
-        }
-        return false;
-    };
+    // --- Dynamic Vuln Checking Engine ---
+    
+    function parseVersion(verStr) {
+      if (!verStr) return [];
+      let cleanStr = String(verStr).toUpperCase().replace('EOF', '').replace(/[^0-9.]/g, '');
+      return cleanStr.split('.').filter(Boolean).map(Number);
+    }
+    
+    function compareVersions(v1, op, v2) {
+      const len = Math.max(v1.length, v2.length);
+      for (let i = 0; i < len; i++) {
+        const num1 = v1[i] || 0;
+        const num2 = v2[i] || 0;
+        if (num1 < num2) return (op === '<' || op === '<=');
+        if (num1 > num2) return (op === '>' || op === '>=');
+      }
+      return (op === '<=' || op === '>=' || op === '==');
+    }
 
-    // ฟังก์ชันเช็คว่า Software เป็นกลุ่มเสี่ยง (PHP2Shell / Node2Shell) หรือไม่
-    const isSoftwareVulnerable = (swName, swVer, allSw) => {
-        const name = (swName || '').toUpperCase();
-        const ver = (swVer || '').trim();
-        let isVuln = false;
+    function checkVulnerability(swName, swVer) {
+      const nameUpper = String(swName || '').trim().toUpperCase();
+      const verUpper = String(swVer || '').trim().toUpperCase();
+      if (!nameUpper) return { isVuln: false };
 
-        // PHP2Shell เงื่อนไข
-        if (name.includes('PHP')) {
-            if (!ver) isVuln = true;
-            else if (ver.startsWith('8.2') && isVersionLess(ver, '8.2.35')) isVuln = true;
-            else if (ver.startsWith('8.3') && isVersionLess(ver, '8.3.36')) isVuln = true;
-            else if (ver.startsWith('8.4') && isVersionLess(ver, '8.4.27')) isVuln = true;
-            else if (ver.startsWith('8.5') && isVersionLess(ver, '8.5.12')) isVuln = true;
-            else {
-                const majorMinor = parseFloat(ver.split('.').slice(0,2).join('.'));
-                if (majorMinor <= 8.1) isVuln = true;
-            }
-        } 
-        // Node2Shell เงื่อนไข
-        else if (name.includes('NODE')) {
-            if (!ver) isVuln = true;
-            else {
-                const major = parseFloat(ver.split('.')[0]);
-                if (isNaN(major) || major <= 25) isVuln = true;
-            }
-        }
-        // ตรวจจับส่วนประกอบที่ใช้ Brotli (Python, .NET, PowerShell, Visual Studio)
-        else if (name.includes('PYTHON') || name.includes('.NET') || name.includes('C#') || 
-                 name.includes('POWERSHELL') || name.includes('VISUAL STUDIO')) {
-            isVuln = true; 
-        }
+      const configEntry = swConfig.find(c => c.software.toUpperCase() === nameUpper);
+      if (!configEntry) return { isVuln: false }; 
 
-        // ตรวจสอบรวม หากมีการระบุในช่องไหนก็ตาม
-        if (!isVuln && allSw) {
-            const allStr = allSw.toUpperCase();
-             if (allStr.includes('PYTHON') || allStr.includes('.NET') || allStr.includes('C#') || 
-                 allStr.includes('POWERSHELL') || allStr.includes('VISUAL STUDIO')) {
-                isVuln = true;
-            }
-        }
+      const rulesStr = configEntry.rules || "";
+      const rules = rulesStr.split(',').map(r => r.trim());
+      const safeVer = configEntry.safeVer || "อัปเดตเวอร์ชันล่าสุด";
 
-        return isVuln;
-    };
+      let isVuln = false;
+      let reason = "";
+
+      for (let rule of rules) {
+        if (rule === "ALL" || rule === "VULN") {
+           isVuln = true; reason = "ต้องตรวจสอบความปลอดภัยเสมอ"; break;
+        }
+        if (rule === "EOF" && verUpper.includes("EOF")) {
+           isVuln = true; reason = "เวอร์ชันหมดระยะสนับสนุน (EOF)"; break;
+        }
+        
+        const match = rule.match(/^(<=|<|>=|>|==)\s*([0-9.]+)$/);
+        if (match) {
+           const op = match[1];
+           const targetVer = parseVersion(match[2]);
+           const currentVer = parseVersion(swVer);
+           
+           if (currentVer.length > 0 && compareVersions(currentVer, op, targetVer)) {
+              isVuln = true; 
+              reason = `เวอร์ชันเก่ากว่าเกณฑ์ปลอดภัย (${safeVer})`;
+              break;
+           }
+        }
+      }
+
+      return { isVuln, safeVer, reason };
+    }
+
 
     function updateCardDashboard() {
       const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
@@ -809,15 +747,18 @@
 
         let isVuln = false;
         
-        // ตรวจสอบ OS EOF
-        if (item.osVer && item.osVer.toUpperCase().includes('EOF')) isVuln = true;
-
-        // ตรวจสอบช่องโหว่ Software
-        const allSw = `${item.swWs} ${item.swApp} ${item.swFe} ${item.swBe}`;
-        if (!isVuln && isSoftwareVulnerable(item.swBe, item.swBeVer, allSw)) isVuln = true;
-        if (!isVuln && isSoftwareVulnerable(item.swWs, item.swWsVer, '')) isVuln = true;
-        if (!isVuln && isSoftwareVulnerable(item.swApp, item.swAppVer, '')) isVuln = true;
-        if (!isVuln && isSoftwareVulnerable(item.swFe, item.swFeVer, '')) isVuln = true;
+        const swChecks = [
+           checkVulnerability(item.os, item.osVer),
+           checkVulnerability(item.swWs, item.swWsVer),
+           checkVulnerability(item.swApp, item.swAppVer),
+           checkVulnerability(item.swFe, item.swFeVer),
+           checkVulnerability(item.swBe, item.swBeVer),
+           checkVulnerability(item.swDb, item.swDbVer)
+        ];
+        
+        if (swChecks.some(c => c.isVuln)) {
+            isVuln = true;
+        }
 
         if (isVuln) upgradeCount++;
         if (item.isSaved) assessedCount++;
@@ -886,7 +827,125 @@
       typeHtml += '<option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>';
       $('edit_type').innerHTML = typeHtml;
     }
-    document.addEventListener('DOMContentLoaded', initEditModal);
+    
+    // --- Dynamic Form Builder ---
+    
+    const SW_CATEGORIES = [
+      { id: 'os', label: 'OS (ระบบปฏิบัติการ)' },
+      { id: 'swWs', label: 'Web Server' },
+      { id: 'swApp', label: 'Application' },
+      { id: 'swFe', label: 'Frontend' },
+      { id: 'swBe', label: 'Backend' },
+      { id: 'swDb', label: 'Database' }
+    ];
+
+    function buildDynamicSwForm() {
+      const container = $('swConfigContainer');
+      if (!container) return;
+      
+      let html = '';
+      
+      SW_CATEGORIES.forEach(cat => {
+         // Filter config list for this category loosely
+         let optionsHtml = '<option value="">-- ไม่ระบุ --</option>';
+         
+         const filteredSw = swConfig.filter(s => {
+             const c = s.category.toUpperCase();
+             if (cat.id === 'os' && c === 'OS') return true;
+             if (cat.id === 'swWs' && c === 'WEB SERVER') return true;
+             if (cat.id === 'swDb' && c === 'DATABASE') return true;
+             if (cat.id === 'swFe' && c === 'FRONTEND') return true;
+             if (cat.id === 'swBe' && c === 'BACKEND') return true;
+             if (cat.id === 'swApp' && c === 'SOFTWARE') return true;
+             return false;
+         });
+         
+         filteredSw.forEach(sw => {
+             optionsHtml += `<option value="${escapeHtml(sw.software)}">${escapeHtml(sw.software)}</option>`;
+         });
+         optionsHtml += '<option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>';
+         
+         html += `
+          <div class="flex flex-col gap-1.5">
+            <label class="font-bold text-slate-500 text-[10px] uppercase">${escapeHtml(cat.label)}</label>
+            <select id="edit_${cat.id}" onchange="handleSwChange('${cat.id}')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+              ${optionsHtml}
+            </select>
+            <input type="text" id="edit_${cat.id}_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ ${escapeHtml(cat.label)}">
+            
+            <div id="verContainer_${cat.id}" class="hidden w-full">
+                <select id="edit_${cat.id}_ver_select" onchange="handleVerChange('${cat.id}')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                </select>
+            </div>
+            
+            <input type="text" id="edit_${cat.id}_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
+          </div>
+         `;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    window.handleSwChange = function(baseId) {
+        const sel = $(`edit_${baseId}`);
+        const other = $(`edit_${baseId}_other`);
+        const verContainer = $(`verContainer_${baseId}`);
+        const verSelect = $(`edit_${baseId}_ver_select`);
+        const verInput = $(`edit_${baseId}_ver`);
+        
+        if (sel.value === 'อื่นๆ') {
+            other.classList.remove('hidden');
+            verContainer.classList.add('hidden');
+            verInput.classList.remove('hidden');
+            verInput.value = '';
+        } else if (sel.value !== '') {
+            other.classList.add('hidden');
+            other.value = '';
+            
+            const swEntry = swConfig.find(s => s.software === sel.value);
+            if (swEntry && swEntry.options) {
+                const opts = swEntry.options.split(',').map(o => o.trim()).filter(Boolean);
+                if (opts.length > 0 && opts[0] !== 'N/A') {
+                    verContainer.classList.remove('hidden');
+                    verInput.classList.add('hidden');
+                    verInput.value = '';
+                    
+                    let html = '<option value="">-- ระบุเวอร์ชัน --</option>';
+                    opts.forEach(o => {
+                        html += `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`;
+                    });
+                    html += '<option value="พิมพ์เอง">พิมพ์เวอร์ชันเอง...</option>';
+                    verSelect.innerHTML = html;
+                } else {
+                    verContainer.classList.add('hidden');
+                    verInput.classList.remove('hidden');
+                }
+            } else {
+                verContainer.classList.add('hidden');
+                verInput.classList.remove('hidden');
+            }
+            
+        } else {
+            other.classList.add('hidden');
+            verContainer.classList.add('hidden');
+            verInput.classList.remove('hidden');
+            verInput.value = '';
+        }
+    };
+    
+    window.handleVerChange = function(baseId) {
+        const verSelect = $(`edit_${baseId}_ver_select`);
+        const verInput = $(`edit_${baseId}_ver`);
+        
+        if (verSelect.value === 'พิมพ์เอง') {
+            verInput.classList.remove('hidden');
+            verInput.value = '';
+            verInput.focus();
+        } else {
+            verInput.classList.add('hidden');
+            verInput.value = verSelect.value; 
+        }
+    };
 
     function getCloudBadgeHtml(typeRaw) {
       const t = String(typeRaw || '').trim();
@@ -916,28 +975,19 @@
       }
     }
 
-    function handleOsColor(el) {
-      if (el.value.toUpperCase().includes('EOF')) {
-        el.classList.add('text-rose-600', 'font-bold', 'bg-rose-50');
-        el.classList.remove('bg-white', 'text-slate-800');
-      } else {
-        el.classList.remove('text-rose-600', 'font-bold', 'bg-rose-50');
-        el.classList.add('bg-white', 'text-slate-800');
-      }
-    }
-
     function renderMainTable() {
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
-      // ตรวจสอบ และสร้าง HTML สำหรับ Software แต่ละตัว
-      const combineSw = (name, ver) => {
+      const buildSwBadge = (name, ver) => {
           if (!name) return "";
-          const isVuln = isSoftwareVulnerable(name, ver, ''); // เช็คช่องโหว่
+          const vulnCheck = checkVulnerability(name, ver);
           const swText = escapeHtml(name) + (ver ? ' ' + escapeHtml(ver) : '');
           
-          if (isVuln) {
-             // ถ้าเสี่ยง ให้ใส่ตัวหนา สีแดง และไอคอนแจ้งเตือน
-             return `<span class="text-rose-600 font-bold" title="⚠️ ควรอัปเกรด (ความเสี่ยงช่องโหว่ หรือ EOL)"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-0.5"></i>${swText}</span>`;
+          if (vulnCheck.isVuln) {
+             return `<div class="tooltip-container">
+                        <span class="text-rose-600 font-bold cursor-help"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-0.5"></i>${swText}</span>
+                        <span class="tooltip-text">ควรอัปเกรด: ${escapeHtml(vulnCheck.reason)}<br>คำแนะนำ: ${escapeHtml(vulnCheck.safeVer)}</span>
+                     </div>`;
           }
           return `<span class="text-slate-600">${swText}</span>`;
       };
@@ -958,11 +1008,11 @@
 
         let osHtml = `<span class="text-slate-300">-</span>`;
         let fullOs = item.os ? escapeHtml(item.os) + (item.osVer ? ' ' + escapeHtml(item.osVer) : '') : "";
+        const osCheck = checkVulnerability(item.os, item.osVer);
         
         if (fullOs) {
           const osUpper = fullOs.toUpperCase();
-          const osHasEof = item.osVer && item.osVer.toUpperCase().includes('EOF');
-          const osTextClass = osHasEof ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
+          const osTextClass = osCheck.isVuln ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
           
           let iconClass = "fa-solid fa-compact-disc text-slate-400";
           if (osUpper.includes("UBUNTU")) iconClass = "fa-brands fa-ubuntu text-orange-500";
@@ -976,22 +1026,34 @@
           else if (osUpper.includes("DEBIAN")) iconClass = "fa-brands fa-linux text-rose-600";
           else if (osUpper.includes("LINUX")) iconClass = "fa-brands fa-linux text-slate-700";
           
-          if (osHasEof) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
+          if (osCheck.isVuln) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
 
-          osHtml = `
-            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${osHasEof ? '⚠️ ควรอัปเกรด (EOF)' : fullOs}">
-              <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
-              <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
-            </div>
-          `;
+          if(osCheck.isVuln) {
+             osHtml = `
+              <div class="tooltip-container">
+                <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px] cursor-help">
+                  <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
+                  <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
+                </div>
+                <span class="tooltip-text">ควรอัปเกรด: ${escapeHtml(osCheck.reason)}<br>คำแนะนำ: ${escapeHtml(osCheck.safeVer)}</span>
+              </div>
+            `;
+          } else {
+             osHtml = `
+              <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]">
+                <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
+                <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
+              </div>
+            `;
+          }
         }
 
         const swParts = [];
-        if (item.swWs) swParts.push(combineSw(item.swWs, item.swWsVer));
-        if (item.swApp) swParts.push(combineSw(item.swApp, item.swAppVer));
-        if (item.swFe) swParts.push(combineSw(item.swFe, item.swFeVer));
-        if (item.swBe) swParts.push(combineSw(item.swBe, item.swBeVer));
-        if (item.swDb) swParts.push(combineSw(item.swDb, item.swDbVer));
+        if (item.swWs) swParts.push(buildSwBadge(item.swWs, item.swWsVer));
+        if (item.swApp) swParts.push(buildSwBadge(item.swApp, item.swAppVer));
+        if (item.swFe) swParts.push(buildSwBadge(item.swFe, item.swFeVer));
+        if (item.swBe) swParts.push(buildSwBadge(item.swBe, item.swBeVer));
+        if (item.swDb) swParts.push(buildSwBadge(item.swDb, item.swDbVer));
         
         let swStack = swParts.length > 0 
           ? `<div class="w-full max-w-[160px] mx-auto text-[11px]" style="line-height: 1.6;">${swParts.join(' <span class="text-slate-300 mx-0.5">|</span> ')}</div>`
@@ -1155,24 +1217,48 @@
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
     }
 
-    const setComboSep = (baseId, valName, valVer) => {
-        const sel = document.getElementById(`edit_${baseId}`);
-        const other = document.getElementById(`edit_${baseId}_other`);
-        const ver = document.getElementById(`edit_${baseId}_ver`);
+    const setComboDyn = (baseId, valName, valVer) => {
+        const sel = $(`edit_${baseId}`);
+        const other = $(`edit_${baseId}_other`);
+        const verSelect = $(`edit_${baseId}_ver_select`);
+        const verInput = $(`edit_${baseId}_ver`);
+        const verContainer = $(`verContainer_${baseId}`);
         
-        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName || '').toLowerCase());
-        if (exists && valName !== 'อื่นๆ' && valName !== '') {
-            sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === String(valName).toLowerCase()).value;
-            if (other) { other.value = ''; other.classList.add('hidden'); }
-        } else if (valName) {
-            sel.value = 'อื่นๆ';
-            if (other) { other.value = valName; other.classList.remove('hidden'); }
-        } else {
+        if (!valName) {
             sel.value = '';
-            if (other) { other.value = ''; other.classList.add('hidden'); }
+            if(other) other.classList.add('hidden');
+            if(verContainer) verContainer.classList.add('hidden');
+            if(verInput) { verInput.classList.remove('hidden'); verInput.value = ''; }
+            return;
         }
-        if (ver) ver.value = valVer || '';
-        if (baseId === 'os') handleOsColor(sel);
+
+        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName).toLowerCase());
+        
+        if (exists && valName !== 'อื่นๆ') {
+            sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === String(valName).toLowerCase()).value;
+            other.classList.add('hidden');
+            handleSwChange(baseId); // Populates versions
+            
+            if (valVer) {
+               // Try to select it in the dropdown if it matches
+               let vExists = Array.from(verSelect.options).some(opt => opt.value.toLowerCase() === String(valVer).toLowerCase());
+               if(vExists && valVer !== 'พิมพ์เอง' && valVer !== '') {
+                   verSelect.value = Array.from(verSelect.options).find(opt => opt.value.toLowerCase() === String(valVer).toLowerCase()).value;
+                   handleVerChange(baseId);
+               } else {
+                   verSelect.value = 'พิมพ์เอง';
+                   handleVerChange(baseId);
+                   verInput.value = valVer;
+               }
+            }
+        } else {
+            sel.value = 'อื่นๆ';
+            other.classList.remove('hidden');
+            other.value = valName;
+            verContainer.classList.add('hidden');
+            verInput.classList.remove('hidden');
+            verInput.value = valVer || '';
+        }
     };
 
     function setForm(a) {
@@ -1180,8 +1266,17 @@
       $('edit_owners').value = a.owners || "";
       $('edit_status').value = a.status || 'ใช้งาน';
 
-      setComboSep('type', a.typeFilter || "");
-      
+      const typeSel = $('edit_type');
+      let typeExists = Array.from(typeSel.options).some(opt => opt.value === (a.typeFilter || "").trim());
+      if(typeExists && a.typeFilter !== 'อื่นๆ' && a.typeFilter) {
+          typeSel.value = a.typeFilter;
+          $('edit_type_other').classList.add('hidden');
+      } else if (a.typeFilter) {
+          typeSel.value = 'อื่นๆ';
+          $('edit_type_other').value = a.typeFilter;
+          $('edit_type_other').classList.remove('hidden');
+      }
+
       $('edit_name').value = a.name || "";
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
@@ -1201,12 +1296,12 @@
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
-      setComboSep('os', a.os, a.osVer);
-      setComboSep('swWs', a.swWs, a.swWsVer);
-      setComboSep('swApp', a.swApp, a.swAppVer);
-      setComboSep('swFe', a.swFe, a.swFeVer);
-      setComboSep('swBe', a.swBe, a.swBeVer);
-      setComboSep('swDb', a.swDb, a.swDbVer);
+      setComboDyn('os', a.os, a.osVer);
+      setComboDyn('swWs', a.swWs, a.swWsVer);
+      setComboDyn('swApp', a.swApp, a.swAppVer);
+      setComboDyn('swFe', a.swFe, a.swFeVer);
+      setComboDyn('swBe', a.swBe, a.swBeVer);
+      setComboDyn('swDb', a.swDb, a.swDbVer);
       
       $('edit_pdpa').checked = a.pdpa === true;
       $('edit_c').value = a.c || 1;
