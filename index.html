@@ -701,17 +701,19 @@
     }
 
     // เช็คความเสี่ยงแบบ Dynamic โดยอ่านกฎคณิตศาสตร์จากคอลัมน์ D
-    function compareVersions(v1, v2, op) {
+    function compareVersions(v1, v2) {
+        // v1 คือเวอร์ชันที่ผู้ใช้เลือก, v2 คือเวอร์ชันเป้าหมายใน Rule
         const p1 = v1.split('.').map(Number);
         const p2 = v2.split('.').map(Number);
         const len = Math.max(p1.length, p2.length);
+        
         for(let i=0; i<len; i++) {
             const n1 = p1[i] || 0;
             const n2 = p2[i] || 0;
-            if(n1 > n2) return op.includes('>');
-            if(n1 < n2) return op.includes('<');
+            if(n1 > n2) return 1;  // v1 มากกว่า
+            if(n1 < n2) return -1; // v1 น้อยกว่า
         }
-        return op.includes('=');
+        return 0; // เท่ากันเป๊ะ
     }
 
     function checkVulnerability(swName, swVer) {
@@ -744,16 +746,32 @@
                }
                
                const cleanVer = verUpper.replace(/[^\d\.]/g, '');
-               if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
-                  isVuln = true;
-                  break;
+               
+               if (cleanVer) {
+                  const compResult = compareVersions(cleanVer, targetVer);
+                  
+                  if (op === '<' && compResult === -1) {
+                      isVuln = true;
+                      break;
+                  } else if (op === '<=' && (compResult === -1 || compResult === 0)) {
+                      isVuln = true;
+                      break;
+                  } else if (op === '>' && compResult === 1) {
+                      isVuln = true;
+                      break;
+                  } else if (op === '>=' && (compResult === 1 || compResult === 0)) {
+                      isVuln = true;
+                      break;
+                  } else if ((op === '=' || op === '==') && compResult === 0) {
+                      isVuln = true;
+                      break;
+                  }
                }
             }
          }
        }
        return { isVuln: isVuln, safeVersion: conf.safeVersion };
     }
-
     // ==========================================
 
     function updateCardDashboard() {
