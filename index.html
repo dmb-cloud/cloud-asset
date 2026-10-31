@@ -85,7 +85,6 @@
 
     <!-- Dashboard Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <!-- Card 1: ระบบที่กำลังใช้งาน -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -101,7 +100,7 @@
         </div>
       </div>
 
-      <!-- Card 2: Software ที่ควรอัปเกรด (รวม OS EOF, PHP2Shell, Node2Shell) -->
+      <!-- Card 2: Software ที่ควรอัปเกรด -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -118,7 +117,6 @@
         </div>
       </div>
 
-      <!-- Card 3: ประเมินแล้ว -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
@@ -135,7 +133,6 @@
         </div>
       </div>
 
-      <!-- Card 4: PDPA -->
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-50 rounded-full z-0"></div>
         <div class="flex justify-between items-start relative z-10">
@@ -740,6 +737,63 @@
     function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
     function closeModal() { $('infoModal').classList.add('hidden'); }
 
+    // ฟังก์ชันช่วยเปรียบเทียบเวอร์ชัน (Return true ถ้า ver น้อยกว่า target)
+    const isVersionLess = (ver, target) => {
+        if (!ver) return true; // ถ้าไม่ระบุ ถือว่ามีความเสี่ยง
+        const vP = ver.split('.').map(Number);
+        const tP = target.split('.').map(Number);
+        for (let i = 0; i < Math.max(vP.length, tP.length); i++) {
+            const v = vP[i] || 0, t = tP[i] || 0;
+            if (v < t) return true;
+            if (v > t) return false;
+        }
+        return false;
+    };
+
+    // ฟังก์ชันเช็คว่า Software เป็นกลุ่มเสี่ยง (PHP2Shell / Node2Shell) หรือไม่
+    const isSoftwareVulnerable = (swName, swVer, allSw) => {
+        const name = (swName || '').toUpperCase();
+        const ver = (swVer || '').trim();
+        let isVuln = false;
+
+        // PHP2Shell เงื่อนไข
+        if (name.includes('PHP')) {
+            if (!ver) isVuln = true;
+            else if (ver.startsWith('8.2') && isVersionLess(ver, '8.2.35')) isVuln = true;
+            else if (ver.startsWith('8.3') && isVersionLess(ver, '8.3.36')) isVuln = true;
+            else if (ver.startsWith('8.4') && isVersionLess(ver, '8.4.27')) isVuln = true;
+            else if (ver.startsWith('8.5') && isVersionLess(ver, '8.5.12')) isVuln = true;
+            else {
+                const majorMinor = parseFloat(ver.split('.').slice(0,2).join('.'));
+                if (majorMinor <= 8.1) isVuln = true;
+            }
+        } 
+        // Node2Shell เงื่อนไข
+        else if (name.includes('NODE')) {
+            if (!ver) isVuln = true;
+            else {
+                const major = parseFloat(ver.split('.')[0]);
+                if (isNaN(major) || major <= 25) isVuln = true;
+            }
+        }
+        // ตรวจจับส่วนประกอบที่ใช้ Brotli (Python, .NET, PowerShell, Visual Studio)
+        else if (name.includes('PYTHON') || name.includes('.NET') || name.includes('C#') || 
+                 name.includes('POWERSHELL') || name.includes('VISUAL STUDIO')) {
+            isVuln = true; 
+        }
+
+        // ตรวจสอบรวม หากมีการระบุในช่องไหนก็ตาม
+        if (!isVuln && allSw) {
+            const allStr = allSw.toUpperCase();
+             if (allStr.includes('PYTHON') || allStr.includes('.NET') || allStr.includes('C#') || 
+                 allStr.includes('POWERSHELL') || allStr.includes('VISUAL STUDIO')) {
+                isVuln = true;
+            }
+        }
+
+        return isVuln;
+    };
+
     function updateCardDashboard() {
       const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
       const totalActive = activeAssets.length;
@@ -749,54 +803,21 @@
       let assessedCount = 0;
       let pdpaCount = 0;
 
-      const isLess = (ver, target) => {
-          if (!ver) return true; 
-          const vP = ver.split('.').map(Number);
-          const tP = target.split('.').map(Number);
-          for (let i = 0; i < Math.max(vP.length, tP.length); i++) {
-              const v = vP[i] || 0, t = tP[i] || 0;
-              if (v < t) return true;
-              if (v > t) return false;
-          }
-          return false;
-      };
-
       activeAssets.forEach(item => {
         const t = (item.typeFilter || 'ไม่ระบุ').trim();
         typeCounts[t] = (typeCounts[t] || 0) + 1;
 
         let isVuln = false;
-
+        
+        // ตรวจสอบ OS EOF
         if (item.osVer && item.osVer.toUpperCase().includes('EOF')) isVuln = true;
 
-        const be = (item.swBe || '').toUpperCase();
-        const beVer = (item.swBeVer || '').trim();
-
-        if (be.includes('PHP')) {
-            if (!beVer) isVuln = true;
-            else if (beVer.startsWith('8.2') && isLess(beVer, '8.2.35')) isVuln = true;
-            else if (beVer.startsWith('8.3') && isLess(beVer, '8.3.36')) isVuln = true;
-            else if (beVer.startsWith('8.4') && isLess(beVer, '8.4.27')) isVuln = true;
-            else if (beVer.startsWith('8.5') && isLess(beVer, '8.5.12')) isVuln = true;
-            else {
-                const majorMinor = parseFloat(beVer.split('.').slice(0,2).join('.'));
-                if (majorMinor <= 8.1) isVuln = true;
-            }
-        } 
-        
-        if (be.includes('NODE')) {
-            if (!beVer) isVuln = true;
-            else {
-                const major = parseFloat(beVer.split('.')[0]);
-                if (isNaN(major) || major <= 25) isVuln = true;
-            }
-        }
-
-        const allSw = `${item.swWs} ${item.swApp} ${item.swFe} ${item.swBe}`.toUpperCase();
-        if (allSw.includes('PYTHON') || allSw.includes('.NET') || allSw.includes('C#') || 
-            allSw.includes('POWERSHELL') || allSw.includes('VISUAL STUDIO')) {
-            isVuln = true; 
-        }
+        // ตรวจสอบช่องโหว่ Software
+        const allSw = `${item.swWs} ${item.swApp} ${item.swFe} ${item.swBe}`;
+        if (!isVuln && isSoftwareVulnerable(item.swBe, item.swBeVer, allSw)) isVuln = true;
+        if (!isVuln && isSoftwareVulnerable(item.swWs, item.swWsVer, '')) isVuln = true;
+        if (!isVuln && isSoftwareVulnerable(item.swApp, item.swAppVer, '')) isVuln = true;
+        if (!isVuln && isSoftwareVulnerable(item.swFe, item.swFeVer, '')) isVuln = true;
 
         if (isVuln) upgradeCount++;
         if (item.isSaved) assessedCount++;
@@ -908,9 +929,17 @@
     function renderMainTable() {
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
+      // ตรวจสอบ และสร้าง HTML สำหรับ Software แต่ละตัว
       const combineSw = (name, ver) => {
           if (!name) return "";
-          return escapeHtml(name) + (ver ? ' ' + escapeHtml(ver) : '');
+          const isVuln = isSoftwareVulnerable(name, ver, ''); // เช็คช่องโหว่
+          const swText = escapeHtml(name) + (ver ? ' ' + escapeHtml(ver) : '');
+          
+          if (isVuln) {
+             // ถ้าเสี่ยง ให้ใส่ตัวหนา สีแดง และไอคอนแจ้งเตือน
+             return `<span class="text-rose-600 font-bold" title="⚠️ ควรอัปเกรด (ความเสี่ยงช่องโหว่ หรือ EOL)"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-0.5"></i>${swText}</span>`;
+          }
+          return `<span class="text-slate-600">${swText}</span>`;
       };
 
       const htmlRows = filteredAssets.map((item, idx) => {
@@ -928,7 +957,7 @@
         }
 
         let osHtml = `<span class="text-slate-300">-</span>`;
-        let fullOs = combineSw(item.os, item.osVer);
+        let fullOs = item.os ? escapeHtml(item.os) + (item.osVer ? ' ' + escapeHtml(item.osVer) : '') : "";
         
         if (fullOs) {
           const osUpper = fullOs.toUpperCase();
@@ -950,7 +979,7 @@
           if (osHasEof) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
 
           osHtml = `
-            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${fullOs}">
+            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]" title="${osHasEof ? '⚠️ ควรอัปเกรด (EOF)' : fullOs}">
               <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
               <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
             </div>
@@ -965,7 +994,7 @@
         if (item.swDb) swParts.push(combineSw(item.swDb, item.swDbVer));
         
         let swStack = swParts.length > 0 
-          ? `<div class="truncate w-full max-w-[160px] mx-auto text-[11px] text-slate-600" title="${swParts.join(' | ')}">${swParts.join(' <span class="text-slate-300">|</span> ')}</div>`
+          ? `<div class="w-full max-w-[160px] mx-auto text-[11px]" style="line-height: 1.6;">${swParts.join(' <span class="text-slate-300 mx-0.5">|</span> ')}</div>`
           : `<span class="text-slate-300 font-medium">-</span>`;
 
         let lastUpdateStr = '-', ts = 0;
