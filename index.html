@@ -700,22 +700,21 @@
         if(baseId === 'os') handleOsColor(sel);
     }
 
-    // เช็คความเสี่ยงแบบ Dynamic โดยอ่านกฎคณิตศาสตร์จากคอลัมน์ D
-    function compareVersions(v1, v2) {
-        // v1 คือเวอร์ชันที่ผู้ใช้เลือก, v2 คือเวอร์ชันเป้าหมายใน Rule
+    // ฟังก์ชันเปรียบเทียบเวอร์ชัน (แบบมาตรฐาน)
+    function compareVersions(v1, v2, op) {
         const p1 = v1.split('.').map(Number);
         const p2 = v2.split('.').map(Number);
         const len = Math.max(p1.length, p2.length);
-        
         for(let i=0; i<len; i++) {
             const n1 = p1[i] || 0;
             const n2 = p2[i] || 0;
-            if(n1 > n2) return 1;  // v1 มากกว่า
-            if(n1 < n2) return -1; // v1 น้อยกว่า
+            if(n1 > n2) return op.includes('>');
+            if(n1 < n2) return op.includes('<');
         }
-        return 0; // เท่ากันเป๊ะ
+        return op.includes('=');
     }
 
+    // ฟังก์ชันตรวจสอบความเสี่ยงแบบรองรับ Branch (อ่านกฎจาก Sheet Software_Config)
     function checkVulnerability(swName, swVer) {
        if(!swName) return { isVuln: false };
        const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
@@ -730,43 +729,34 @@
             isVuln = true;
             break;
          }
+         
          if(rule === 'EOF' && verUpper.includes('EOF')) {
             isVuln = true;
             break;
          }
-         if((rule.startsWith('<') || rule.startsWith('='))) {
-            const match = rule.match(/^(<=|<|>=|>|==|=)\s*([\d\.]+)/);
-            if(match) {
-               const op = match[1];
-               const targetVer = match[2];
-               
-               if(!verUpper) {
-                  isVuln = true; 
-                  break;
-               }
-               
-               const cleanVer = verUpper.replace(/[^\d\.]/g, '');
-               
-               if (cleanVer) {
-                  const compResult = compareVersions(cleanVer, targetVer);
-                  
-                  if (op === '<' && compResult === -1) {
-                      isVuln = true;
-                      break;
-                  } else if (op === '<=' && (compResult === -1 || compResult === 0)) {
-                      isVuln = true;
-                      break;
-                  } else if (op === '>' && compResult === 1) {
-                      isVuln = true;
-                      break;
-                  } else if (op === '>=' && (compResult === 1 || compResult === 0)) {
-                      isVuln = true;
-                      break;
-                  } else if ((op === '=' || op === '==') && compResult === 0) {
-                      isVuln = true;
-                      break;
-                  }
-               }
+         
+         // 🚨 Regex แบบใหม่: รองรับการอ่าน Branch Prefix ไว้ข้างหน้า เช่น "8.4 < 8.4.27"
+         const match = rule.match(/^(?:([\d\.]+)\s+)?(<=|<|>=|>|==|=)\s*([\d\.]+)/);
+         if(match) {
+            const branchPrefix = match[1]; // ดึงค่าสายเวอร์ชัน เช่น "8.4" (ถ้ามีการระบุไว้)
+            const op = match[2];           // เครื่องหมาย เช่น "<"
+            const targetVer = match[3];    // เวอร์ชันอ้างอิง เช่น "8.4.27"
+            
+            if(!verUpper) {
+               isVuln = true; 
+               break;
+            }
+
+            const cleanVer = verUpper.replace(/[^\d\.]/g, '');
+            
+            // 💡 ถ้ามีการระบุสายเวอร์ชัน (เช่น 8.4) แต่ที่ผู้ใช้กรอกไม่ได้เริ่มด้วยเลขนี้ ให้ข้ามกฎนี้ไปเลย!
+            if (branchPrefix && !cleanVer.startsWith(branchPrefix)) {
+                continue; 
+            }
+
+            if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
+               isVuln = true;
+               break;
             }
          }
        }
