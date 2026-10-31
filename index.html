@@ -55,7 +55,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.0</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.1</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -96,7 +96,6 @@
           </div>
         </div>
         <div id="cloudTypeStats" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-y-2 gap-x-1 text-[10px] font-semibold text-slate-600">
-          <!-- ข้อมูลสถิติประเภทคลาวด์จะถูกสร้างตรงนี้ด้วย JavaScript -->
         </div>
       </div>
 
@@ -291,7 +290,6 @@
             </h4>
             
             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-              <!-- Type (4 cols) -->
               <div class="md:col-span-4">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Type</label>
                 <div class="flex flex-col gap-1.5">
@@ -300,13 +298,11 @@
                 </div>
               </div>
               
-              <!-- Resource Name (8 cols) -->
               <div class="md:col-span-8">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">ชื่อระบบงาน (Resource Name) <span class="text-rose-500">*</span></label>
                 <input type="text" id="edit_name" maxlength="200" required class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm placeholder:text-slate-400" placeholder="ระบุชื่อระบบงาน">
               </div>
 
-              <!-- Domain Name + SSL (8 cols) -->
               <div class="md:col-span-8">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">Domain Name & SSL Expiry</label>
                 <div class="flex border border-slate-300 bg-slate-50 rounded-xl focus-within:ring-2 focus-within:ring-sky-500 focus-within:bg-white focus-within:border-sky-500 transition shadow-sm overflow-hidden group">
@@ -328,19 +324,16 @@
                 </div>
               </div>
 
-              <!-- IP Public (4 cols) -->
               <div class="md:col-span-4">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">IP Public</label>
                 <input type="text" id="edit_ip" maxlength="100" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm font-mono text-sky-700 placeholder:text-slate-400" placeholder="192.168.x.x">
               </div>
 
-              <!-- Sys Type (4 cols) -->
               <div class="md:col-span-4">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">หมวดหมู่ระบบ (System Type)</label>
                 <select id="edit_sysType" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm"></select>
               </div>
 
-              <!-- Note (8 cols) -->
               <div class="md:col-span-8">
                 <label class="font-bold mb-1.5 block text-slate-700 text-[11px] tracking-wide">หมายเหตุ (Note)</label>
                 <input type="text" id="edit_note" maxlength="300" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition shadow-sm placeholder:text-slate-400" placeholder="คำอธิบายเพิ่มเติม (ถ้ามี)">
@@ -696,11 +689,15 @@
     function handleSoftwareSelect(sel, baseId) {
         handleSelectChange(sel, `edit_${baseId}_other`);
         const val = sel.value === 'อื่นๆ' ? $(`edit_${baseId}_other`).value : sel.value;
+        
+        // เคลียร์ค่าในช่องเวอร์ชันทิ้งทุกครั้งที่เปลี่ยนซอฟต์แวร์ใหม่
+        const verInput = document.getElementById(`edit_${baseId}_ver`);
+        if (verInput) verInput.value = '';
+
         updateVersionDatalist(baseId, val);
         if(baseId === 'os') handleOsColor(sel);
     }
 
-    // ฟังก์ชันเปรียบเทียบเวอร์ชัน (แบบมาตรฐาน)
     function compareVersions(v1, v2, op) {
         const p1 = v1.split('.').map(Number);
         const p2 = v2.split('.').map(Number);
@@ -714,7 +711,6 @@
         return op.includes('=');
     }
 
-    // ฟังก์ชันตรวจสอบความเสี่ยงแบบรองรับ Branch (อ่านกฎจาก Sheet Software_Config)
     function checkVulnerability(swName, swVer) {
        if(!swName) return { isVuln: false };
        const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
@@ -735,12 +731,11 @@
             break;
          }
          
-         // 🚨 Regex แบบใหม่: รองรับการอ่าน Branch Prefix ไว้ข้างหน้า เช่น "8.4 < 8.4.27"
          const match = rule.match(/^(?:([\d\.]+)\s+)?(<=|<|>=|>|==|=)\s*([\d\.]+)/);
          if(match) {
-            const branchPrefix = match[1]; // ดึงค่าสายเวอร์ชัน เช่น "8.4" (ถ้ามีการระบุไว้)
-            const op = match[2];           // เครื่องหมาย เช่น "<"
-            const targetVer = match[3];    // เวอร์ชันอ้างอิง เช่น "8.4.27"
+            const branchPrefix = match[1]; 
+            const op = match[2];           
+            const targetVer = match[3];    
             
             if(!verUpper) {
                isVuln = true; 
@@ -749,7 +744,6 @@
 
             const cleanVer = verUpper.replace(/[^\d\.]/g, '');
             
-            // 💡 ถ้ามีการระบุสายเวอร์ชัน (เช่น 8.4) แต่ที่ผู้ใช้กรอกไม่ได้เริ่มด้วยเลขนี้ ให้ข้ามกฎนี้ไปเลย!
             if (branchPrefix && !cleanVer.startsWith(branchPrefix)) {
                 continue; 
             }
@@ -762,6 +756,7 @@
        }
        return { isVuln: isVuln, safeVersion: conf.safeVersion };
     }
+
     // ==========================================
 
     function updateCardDashboard() {
