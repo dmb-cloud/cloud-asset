@@ -55,12 +55,12 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.1</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.2</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="dashboard.html" class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition text-white">
-  <i class="fa-solid fa-chart-pie mr-2"></i> แดชบอร์ดภาพรวม
-</a>
+        <i class="fa-solid fa-chart-pie mr-2"></i> แดชบอร์ดภาพรวม
+      </a>
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
         class="flex items-center text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition">
         <i class="fa-solid fa-book mr-2"></i> คู่มือ
@@ -358,7 +358,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_os_other" onkeyup="updateVersionDatalist('os', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ OS">
-                  <input type="text" id="edit_os_ver" list="list_os_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_os_ver" list="list_os_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_os_ver"></datalist>
                 </div>
 
@@ -369,7 +369,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_swWs_other" onkeyup="updateVersionDatalist('swWs', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Web Server">
-                  <input type="text" id="edit_swWs_ver" list="list_swWs_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_swWs_ver" list="list_swWs_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_swWs_ver"></datalist>
                 </div>
 
@@ -380,7 +380,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_swApp_other" onkeyup="updateVersionDatalist('swApp', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Application">
-                  <input type="text" id="edit_swApp_ver" list="list_swApp_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_swApp_ver" list="list_swApp_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_swApp_ver"></datalist>
                 </div>
 
@@ -391,7 +391,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_swFe_other" onkeyup="updateVersionDatalist('swFe', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Frontend">
-                  <input type="text" id="edit_swFe_ver" list="list_swFe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_swFe_ver" list="list_swFe_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_swFe_ver"></datalist>
                 </div>
 
@@ -402,7 +402,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_swBe_other" onkeyup="updateVersionDatalist('swBe', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Backend">
-                  <input type="text" id="edit_swBe_ver" list="list_swBe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_swBe_ver" list="list_swBe_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_swBe_ver"></datalist>
                 </div>
 
@@ -413,7 +413,7 @@
                     <option value="">-- ไม่ระบุ --</option>
                   </select>
                   <input type="text" id="edit_swDb_other" onkeyup="updateVersionDatalist('swDb', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Database">
-                  <input type="text" id="edit_swDb_ver" list="list_swDb_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <input type="text" id="edit_swDb_ver" list="list_swDb_ver" class="version-datalist-input w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
                   <datalist id="list_swDb_ver"></datalist>
                 </div>
 
@@ -577,8 +577,27 @@
         return;
       }
       startSessionWatch(exp);
+      setupVersionInputAutoClear();
       await loadDataFromCloud();
     });
+
+    // เพิ่มฟังก์ชันเปิด Datalist เต็มรูปแบบเมื่อคลิกที่ช่อง Version
+    function setupVersionInputAutoClear() {
+      document.querySelectorAll('.version-datalist-input').forEach(input => {
+        input.addEventListener('focus', function () {
+          // เก็บค่าเดิมไว้ก่อน
+          this.dataset.previousValue = this.value;
+          // ล้างค่าชั่วคราวเพื่อให้ Dropdown Datalist แสดงรายการทั้งหมดขึ้นมาทันที
+          this.value = '';
+        });
+        input.addEventListener('blur', function () {
+          // ถ้าผู้ใช้ไม่ได้เลือกอะไร ให้คืนค่าเดิมกลับมา
+          if (!this.value && this.dataset.previousValue) {
+            this.value = this.dataset.previousValue;
+          }
+        });
+      });
+    }
 
     function startSessionWatch(exp) {
       clearInterval(sessionTimerId);
@@ -693,9 +712,12 @@
         handleSelectChange(sel, `edit_${baseId}_other`);
         const val = sel.value === 'อื่นๆ' ? $(`edit_${baseId}_other`).value : sel.value;
         
-        // เคลียร์ค่าในช่องเวอร์ชันทิ้งทุกครั้งที่เปลี่ยนซอฟต์แวร์ใหม่
+        // เคลียร์ค่าในช่องเวอร์ชันทิ้งทันทีเมื่อเปลี่ยนชนิดซอฟต์แวร์
         const verInput = document.getElementById(`edit_${baseId}_ver`);
-        if (verInput) verInput.value = '';
+        if (verInput) {
+          verInput.value = '';
+          delete verInput.dataset.previousValue;
+        }
 
         updateVersionDatalist(baseId, val);
         if(baseId === 'os') handleOsColor(sel);
@@ -1141,7 +1163,10 @@
         }
         
         updateVersionDatalist(baseId, sel.value === 'อื่นๆ' && other ? other.value : sel.value);
-        if (ver) ver.value = valVer || '';
+        if (ver) {
+          ver.value = valVer || '';
+          ver.dataset.previousValue = valVer || '';
+        }
         if (baseId === 'os') handleOsColor(sel);
     };
 
