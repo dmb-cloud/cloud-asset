@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>DMS Cloud Registry - ภาพรวมระบบสำหรับผู้ดูแล</title>
+  <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+    :root { --theme-primary: #122e5a; }
+    .bg-theme { background-color: var(--theme-primary) !important; }
+    .text-theme { color: var(--theme-primary) !important; }
+    
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen pb-10 text-slate-800">
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay"
+    class="fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#122e5a] mb-4"></i>
+    <h2 class="text-lg font-bold text-slate-800">กำลังประมวลผลข้อมูลภาพรวม...</h2>
+  </div>
+
+  <!-- Header / Navbar -->
+  <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
+    <div class="flex items-center gap-3">
+      <div>
+        <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-sky-400"></i> DMS Cloud Registry
+        </h1>
+        <span class="text-white/80 text-[11px] font-light tracking-wide drop-shadow-md">Central Domain & Vulnerability Overview</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3 bg-black/20 rounded-full px-4 py-2 text-xs">
+        <div class="flex items-center">
+          <i class="fa-regular fa-clock mr-1.5 text-white/70"></i>
+          <span id="clockTime" class="font-bold text-white tracking-wide">--:--</span>
+        </div>
+        <span class="text-slate-400">|</span>
+        <div class="flex items-center text-white/80">
+          <span id="clockDate">--</span>
+        </div>
+      </div>
+      <button onclick="toggleFullscreen()" class="flex items-center text-xs font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition text-white">
+        <i class="fa-solid fa-expand mr-1.5"></i> เต็มจอ
+      </button>
+      <a href="index.html" class="flex items-center text-xs font-medium bg-sky-600 hover:bg-sky-500 px-3.5 py-1.5 rounded-full transition text-white shadow-sm">
+        <i class="fa-solid fa-table-list mr-1.5"></i> จัดการระบบ
+      </a>
+    </div>
+  </div>
+
+  <div class="max-w-full mx-auto space-y-6 p-4 md:p-8">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: ระบบทั้งหมด -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่ใช้งานทั้งหมด (Active)</p>
+            <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500">
+          <span>รวมทุกโครงสร้างพื้นฐาน</span>
+          <span class="font-bold text-slate-700">100%</span>
+        </div>
+      </div>
+
+      <!-- Card 2: เสี่ยงสูง / EOL -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">PHP / Node EOL (เสี่ยงสูง)</p>
+            <h3 id="cardEol" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-clock-rotate-left mr-1"></i> ต้องเร่งอัปเดต</span>
+          <span id="cardEolPct" class="text-rose-600 font-bold">0%</span>
+        </div>
+      </div>
+
+      <!-- Card 3: อัปเกรดแล้ว -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">PHP / Node (อัปเกรดแล้ว)</p>
+            <h3 id="cardSafe" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-shield-check"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">ปิดช่องโหว่เรียบร้อย</span>
+          <span id="cardSafePct" class="text-emerald-600 font-bold">0%</span>
+        </div>
+      </div>
+
+      <!-- Card 4: อื่น ๆ / ปกติ -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั่วไป (ปกติ)</p>
+            <h3 id="cardNormal" class="text-3xl font-black text-slate-700 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full">ไม่พบความเสี่ยง</span>
+          <span id="cardNormalPct" class="text-slate-600 font-bold">0%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN 3-COLUMN SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Column 1: โครงสร้างพื้นฐาน & ภาพรวมสถานะความเสี่ยง -->
+      <div class="lg:col-span-4 space-y-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <h2 class="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-server text-sky-600"></i> สัดส่วนโครงสร้างพื้นฐาน
+            </h2>
+            <span class="text-xs text-slate-400 font-medium">Infrastructures</span>
+          </div>
+
+          <div id="infraList" class="space-y-3 my-2 text-xs">
+            <!-- Dynamic Infra Bars -->
+          </div>
+
+          <!-- สถานะความเสี่ยงภาพรวม -->
+          <div class="mt-6 pt-5 border-t border-slate-100">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ภาพรวม)</span>
+              <span id="segSummaryText" class="text-[11px] font-semibold text-slate-500">--</span>
+            </div>
+            <div id="overallSegBar" class="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex gap-0.5">
+              <!-- Dynamic overall bar -->
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 font-medium mt-2">
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: ความคืบหน้ารายหน่วยงาน -->
+      <div class="lg:col-span-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col h-full">
+          <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-3">
+            <h2 class="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-building text-indigo-600"></i> สัดส่วนการใช้งานรายหน่วยงาน
+            </h2>
+            <span class="text-xs text-slate-400 font-medium">Top Agencies</span>
+          </div>
+          
+          <div class="flex justify-end gap-3 text-[11px] font-semibold mb-3 text-slate-500">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+          </div>
+
+          <div id="agencyList" class="divide-y divide-slate-100 flex-1 flex flex-col justify-start text-xs max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+            <!-- Dynamic Agency Rows -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: โดเมนที่ต้องเร่งอัปเดต -->
+      <div class="lg:col-span-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col h-full">
+          <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+            <h2 class="text-sm md:text-base font-bold text-rose-600 flex items-center gap-2">
+              <i class="fa-solid fa-shield-virus"></i> โดเมนที่ต้องเร่งอัปเดต
+            </h2>
+            <button onclick="exportDomainCsv()" class="inline-flex items-center px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 transition shadow-sm">
+              <i class="fa-solid fa-file-csv mr-1.5"></i> CSV
+            </button>
+          </div>
+
+          <!-- ช่องค้นหา -->
+          <div class="relative w-full mb-3">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input type="text" id="domainSearchInput" onkeyup="filterDomainTable(true)" placeholder="ค้นหาโดเมน หรือเวอร์ชัน..."
+              class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-xs shadow-sm">
+          </div>
+
+          <!-- ตาราง Scrollable -->
+          <div class="custom-scrollbar overflow-x-auto overflow-y-auto max-h-[340px] rounded-xl border border-slate-200 mb-3 shadow-sm flex-1">
+            <table class="w-full text-xs border-collapse">
+              <thead class="sticky top-0 z-20 shadow-sm bg-theme text-white text-[11px]">
+                <tr>
+                  <th class="py-2.5 px-3 text-left">โดเมน</th>
+                  <th class="py-2.5 px-3 text-center">เวอร์ชัน</th>
+                  <th class="py-2.5 px-3 text-center w-20">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="domainTableBody" class="divide-y divide-slate-100 bg-white">
+                <!-- Dynamic Rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+            <span id="domainPageInfo" class="font-medium text-[11px]">แสดง 0 จาก 0</span>
+            <div class="flex items-center gap-1.5">
+              <button id="btnPrevDomain" onclick="changeDomainPage(-1)" class="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition text-xs">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button id="btnNextDomain" onclick="changeDomainPage(1)" class="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition text-xs">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Software Version Vulnerability Guidance -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
+      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-code-compare text-sky-600"></i> เกณฑ์เวอร์ชันซอฟต์แวร์ที่ต้องอัปเกรด (Software Advisory จากชีต Software_Config)
+      </h3>
+      <div id="versionsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs">
+        <!-- Dynamic Version Cards -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+    const $ = id => document.getElementById(id);
+
+    let allAssets = [];
+    let softwareConfig = [];
+    let domainRows = [];
+    let currentDomainPage = 1;
+    const domainPageSize = 10;
+
+    function escapeHtml(v) {
+      return String(v === null || v === undefined ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getToken() { return sessionStorage.getItem('access_token') || ""; }
+
+    function forceLogin() {
+      sessionStorage.clear();
+      window.location.href = "auth.html";
+    }
+
+    async function callBackend(action, payload = {}) {
+      try {
+        payload.token = getToken();
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, payload: payload })
+        });
+        const res = await response.json();
+        if (!res.success && res.code === 'UNAUTHENTICATED') {
+          forceLogin();
+          return { success: false };
+        }
+        return res.data || { success: false };
+      } catch (err) {
+        return { success: false, networkError: true };
+      }
+    }
+
+    // ฟังก์ชันนาฬิกา
+    function updateClock() {
+      const now = new Date();
+      $('clockTime').textContent = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      $('clockDate').textContent = now.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // ฟังก์ชันเปรียบเทียบเวอร์ชัน (มาตรฐานเดียวกันกับ index.html)
+    function compareVersions(v1, v2, op) {
+      const p1 = v1.split('.').map(Number);
+      const p2 = v2.split('.').map(Number);
+      const len = Math.max(p1.length, p2.length);
+      for(let i=0; i<len; i++) {
+        const n1 = p1[i] || 0;
+        const n2 = p2[i] || 0;
+        if(n1 > n2) return op.includes('>');
+        if(n1 < n2) return op.includes('<');
+      }
+      return op.includes('=');
+    }
+
+    function checkVulnerability(swName, swVer) {
+      if(!swName) return { isVuln: false };
+      const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
+      if(!conf || !conf.rules) return { isVuln: false };
+
+      const rules = conf.rules.split(',').map(s => s.trim().toUpperCase());
+      const verUpper = (swVer || '').toUpperCase().trim();
+      
+      let isVuln = false;
+      for(const rule of rules) {
+        if(rule === 'ALL' || rule === 'VULN') {
+          isVuln = true;
+          break;
+        }
+        if(rule === 'EOF' && verUpper.includes('EOF')) {
+          isVuln = true;
+          break;
+        }
+        const match = rule.match(/^(?:([\d\.]+)\s+)?(<=|<|>=|>|==|=)\s*([\d\.]+)/);
+        if(match) {
+          const branchPrefix = match[1];
+          const op = match[2];
+          const targetVer = match[3];
+
+          if(!verUpper) {
+            isVuln = true;
+            break;
+          }
+          const cleanVer = verUpper.replace(/[^\d\.]/g, '');
+          if (branchPrefix && !cleanVer.startsWith(branchPrefix)) {
+            continue;
+          }
+          if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
+            isVuln = true;
+            break;
+          }
+        }
+      }
+      return { isVuln: isVuln, safeVersion: conf.safeVersion };
+    }
+
+    // โหลดข้อมูลจาก Backend
+    document.addEventListener("DOMContentLoaded", async function () {
+      const overlay = $('loadingOverlay');
+      if (overlay) overlay.classList.remove('hidden', 'opacity-0');
+
+      if (!getToken()) {
+        forceLogin();
+        return;
+      }
+
+      const res = await callBackend("getAllRiskCloudData");
+      if (res && res.success && Array.isArray(res.assets)) {
+        allAssets = res.assets.filter(item => item.status !== 'ไม่ใช้งาน');
+        softwareConfig = res.config || [];
+        processAndRenderRealData();
+      } else {
+        alert("ไม่สามารถดึงข้อมูลสำหรับ Admin ได้ หรือสิทธิ์การเข้าถึงไม่ถูกต้อง");
+      }
+
+      if (overlay) {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+      }
+    });
+
+    // ประมวลผลและ Render ข้อมูลจาก Google Sheets จริง
+    function processAndRenderRealData() {
+      const totalSystems = allAssets.length;
+      let eolCount = 0;
+      let safeCount = 0;
+      let normalCount = 0;
+
+      const infraMap = {};
+      const agencyMap = {};
+      const urgentDomains = [];
+
+      allAssets.forEach(asset => {
+        // 1. ตรวจสอบความเสี่ยงของระบบ
+        const osVuln = checkVulnerability(asset.os, asset.osVer).isVuln;
+        const beVuln = checkVulnerability(asset.swBe, asset.swBeVer).isVuln;
+        const wsVuln = checkVulnerability(asset.swWs, asset.swWsVer).isVuln;
+        const appVuln = checkVulnerability(asset.swApp, asset.swAppVer).isVuln;
+        const feVuln = checkVulnerability(asset.swFe, asset.swFeVer).isVuln;
+        const dbVuln = checkVulnerability(asset.swDb, asset.swDbVer).isVuln;
+
+        const isVuln = osVuln || beVuln || wsVuln || appVuln || feVuln || dbVuln;
+
+        // แยกสถานะ: มี PHP/Node หรือไม่
+        const beName = (asset.swBe || '').toUpperCase();
+        const hasPhpOrNode = beName.includes('PHP') || beName.includes('NODE');
+
+        let statusCategory = 'normal';
+        if (isVuln) {
+          statusCategory = 'eol';
+          eolCount++;
+          // เก็บลงตารางที่ต้องเร่งอัปเดต
+          let versionLabel = asset.swBe ? `${asset.swBe} ${asset.swBeVer || ''}`.trim() : (asset.os ? `${asset.os} ${asset.osVer || ''}`.trim() : 'ไม่ระบุ');
+          urgentDomains.push({
+            domain: asset.domain || asset.name || 'ไม่ระบุโดเมน',
+            ver: versionLabel,
+            isCritical: (asset.swBeVer && (asset.swBeVer.startsWith('5.') || asset.swBeVer.startsWith('7.'))) || (asset.osVer && asset.osVer.includes('EOF'))
+          });
+        } else if (hasPhpOrNode) {
+          statusCategory = 'safe';
+          safeCount++;
+        } else {
+          statusCategory = 'normal';
+          normalCount++;
+        }
+
+        // 2. สรุปโครงสร้างพื้นฐาน (Type / Infrastructure)
+        const type = (asset.typeFilter || 'อื่น ๆ').trim();
+        infraMap[type] = (infraMap[type] || 0) + 1;
+
+        // 3. สรุปรายหน่วยงาน
+        const agencyName = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        if (!agencyMap[agencyName]) {
+          agencyMap[agencyName] = { count: 0, eol: 0, safe: 0, none: 0 };
+        }
+        agencyMap[agencyName].count++;
+        if (statusCategory === 'eol') agencyMap[agencyName].eol++;
+        else if (statusCategory === 'safe') agencyMap[agencyName].safe++;
+        else agencyMap[agencyName].none++;
+      });
+
+      // อัปเดต KPI Cards
+      const tot = totalSystems || 1;
+      $('cardTotal').textContent = totalSystems.toLocaleString('th-TH');
+      $('cardEol').textContent = eolCount.toLocaleString('th-TH');
+      $('cardSafe').textContent = safeCount.toLocaleString('th-TH');
+      $('cardNormal').textContent = normalCount.toLocaleString('th-TH');
+
+      $('cardEolPct').textContent = ((eolCount / tot) * 100).toFixed(1) + '%';
+      $('cardSafePct').textContent = ((safeCount / tot) * 100).toFixed(1) + '%';
+      $('cardNormalPct').textContent = ((normalCount / tot) * 100).toFixed(1) + '%';
+
+      // Overall Segment Bar
+      $('segSummaryText').textContent = `${((eolCount/tot)*100).toFixed(1)}% · ${((safeCount/tot)*100).toFixed(1)}% · ${((normalCount/tot)*100).toFixed(1)}%`;
+      $('overallSegBar').innerHTML = `
+        <div style="flex: ${eolCount || 0.001};" class="bg-rose-500 h-full" title="เสี่ยงสูง ${eolCount}"></div>
+        <div style="flex: ${safeCount || 0.001};" class="bg-emerald-500 h-full" title="ปลอดภัย ${safeCount}"></div>
+        <div style="flex: ${normalCount || 0.001};" class="bg-slate-300 h-full" title="ปกติ ${normalCount}"></div>
+      `;
+
+      // Infrastructure List
+      const infraColors = {
+        'GDCC': '#0d9488',
+        'Private Cloud': '#64748b',
+        'Huawei': '#e11d48',
+        'AWS': '#f97316',
+        'NIPA': '#06b6d4',
+        'GPC': '#6366f1',
+        'INET': '#8b5cf6',
+        'On-Premise': '#475569'
+      };
+
+      const sortedInfra = Object.entries(infraMap).sort((a,b) => b[1] - a[1]);
+      $('infraList').innerHTML = sortedInfra.map(([name, count]) => {
+        const pct = ((count / tot) * 100).toFixed(1);
+        const col = infraColors[name] || '#3b82f6';
+        return `
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-cloud text-slate-400"></i> ${escapeHtml(name)}
+              </span>
+              <span class="font-mono text-slate-600 font-semibold">${count} <span class="text-slate-400 text-[10px]">(${pct}%)</span></span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+              <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${col};"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Top Agencies List
+      const sortedAgencies = Object.entries(agencyMap).sort((a,b) => b[1].count - a[1].count);
+      $('agencyList').innerHTML = sortedAgencies.map(([name, ag], idx) => {
+        const total = ag.count;
+        const e = ag.eol, s = ag.safe, n = ag.none;
+        const tipText = `เสี่ยงสูง ${e} · ปลอดภัย ${s} · ปกติ ${n} (รวม ${total})`;
+
+        let barSegments = '';
+        if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="เสี่ยงสูง ${e}"></div>`;
+        if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="ปลอดภัย ${s}"></div>`;
+        if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="ปกติ ${n}"></div>`;
+
+        return `
+          <div class="py-2.5">
+            <div class="flex justify-between items-center mb-1.5">
+              <span class="font-semibold text-slate-700 flex items-center gap-1.5 truncate max-w-[210px]" title="${escapeHtml(name)}">
+                <span class="text-slate-400 font-mono text-[11px]">${idx + 1}.</span> ${escapeHtml(name)}
+              </span>
+              <div class="relative group cursor-pointer" title="${tipText}">
+                <span class="text-[11px] font-bold text-slate-600 bg-slate-100 group-hover:bg-slate-200 px-2 py-0.5 rounded-lg border border-slate-200/60 transition">
+                  รวม <span class="text-slate-800">${total}</span>
+                </span>
+                <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition absolute right-0 bottom-full mb-1.5 z-30 bg-slate-800 text-white text-[10px] px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
+                  <span class="text-rose-400">เสี่ยง ${e}</span> ·
+                  <span class="text-emerald-400">ปลอดภัย ${s}</span> ·
+                  <span class="text-slate-300">ปกติ ${n}</span>
+                </div>
+              </div>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex gap-0.5 cursor-pointer hover:h-2.5 transition-all" title="${tipText}">
+              ${barSegments}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Guidance Versions จาก softwareConfig จริง
+      if (softwareConfig.length > 0) {
+        $('versionsGrid').innerHTML = softwareConfig.slice(0, 12).map(c => `
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center flex flex-col justify-between">
+            <span class="font-bold text-slate-800 text-xs">${escapeHtml(c.software)}</span>
+            <span class="text-[10px] text-rose-500 mt-0.5 truncate" title="${escapeHtml(c.rules)}">กฎ: ${escapeHtml(c.rules)}</span>
+            <span class="text-[10px] text-emerald-600 font-semibold mt-0.5 truncate" title="${escapeHtml(c.safeVersion || '-')}">→ ${escapeHtml(c.safeVersion || 'ล่าสุด')}</span>
+          </div>
+        `).join('');
+      }
+
+      // ตารางโดเมนที่ต้องเร่งอัปเดต
+      domainRows = urgentDomains;
+      filterDomainTable(true);
+    }
+
+    function filterDomainTable(resetPage = false) {
+      if (resetPage) currentDomainPage = 1;
+      const q = $('domainSearchInput').value.toLowerCase().trim();
+      const filtered = domainRows.filter(r => r.domain.toLowerCase().includes(q) || r.ver.toLowerCase().includes(q));
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / domainPageSize));
+      if (currentDomainPage > totalPages) currentDomainPage = totalPages;
+      if (currentDomainPage < 1) currentDomainPage = 1;
+
+      const start = (currentDomainPage - 1) * domainPageSize;
+      const end = Math.min(start + domainPageSize, total);
+      const displayRows = filtered.slice(start, end);
+
+      $('domainTableBody').innerHTML = displayRows.map(r => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2.5 px-3 font-medium text-slate-800 truncate max-w-[140px]" title="${escapeHtml(r.domain)}">
+            ${escapeHtml(r.domain)}
+          </td>
+          <td class="py-2.5 px-3 text-center text-rose-600 font-bold font-mono">
+            ${escapeHtml(r.ver)}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full ${r.isCritical ? 'bg-rose-100 text-rose-700 border border-rose-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}">
+              ${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}
+            </span>
+          </td>
+        </tr>
+      `).join('') || `<tr><td colspan="3" class="text-center py-8 text-slate-400 font-medium">ไม่พบรายการโดเมนที่เข้าข่าย</td></tr>`;
+
+      $('domainPageInfo').textContent = `แสดง ${total === 0 ? 0 : start + 1}–${end} จาก ${total} · หน้า ${currentDomainPage}/${totalPages}`;
+      $('btnPrevDomain').disabled = currentDomainPage <= 1;
+      $('btnNextDomain').disabled = currentDomainPage >= totalPages;
+    }
+
+    function changeDomainPage(dir) {
+      currentDomainPage += dir;
+      filterDomainTable();
+    }
+
+    function exportDomainCsv() {
+      const q = $('domainSearchInput').value.toLowerCase().trim();
+      const filtered = domainRows.filter(r => r.domain.toLowerCase().includes(q) || r.ver.toLowerCase().includes(q));
+      if (filtered.length === 0) {
+        alert("ไม่มีข้อมูลที่จะส่งออก");
+        return;
+      }
+      let csv = '\uFEFFโดเมน,ซอฟต์แวร์/เวอร์ชัน,สถานะ\n' + filtered.map(r => `"${r.domain}","${r.ver}","${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}"`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `DMS_Urgent_Update_Domains_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
