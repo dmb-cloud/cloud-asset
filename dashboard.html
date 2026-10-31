@@ -79,6 +79,80 @@
 
   <div class="max-w-full mx-auto space-y-6 p-4 md:p-8">
 
+    <!-- FILTER BAR: Dropdown Checkboxes for Agency & Software -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center gap-3 relative z-30">
+      <div class="flex items-center gap-2 mr-1">
+        <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-filter"></i>
+        </span>
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">ตัวกรองข้อมูล:</span>
+      </div>
+
+      <!-- Dropdown: หน่วยงาน (Agencies) -->
+      <div class="relative">
+        <button id="btnAgencyDropdown" onclick="toggleDropdown('agencyDropdownMenu')" 
+          class="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-2.5 transition shadow-sm">
+          <i class="fa-solid fa-building text-indigo-500"></i>
+          <span id="labelAgencyFilter">หน่วยงานทั้งหมด</span>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        </button>
+
+        <div id="agencyDropdownMenu" class="hidden absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-3 z-40">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100 text-xs">
+            <span class="font-bold text-slate-800">เลือกหน่วยงาน</span>
+            <div class="space-x-2 text-[11px]">
+              <button onclick="selectAllFilters('agency', true)" class="text-sky-600 hover:underline font-semibold">ทั้งหมด</button>
+              <span class="text-slate-300">|</span>
+              <button onclick="selectAllFilters('agency', false)" class="text-slate-400 hover:underline font-semibold">ล้าง</button>
+            </div>
+          </div>
+          <div class="my-2">
+            <input type="text" onkeyup="filterCheckboxes(this, 'agencyCheckboxList')" placeholder="ค้นหาหน่วยงาน..." 
+              class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-500">
+          </div>
+          <div id="agencyCheckboxList" class="max-h-52 overflow-y-auto custom-scrollbar space-y-1 pr-1 text-xs">
+            <!-- Dynamic Agency Checkboxes -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Dropdown: ซอฟต์แวร์ (Software) -->
+      <div class="relative">
+        <button id="btnSoftwareDropdown" onclick="toggleDropdown('softwareDropdownMenu')" 
+          class="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-2.5 transition shadow-sm">
+          <i class="fa-solid fa-code text-emerald-500"></i>
+          <span id="labelSoftwareFilter">ซอฟต์แวร์ทั้งหมด</span>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        </button>
+
+        <div id="softwareDropdownMenu" class="hidden absolute left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-3 z-40">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100 text-xs">
+            <span class="font-bold text-slate-800">เลือกซอฟต์แวร์</span>
+            <div class="space-x-2 text-[11px]">
+              <button onclick="selectAllFilters('software', true)" class="text-sky-600 hover:underline font-semibold">ทั้งหมด</button>
+              <span class="text-slate-300">|</span>
+              <button onclick="selectAllFilters('software', false)" class="text-slate-400 hover:underline font-semibold">ล้าง</button>
+            </div>
+          </div>
+          <div class="my-2">
+            <input type="text" onkeyup="filterCheckboxes(this, 'softwareCheckboxList')" placeholder="ค้นหาซอฟต์แวร์..." 
+              class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-500">
+          </div>
+          <div id="softwareCheckboxList" class="max-h-52 overflow-y-auto custom-scrollbar space-y-1 pr-1 text-xs">
+            <!-- Dynamic Software Checkboxes -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Filter Status & Reset Button -->
+      <div class="ml-auto flex items-center gap-2">
+        <span id="filterSummaryText" class="text-xs text-slate-400 font-medium hidden md:inline">แสดงข้อมูลทั้งหมด</span>
+        <button onclick="resetAllFilters()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-2 transition flex items-center gap-1.5 bg-slate-50 hover:bg-rose-50 border border-slate-200 rounded-xl">
+          <i class="fa-solid fa-arrow-rotate-left"></i> รีเซ็ตตัวกรอง
+        </button>
+      </div>
+    </div>
+
     <!-- KPI Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       
@@ -155,24 +229,39 @@
     <!-- MAIN 3-COLUMN SECTION -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- Column 1: โครงสร้างพื้นฐาน & ภาพรวมสถานะความเสี่ยง -->
+      <!-- Column 1: โครงสร้างพื้นฐาน (Pie Chart ด้านซ้าย + สัดส่วนด้านขวา) & ภาพรวมสถานะความเสี่ยง -->
       <div class="lg:col-span-4 space-y-6">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col justify-between">
           <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
             <h2 class="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2">
-              <i class="fa-solid fa-server text-sky-600"></i> สัดส่วนโครงสร้างพื้นฐาน
+              <i class="fa-solid fa-chart-pie text-teal-600"></i> สัดส่วนโครงสร้างพื้นฐาน
             </h2>
             <span class="text-xs text-slate-400 font-medium">Infrastructures</span>
           </div>
 
-          <div id="infraList" class="space-y-3 my-2 text-xs">
-            <!-- Dynamic Infra Bars -->
+          <!-- Pie Chart ด้านซ้าย และ รายการสัดส่วนด้านขวา -->
+          <div class="flex items-center justify-between gap-4 py-2">
+            <!-- Doughnut Chart วงกลมด้านซ้าย -->
+            <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+              <div id="infraPieChart" class="w-full h-full rounded-full transition-transform hover:scale-105 duration-300"
+                style="background: conic-gradient(#0d9488 0% 80%, #64748b 80% 96.5%, #f59e0b 96.5% 100%);">
+              </div>
+              <div class="absolute inset-4 bg-white rounded-full flex flex-col items-center justify-center shadow-inner pointer-events-none">
+                <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">ทั้งหมด</span>
+                <span id="infraTotalCount" class="text-lg font-black text-slate-800">0</span>
+              </div>
+            </div>
+
+            <!-- รายการสัดส่วนด้านขวา -->
+            <div id="infraLegendList" class="flex-1 space-y-2 pl-2 text-xs">
+              <!-- Rendered Dynamically -->
+            </div>
           </div>
 
           <!-- สถานะความเสี่ยงภาพรวม -->
           <div class="mt-6 pt-5 border-t border-slate-100">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ภาพรวม)</span>
+              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ตามตัวกรอง)</span>
               <span id="segSummaryText" class="text-[11px] font-semibold text-slate-500">--</span>
             </div>
             <div id="overallSegBar" class="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex gap-0.5">
@@ -221,7 +310,7 @@
             </button>
           </div>
 
-          <!-- ช่องค้นหา -->
+          <!-- ช่องค้นหาในตาราง -->
           <div class="relative w-full mb-3">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
               <i class="fa-solid fa-magnifying-glass"></i>
@@ -285,6 +374,12 @@
     let currentDomainPage = 1;
     const domainPageSize = 10;
 
+    // ตัวแปรสถานะตัวกรอง (Filters)
+    let selectedAgencies = new Set();
+    let selectedSoftware = new Set();
+    let totalAgencyCount = 0;
+    let totalSoftwareCount = 0;
+
     function escapeHtml(v) {
       return String(v === null || v === undefined ? '' : v)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -334,7 +429,25 @@
       }
     }
 
-    // ฟังก์ชันเปรียบเทียบเวอร์ชัน (มาตรฐานเดียวกันกับ index.html)
+    // จัดการเปิด/ปิด Dropdown
+    function toggleDropdown(menuId) {
+      const menu = $(menuId);
+      const isHidden = menu.classList.contains('hidden');
+      $('agencyDropdownMenu').classList.add('hidden');
+      $('softwareDropdownMenu').classList.add('hidden');
+      if (isHidden) menu.classList.remove('hidden');
+    }
+
+    // ปิด Dropdown เมื่อคลิกนอกขอบเขต
+    window.addEventListener('click', function(e) {
+      if (!e.target.closest('#btnAgencyDropdown') && !e.target.closest('#agencyDropdownMenu') &&
+          !e.target.closest('#btnSoftwareDropdown') && !e.target.closest('#softwareDropdownMenu')) {
+        $('agencyDropdownMenu')?.classList.add('hidden');
+        $('softwareDropdownMenu')?.classList.add('hidden');
+      }
+    });
+
+    // เปรียบเทียบเวอร์ชัน
     function compareVersions(v1, v2, op) {
       const p1 = v1.split('.').map(Number);
       const p2 = v2.split('.').map(Number);
@@ -403,7 +516,15 @@
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets.filter(item => item.status !== 'ไม่ใช้งาน');
         softwareConfig = res.config || [];
-        processAndRenderRealData();
+        
+        // Render Guidance Rules
+        renderGuidanceRules();
+
+        // สร้าง Checkboxes สำหรับ Agencies และ Software
+        initFilterDropdowns();
+
+        // คำนวณและแสดงผลข้อมูลครั้งแรก
+        applyFiltersAndRender();
       } else {
         alert("ไม่สามารถดึงข้อมูลสำหรับ Admin ได้ หรือสิทธิ์การเข้าถึงไม่ถูกต้อง");
       }
@@ -414,9 +535,131 @@
       }
     });
 
-    // ประมวลผลและ Render ข้อมูลจาก Google Sheets จริง
-    function processAndRenderRealData() {
-      const totalSystems = allAssets.length;
+    // สร้างตัวเลือก Dropdown Checkboxes
+    function initFilterDropdowns() {
+      const agencyCounts = {};
+      const swCounts = {};
+
+      allAssets.forEach(asset => {
+        // นับหน่วยงาน
+        const ag = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        agencyCounts[ag] = (agencyCounts[ag] || 0) + 1;
+
+        // นับซอฟต์แวร์จากทุกระดับ
+        const sws = [asset.swBe, asset.swWs, asset.swDb, asset.swApp, asset.swFe, asset.os]
+          .filter(Boolean)
+          .map(s => s.trim());
+
+        const uniqueAssetSw = [...new Set(sws)];
+        uniqueAssetSw.forEach(sw => {
+          swCounts[sw] = (swCounts[sw] || 0) + 1;
+        });
+      });
+
+      // 1. Render Agency Checkboxes
+      const sortedAgencies = Object.entries(agencyCounts).sort((a,b) => b[1] - a[1]);
+      totalAgencyCount = sortedAgencies.length;
+      selectedAgencies = new Set(Object.keys(agencyCounts));
+
+      $('agencyCheckboxList').innerHTML = sortedAgencies.map(([name, count]) => `
+        <label class="flex items-center justify-between p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition select-none">
+          <div class="flex items-center gap-2 truncate pr-2">
+            <input type="checkbox" value="${escapeHtml(name)}" onchange="onFilterChange('agency')" checked 
+              class="agency-checkbox rounded text-sky-600 focus:ring-sky-500 w-3.5 h-3.5">
+            <span class="truncate text-slate-700">${escapeHtml(name)}</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold">${count}</span>
+        </label>
+      `).join('');
+
+      // 2. Render Software Checkboxes
+      const sortedSw = Object.entries(swCounts).sort((a,b) => b[1] - a[1]);
+      totalSoftwareCount = sortedSw.length;
+      selectedSoftware = new Set(Object.keys(swCounts));
+
+      $('softwareCheckboxList').innerHTML = sortedSw.map(([name, count]) => `
+        <label class="flex items-center justify-between p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition select-none">
+          <div class="flex items-center gap-2 truncate pr-2">
+            <input type="checkbox" value="${escapeHtml(name)}" onchange="onFilterChange('software')" checked 
+              class="software-checkbox rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5">
+            <span class="truncate text-slate-700">${escapeHtml(name)}</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold">${count}</span>
+        </label>
+      `).join('');
+
+      updateFilterLabels();
+    }
+
+    // จัดการเมื่อมีการเลือก/ยกเลิก Checkbox
+    function onFilterChange(type) {
+      if (type === 'agency') {
+        const checked = Array.from(document.querySelectorAll('.agency-checkbox:checked')).map(cb => cb.value);
+        selectedAgencies = new Set(checked);
+      } else if (type === 'software') {
+        const checked = Array.from(document.querySelectorAll('.software-checkbox:checked')).map(cb => cb.value);
+        selectedSoftware = new Set(checked);
+      }
+      updateFilterLabels();
+      applyFiltersAndRender();
+    }
+
+    // อัปเดตข้อความบนปุ่ม Dropdown
+    function updateFilterLabels() {
+      const agCount = selectedAgencies.size;
+      $('labelAgencyFilter').textContent = agCount === totalAgencyCount ? 'หน่วยงานทั้งหมด' : `หน่วยงาน (${agCount})`;
+
+      const swCount = selectedSoftware.size;
+      $('labelSoftwareFilter').textContent = swCount === totalSoftwareCount ? 'ซอฟต์แวร์ทั้งหมด' : `ซอฟต์แวร์ (${swCount})`;
+
+      const isAllSelected = (agCount === totalAgencyCount) && (swCount === totalSoftwareCount);
+      $('filterSummaryText').textContent = isAllSelected ? 'แสดงข้อมูลทั้งหมด' : `กำลังกรอง (${agCount} หน่วยงาน, ${swCount} ซอฟต์แวร์)`;
+    }
+
+    // ค้นหารายการ Checkbox ภายใน Dropdown
+    function filterCheckboxes(input, containerId) {
+      const q = input.value.toLowerCase().trim();
+      const labels = $(containerId).querySelectorAll('label');
+      labels.forEach(lbl => {
+        const text = lbl.innerText.toLowerCase();
+        lbl.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    // เลือกทั้งหมด / ล้างทั้งหมด
+    function selectAllFilters(type, select) {
+      const checkboxes = document.querySelectorAll(`.${type}-checkbox`);
+      checkboxes.forEach(cb => { cb.checked = select; });
+      onFilterChange(type);
+    }
+
+    // รีเซ็ตตัวกรองทั้งหมด
+    function resetAllFilters() {
+      selectAllFilters('agency', true);
+      selectAllFilters('software', true);
+    }
+
+    // กรองข้อมูลและนำไป Render
+    function applyFiltersAndRender() {
+      const filtered = allAssets.filter(asset => {
+        const ag = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        const matchAgency = selectedAgencies.has(ag);
+
+        const assetSws = [asset.swBe, asset.swWs, asset.swDb, asset.swApp, asset.swFe, asset.os]
+          .filter(Boolean)
+          .map(s => s.trim());
+        
+        const matchSoftware = (assetSws.length === 0) || assetSws.some(sw => selectedSoftware.has(sw));
+
+        return matchAgency && matchSoftware;
+      });
+
+      processAndRenderRealData(filtered);
+    }
+
+    // ประมวลผลและ Render ข้อมูลหน้า Dashboard
+    function processAndRenderRealData(assets) {
+      const totalSystems = assets.length;
       let eolCount = 0;
       let safeCount = 0;
       let normalCount = 0;
@@ -425,7 +668,7 @@
       const agencyMap = {};
       const urgentDomains = [];
 
-      allAssets.forEach(asset => {
+      assets.forEach(asset => {
         // 1. ตรวจสอบความเสี่ยงของระบบ
         const osVuln = checkVulnerability(asset.os, asset.osVer).isVuln;
         const beVuln = checkVulnerability(asset.swBe, asset.swBeVer).isVuln;
@@ -436,7 +679,6 @@
 
         const isVuln = osVuln || beVuln || wsVuln || appVuln || feVuln || dbVuln;
 
-        // แยกสถานะ: มี PHP/Node หรือไม่
         const beName = (asset.swBe || '').toUpperCase();
         const hasPhpOrNode = beName.includes('PHP') || beName.includes('NODE');
 
@@ -444,7 +686,6 @@
         if (isVuln) {
           statusCategory = 'eol';
           eolCount++;
-          // เก็บลงตารางที่ต้องเร่งอัปเดต
           let versionLabel = asset.swBe ? `${asset.swBe} ${asset.swBeVer || ''}`.trim() : (asset.os ? `${asset.os} ${asset.osVer || ''}`.trim() : 'ไม่ระบุ');
           urgentDomains.push({
             domain: asset.domain || asset.name || 'ไม่ระบุโดเมน',
@@ -459,7 +700,7 @@
           normalCount++;
         }
 
-        // 2. สรุปโครงสร้างพื้นฐาน (Type / Infrastructure)
+        // 2. สรุปโครงสร้างพื้นฐาน
         const type = (asset.typeFilter || 'อื่น ๆ').trim();
         infraMap[type] = (infraMap[type] || 0) + 1;
 
@@ -481,86 +722,118 @@
       $('cardSafe').textContent = safeCount.toLocaleString('th-TH');
       $('cardNormal').textContent = normalCount.toLocaleString('th-TH');
 
-      $('cardEolPct').textContent = ((eolCount / tot) * 100).toFixed(1) + '%';
-      $('cardSafePct').textContent = ((safeCount / tot) * 100).toFixed(1) + '%';
-      $('cardNormalPct').textContent = ((normalCount / tot) * 100).toFixed(1) + '%';
+      $('cardEolPct').textContent = totalSystems === 0 ? '0%' : ((eolCount / tot) * 100).toFixed(1) + '%';
+      $('cardSafePct').textContent = totalSystems === 0 ? '0%' : ((safeCount / tot) * 100).toFixed(1) + '%';
+      $('cardNormalPct').textContent = totalSystems === 0 ? '0%' : ((normalCount / tot) * 100).toFixed(1) + '%';
 
       // Overall Segment Bar
-      $('segSummaryText').textContent = `${((eolCount/tot)*100).toFixed(1)}% · ${((safeCount/tot)*100).toFixed(1)}% · ${((normalCount/tot)*100).toFixed(1)}%`;
-      $('overallSegBar').innerHTML = `
-        <div style="flex: ${eolCount || 0.001};" class="bg-rose-500 h-full" title="เสี่ยงสูง ${eolCount}"></div>
-        <div style="flex: ${safeCount || 0.001};" class="bg-emerald-500 h-full" title="ปลอดภัย ${safeCount}"></div>
-        <div style="flex: ${normalCount || 0.001};" class="bg-slate-300 h-full" title="ปกติ ${normalCount}"></div>
-      `;
+      if (totalSystems === 0) {
+        $('segSummaryText').textContent = '0% · 0% · 0%';
+        $('overallSegBar').innerHTML = `<div class="w-full bg-slate-200 h-full"></div>`;
+      } else {
+        $('segSummaryText').textContent = `${((eolCount/tot)*100).toFixed(1)}% · ${((safeCount/tot)*100).toFixed(1)}% · ${((normalCount/tot)*100).toFixed(1)}%`;
+        $('overallSegBar').innerHTML = `
+          <div style="flex: ${eolCount || 0.0001};" class="bg-rose-500 h-full transition-all" title="เสี่ยงสูง ${eolCount}"></div>
+          <div style="flex: ${safeCount || 0.0001};" class="bg-emerald-500 h-full transition-all" title="ปลอดภัย ${safeCount}"></div>
+          <div style="flex: ${normalCount || 0.0001};" class="bg-slate-300 h-full transition-all" title="ปกติ ${normalCount}"></div>
+        `;
+      }
 
-      // Infrastructure List
+      // 4. Infrastructure: Doughnut/Pie Chart ซ้าย + สัดส่วนขวา
       const infraColors = {
         'GDCC': '#0d9488',
         'Private Cloud': '#64748b',
+        'On-Premise': '#f59e0b',
         'Huawei': '#e11d48',
         'AWS': '#f97316',
         'NIPA': '#06b6d4',
         'GPC': '#6366f1',
-        'INET': '#8b5cf6',
-        'On-Premise': '#475569'
+        'INET': '#8b5cf6'
       };
 
       const sortedInfra = Object.entries(infraMap).sort((a,b) => b[1] - a[1]);
-      $('infraList').innerHTML = sortedInfra.map(([name, count]) => {
-        const pct = ((count / tot) * 100).toFixed(1);
-        const col = infraColors[name] || '#3b82f6';
-        return `
-          <div class="space-y-1">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-cloud text-slate-400"></i> ${escapeHtml(name)}
-              </span>
-              <span class="font-mono text-slate-600 font-semibold">${count} <span class="text-slate-400 text-[10px]">(${pct}%)</span></span>
-            </div>
-            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background-color: ${col};"></div>
-            </div>
-          </div>
-        `;
-      }).join('');
+      const infraTotal = sortedInfra.reduce((sum, item) => sum + item[1], 0);
+      $('infraTotalCount').textContent = infraTotal.toLocaleString('th-TH');
 
-      // Top Agencies List
-      const sortedAgencies = Object.entries(agencyMap).sort((a,b) => b[1].count - a[1].count);
-      $('agencyList').innerHTML = sortedAgencies.map(([name, ag], idx) => {
-        const total = ag.count;
-        const e = ag.eol, s = ag.safe, n = ag.none;
-        const tipText = `เสี่ยงสูง ${e} · ปลอดภัย ${s} · ปกติ ${n} (รวม ${total})`;
+      if (sortedInfra.length === 0) {
+        $('infraPieChart').style.background = '#e2e8f0';
+        $('infraLegendList').innerHTML = `<p class="text-slate-400 text-center py-6">ไม่พบข้อมูลโครงสร้างพื้นฐาน</p>`;
+      } else {
+        let gradientStops = [];
+        let currentPct = 0;
 
-        let barSegments = '';
-        if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="เสี่ยงสูง ${e}"></div>`;
-        if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="ปลอดภัย ${s}"></div>`;
-        if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="ปกติ ${n}"></div>`;
+        $('infraLegendList').innerHTML = sortedInfra.map(([name, count]) => {
+          const pct = ((count / (infraTotal || 1)) * 100).toFixed(1);
+          const color = infraColors[name] || '#3b82f6';
 
-        return `
-          <div class="py-2.5">
-            <div class="flex justify-between items-center mb-1.5">
-              <span class="font-semibold text-slate-700 flex items-center gap-1.5 truncate max-w-[210px]" title="${escapeHtml(name)}">
-                <span class="text-slate-400 font-mono text-[11px]">${idx + 1}.</span> ${escapeHtml(name)}
-              </span>
-              <div class="relative group cursor-pointer" title="${tipText}">
-                <span class="text-[11px] font-bold text-slate-600 bg-slate-100 group-hover:bg-slate-200 px-2 py-0.5 rounded-lg border border-slate-200/60 transition">
-                  รวม <span class="text-slate-800">${total}</span>
-                </span>
-                <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition absolute right-0 bottom-full mb-1.5 z-30 bg-slate-800 text-white text-[10px] px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
-                  <span class="text-rose-400">เสี่ยง ${e}</span> ·
-                  <span class="text-emerald-400">ปลอดภัย ${s}</span> ·
-                  <span class="text-slate-300">ปกติ ${n}</span>
+          const startPct = currentPct;
+          currentPct += parseFloat(pct);
+          gradientStops.push(`${color} ${startPct.toFixed(1)}% ${currentPct.toFixed(1)}%`);
+
+          return `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100/80 hover:bg-slate-100/80 transition">
+              <div class="flex items-center gap-2 truncate pr-2">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${color};"></span>
+                <div class="truncate">
+                  <p class="font-bold text-slate-800 leading-tight truncate text-[11px]" title="${escapeHtml(name)}">${escapeHtml(name)}</p>
+                  <p class="text-[10px] text-slate-400 font-medium">${pct}%</p>
                 </div>
               </div>
+              <span class="font-mono font-bold text-slate-700 text-xs">${count.toLocaleString('th-TH')}</span>
             </div>
-            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex gap-0.5 cursor-pointer hover:h-2.5 transition-all" title="${tipText}">
-              ${barSegments}
-            </div>
-          </div>
-        `;
-      }).join('');
+          `;
+        }).join('');
 
-      // Render Guidance Versions จาก softwareConfig จริง
+        $('infraPieChart').style.background = `conic-gradient(${gradientStops.join(', ')})`;
+      }
+
+      // 5. Top Agencies List
+      const sortedAgencies = Object.entries(agencyMap).sort((a,b) => b[1].count - a[1].count);
+      if (sortedAgencies.length === 0) {
+        $('agencyList').innerHTML = `<p class="text-slate-400 text-center py-8">ไม่พบข้อมูลตามเงื่อนไขตัวกรอง</p>`;
+      } else {
+        $('agencyList').innerHTML = sortedAgencies.map(([name, ag], idx) => {
+          const total = ag.count;
+          const e = ag.eol, s = ag.safe, n = ag.none;
+          const tipText = `เสี่ยงสูง ${e} · ปลอดภัย ${s} · ปกติ ${n} (รวม ${total})`;
+
+          let barSegments = '';
+          if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="เสี่ยงสูง ${e}"></div>`;
+          if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="ปลอดภัย ${s}"></div>`;
+          if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="ปกติ ${n}"></div>`;
+
+          return `
+            <div class="py-2.5">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-semibold text-slate-700 flex items-center gap-1.5 truncate max-w-[210px]" title="${escapeHtml(name)}">
+                  <span class="text-slate-400 font-mono text-[11px]">${idx + 1}.</span> ${escapeHtml(name)}
+                </span>
+                <div class="relative group cursor-pointer" title="${tipText}">
+                  <span class="text-[11px] font-bold text-slate-600 bg-slate-100 group-hover:bg-slate-200 px-2 py-0.5 rounded-lg border border-slate-200/60 transition">
+                    รวม <span class="text-slate-800">${total}</span>
+                  </span>
+                  <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition absolute right-0 bottom-full mb-1.5 z-30 bg-slate-800 text-white text-[10px] px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
+                    <span class="text-rose-400">เสี่ยง ${e}</span> ·
+                    <span class="text-emerald-400">ปลอดภัย ${s}</span> ·
+                    <span class="text-slate-300">ปกติ ${n}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex gap-0.5 cursor-pointer hover:h-2.5 transition-all" title="${tipText}">
+                ${barSegments}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 6. ตารางโดเมนที่ต้องเร่งอัปเดต
+      domainRows = urgentDomains;
+      filterDomainTable(true);
+    }
+
+    // Render Software Advisory Guidance
+    function renderGuidanceRules() {
       if (softwareConfig.length > 0) {
         $('versionsGrid').innerHTML = softwareConfig.slice(0, 12).map(c => `
           <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center flex flex-col justify-between">
@@ -570,10 +843,6 @@
           </div>
         `).join('');
       }
-
-      // ตารางโดเมนที่ต้องเร่งอัปเดต
-      domainRows = urgentDomains;
-      filterDomainTable(true);
     }
 
     function filterDomainTable(resetPage = false) {
