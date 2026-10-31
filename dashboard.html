@@ -440,9 +440,10 @@
       }
     });
 
+    // เปรียบเทียบเวอร์ชันเชิงตัวเลข (SemVer Comparison)
     function compareVersions(v1, v2, op) {
-      const p1 = v1.split('.').map(Number);
-      const p2 = v2.split('.').map(Number);
+      const p1 = String(v1).split('.').map(Number);
+      const p2 = String(v2).split('.').map(Number);
       const len = Math.max(p1.length, p2.length);
       for(let i=0; i<len; i++) {
         const n1 = p1[i] || 0;
@@ -453,39 +454,76 @@
       return op.includes('=');
     }
 
+    // ฟังก์ชันตรวจสอบความเสี่ยง: รองรับ Branch Specificity + Safe Version Whitelist
     function checkVulnerability(swName, swVer) {
       if(!swName) return { isVuln: false };
       const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
       if(!conf || !conf.rules) return { isVuln: false };
 
-      const rules = conf.rules.split(',').map(s => s.trim().toUpperCase());
       const verUpper = (swVer || '').toUpperCase().trim();
-      
+      if(!verUpper) {
+        return { isVuln: true, safeVersion: conf.safeVersion };
+      }
+
+      // 1. ตรวจสอบเงื่อนไข EOF
+      if (verUpper.includes('EOF')) {
+        return { isVuln: true, safeVersion: conf.safeVersion };
+      }
+
+      // ดึงเฉพาะตัวเลขเวอร์ชัน เช่น 'PHP 8.4.27' -> '8.4.27'
+      const cleanVerMatch = verUpper.match(/\d+(\.\d+)*/);
+      const cleanVer = cleanVerMatch ? cleanVerMatch[0] : '';
+      if (!cleanVer) {
+        return { isVuln: true, safeVersion: conf.safeVersion };
+      }
+
+      // 2. ถ้าเวอร์ชันตรงกับ Safe Version ถือว่าปลอดภัยทันที (Whitelist Guard)
+      if (conf.safeVersion) {
+        const safeList = conf.safeVersion.split(',').map(s => s.replace(/[^\d\.]/g, '').trim()).filter(Boolean);
+        if (safeList.some(sv => sv === cleanVer || compareVersions(cleanVer, sv, '>='))) {
+          // ตรวจสอบว่าอยู่ในสายเดียวกันหรือไม่
+          const userMajorMinor = cleanVer.split('.').slice(0, 2).join('.');
+          const matchingSafe = safeList.find(sv => sv.startsWith(userMajorMinor));
+          if (matchingSafe && compareVersions(cleanVer, matchingSafe, '>=')) {
+            return { isVuln: false, safeVersion: conf.safeVersion };
+          }
+        }
+      }
+
+      // 3. วิเคราะห์กฎ (Rules) จากชีต
+      const rules = conf.rules.split(',').map(s => s.trim().toUpperCase());
       let isVuln = false;
+
       for(const rule of rules) {
         if(rule === 'ALL' || rule === 'VULN') {
           isVuln = true;
           break;
         }
-        if(rule === 'EOF' && verUpper.includes('EOF')) {
-          isVuln = true;
-          break;
-        }
+
         const match = rule.match(/^(?:([\d\.]+)\s+)?(<=|<|>=|>|==|=)\s*([\d\.]+)/);
         if(match) {
           const branchPrefix = match[1];
           const op = match[2];
           const targetVer = match[3];
 
-          if(!verUpper) {
-            isVuln = true;
-            break;
-          }
-          const cleanVer = verUpper.replace(/[^\d\.]/g, '');
+          // ถ้ากฎระบุสาย เช่น '8.4 < 8.4.27' แต่เวอร์ชันไม่ใช่ 8.4.x ให้ข้าม
           if (branchPrefix && !cleanVer.startsWith(branchPrefix)) {
             continue;
           }
-          if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
+
+          // ถ้ากฎไม่ได้ระบุสาย เช่น '<= 8.1.99' แต่เป็นกฎเปรียบเทียบ Major/Minor
+          // ป้องกันไม่ให้นำกฎของสายอื่นมาเปรียบเทียบข้ามสาย
+          const targetMajorMinor = targetVer.split('.').slice(0, 2).join('.');
+          const userMajorMinor = cleanVer.split('.').slice(0, 2).join('.');
+
+          if (!branchPrefix && targetVer.includes('.')) {
+            // หากผู้ใช้เวอร์ชัน 8.4.x แต่กฎเป็น <= 8.1.99 ให้เทียบ Major/Minor โดยตรง
+            if (compareVersions(userMajorMinor, targetMajorMinor, '>')) {
+              continue; // เวอร์ชันปัจจุบันอยู่สายที่ใหม่กว่ากฎกว้างนี้ ข้ามไป
+            }
+          }
+
+          if(compareVersions(cleanVer, targetVer, op)) {
             isVuln = true;
             break;
           }
@@ -505,7 +543,7 @@
 
       const res = await callBackend("getAllRiskCloudData");
       if (res && res.success) {
-        // Admin Guard: ตรวจสอบสิทธิ์ Admin อย่างเข้มงวด
+        // Admin Guard
         if (!res.user || !res.user.isAdmin) {
           alert("หน้านี้สงวนสิทธิ์เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น");
           window.location.href = "index.html";
