@@ -39,42 +39,6 @@
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background-color: #94a3b8; 
     }
-    
-    /* Tooltip */
-    .tooltip-container { position: relative; display: inline-flex; align-items: center; }
-    .tooltip-container .tooltip-text {
-      visibility: hidden;
-      background-color: #1e293b;
-      color: #fff;
-      text-align: center;
-      border-radius: 6px;
-      padding: 6px 10px;
-      position: absolute;
-      z-index: 50;
-      bottom: 125%;
-      left: 50%;
-      transform: translateX(-50%);
-      opacity: 0;
-      transition: opacity 0.2s;
-      white-space: nowrap;
-      font-size: 10px;
-      font-weight: 500;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    }
-    .tooltip-container .tooltip-text::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #1e293b transparent transparent transparent;
-    }
-    .tooltip-container:hover .tooltip-text {
-      visibility: visible;
-      opacity: 1;
-    }
   </style>
 </head>
 
@@ -91,7 +55,7 @@
   <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
     <div>
       <h1 class="text-lg md:text-xl font-bold">DMS Cloud Registry</h1>
-      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.0 (Dynamic Rules)</span>
+      <span class="text-white/80 text-[11px] font-light tracking-wide z-10 drop-shadow-md">Version 2.3.0</span>
     </div>
     <div class="hidden md:flex items-center gap-4 bg-black/20 rounded-full px-4 py-2">
       <a href="docs/manual.pdf" target="_blank" rel="noopener"
@@ -132,22 +96,23 @@
           </div>
         </div>
         <div id="cloudTypeStats" class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-2 gap-y-2 gap-x-1 text-[10px] font-semibold text-slate-600">
+          <!-- ข้อมูลสถิติประเภทคลาวด์จะถูกสร้างตรงนี้ด้วย JavaScript -->
         </div>
       </div>
 
-      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition relative overflow-hidden">
-        <div class="absolute -right-4 -top-4 w-16 h-16 bg-rose-50 rounded-full z-0"></div>
-        <div class="flex justify-between items-start relative z-10">
+      <!-- Card 2: Software ที่ควรอัปเกรด -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">Software ที่ควรอัปเกรด</p>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider" title="ตรวจสอบความเสี่ยง (VULN) และ OS EOF">Software ที่ควรอัปเกรด</p>
             <h3 id="cardUpgrade" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
-          <div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center text-lg">
-            <i class="fa-solid fa-shield-virus"></i>
+          <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-bug"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold relative z-10">
-          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ เสี่ยง/หมดอายุ: <span id="cardUpgradeSub">0</span></span>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs font-semibold">
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">⚠️ เสี่ยง/ควรอัปเกรด: <span id="cardUpgradeSub">0</span></span>
           <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-shield-check"></i> ปกติ: <span id="cardSafeSw">0</span></span>
         </div>
       </div>
@@ -179,7 +144,7 @@
             <i class="fa-solid fa-fingerprint"></i>
           </div>
         </div>
-        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold relative z-10">
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-semibold">
           <span class="text-emerald-600 flex items-center">
             <i class="fa-solid fa-shield-halved mr-1.5"></i>ข้อมูลส่วนบุคคล
           </span>
@@ -269,12 +234,12 @@
                     IP Public <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
                   </div>
                 </th>
-                <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[120px]">
+                <th onclick="sortTable('os')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
                   <div class="flex items-center justify-center gap-1.5">
                     OS <i class="fa-solid fa-sort text-slate-400 opacity-70"></i>
                   </div>
                 </th>
-                <th class="py-3.5 px-4 text-center min-w-[240px]">
+                <th class="py-3.5 px-4 text-center min-w-[220px]">
                   Software <span class="font-normal opacity-70 ml-1">(WS | App | FE | BE | DB)</span>
                 </th>
                 <th onclick="sortTable('impact')" class="py-3.5 px-4 text-center th-sortable transition min-w-[100px]">
@@ -301,50 +266,6 @@
 
   </div>
 
-  <!-- Announcement Modal -->
-  <div id="announcementPopup" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-[100] hidden p-4 transition-opacity duration-300">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200">
-      <div class="bg-rose-600 px-6 py-4 flex items-center justify-between shrink-0 border-b border-white/10">
-        <div class="flex items-center gap-3 text-white">
-          <div class="bg-white/20 p-2 rounded-full flex items-center justify-center">
-            <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
-          </div>
-          <div>
-            <p class="text-rose-100 text-[10px] uppercase font-bold tracking-widest">ด่วนที่สุด (Urgent)</p>
-            <h2 class="text-base md:text-lg font-bold">มาตรการเร่งด่วนเพื่อยกระดับความมั่นคงปลอดภัยทางไซเบอร์</h2>
-          </div>
-        </div>
-      </div>
-      <div class="p-5 overflow-y-auto text-xs text-slate-700 space-y-4 leading-relaxed">
-        <div class="bg-slate-50 border border-slate-200 border-l-4 border-l-[#122e5a] p-4 rounded-xl">
-          <p class="font-bold text-[#122e5a] text-sm">อ้างอิง: หนังสือ สธ 0212.07/ว7009</p>
-          <p class="mt-1 text-slate-600">ขอให้ทุกหน่วยงานในสังกัดสำนักงานปลัดกระทรวงสาธารณสุข ดำเนินการตามมาตรการเร่งด่วน</p>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-        <button onclick="closeAnnouncement()" class="w-full sm:w-auto px-6 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center">
-          <i class="fa-solid fa-check-circle mr-2 text-emerald-400"></i> รับทราบและดำเนินการตามมาตรการ
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Info Modal -->
-  <div id="infoModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
-      <div class="bg-theme px-6 py-4 flex items-center justify-between text-white border-b border-white/10 shrink-0">
-        <h3 id="modalTitle" class="text-sm font-bold flex items-center gap-2"></h3>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl leading-none font-bold">&times;</button>
-      </div>
-      <div class="p-5 overflow-y-auto text-xs">
-        <div id="modalBody" class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-slate-600 leading-relaxed space-y-3"></div>
-      </div>
-      <div class="flex justify-end gap-2 px-5 py-3 border-t border-slate-200 bg-white shrink-0">
-        <button onclick="closeModal()" class="px-4 py-2.5 bg-theme hover:opacity-90 text-white text-xs font-bold rounded-xl shadow-sm transition">เข้าใจแล้ว / ปิด</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Edit / Add Modal -->
   <div id="editAssetModal" class="hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 transition-all">
@@ -359,7 +280,6 @@
       <form onsubmit="saveSingleAssessment(event); return false;" class="flex flex-col min-h-0 text-xs">
         <div class="p-5 space-y-5 overflow-y-auto bg-slate-50/50">
 
-          <!-- Hidden inputs -->
           <input type="hidden" id="edit_agency">
           <input type="hidden" id="edit_status" value="ใช้งาน">
           <input type="hidden" id="edit_owners">
@@ -433,10 +353,74 @@
                 <i class="fa-brands fa-stack-overflow text-indigo-500"></i> ซอฟต์แวร์และเวอร์ชัน (Software Stack)
               </h5>
               
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="swConfigContainer">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 
-                <!-- Dynamic Elements will be injected here via JS -->
-                
+                <!-- OS -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">OS (ระบบปฏิบัติการ)</label>
+                  <select id="edit_os" onchange="handleSoftwareSelect(this, 'os')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_os_other" onkeyup="updateVersionDatalist('os', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ OS">
+                  <input type="text" id="edit_os_ver" list="list_os_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_os_ver"></datalist>
+                </div>
+
+                <!-- Web Server -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">Web Server</label>
+                  <select id="edit_swWs" onchange="handleSoftwareSelect(this, 'swWs')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_swWs_other" onkeyup="updateVersionDatalist('swWs', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Web Server">
+                  <input type="text" id="edit_swWs_ver" list="list_swWs_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_swWs_ver"></datalist>
+                </div>
+
+                <!-- Application -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">Application (Software)</label>
+                  <select id="edit_swApp" onchange="handleSoftwareSelect(this, 'swApp')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_swApp_other" onkeyup="updateVersionDatalist('swApp', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Application">
+                  <input type="text" id="edit_swApp_ver" list="list_swApp_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_swApp_ver"></datalist>
+                </div>
+
+                <!-- Frontend -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">Frontend</label>
+                  <select id="edit_swFe" onchange="handleSoftwareSelect(this, 'swFe')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_swFe_other" onkeyup="updateVersionDatalist('swFe', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Frontend">
+                  <input type="text" id="edit_swFe_ver" list="list_swFe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_swFe_ver"></datalist>
+                </div>
+
+                <!-- Backend -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">Backend</label>
+                  <select id="edit_swBe" onchange="handleSoftwareSelect(this, 'swBe')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_swBe_other" onkeyup="updateVersionDatalist('swBe', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Backend">
+                  <input type="text" id="edit_swBe_ver" list="list_swBe_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_swBe_ver"></datalist>
+                </div>
+
+                <!-- Database -->
+                <div class="flex flex-col gap-1.5">
+                  <label class="font-bold text-slate-500 text-[10px] uppercase">Database</label>
+                  <select id="edit_swDb" onchange="handleSoftwareSelect(this, 'swDb')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
+                    <option value="">-- ไม่ระบุ --</option>
+                  </select>
+                  <input type="text" id="edit_swDb_other" onkeyup="updateVersionDatalist('swDb', this.value)" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ Database">
+                  <input type="text" id="edit_swDb_ver" list="list_swDb_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version (เลือกหรือพิมพ์)">
+                  <datalist id="list_swDb_ver"></datalist>
+                </div>
+
               </div>
             </div>
           </section>
@@ -450,7 +434,6 @@
               <span id="edit_impactBadge" class="px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm transition">Impact: LOW</span>
             </div>
 
-            <!-- PDPA Card Toggle -->
             <label class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-sky-300 hover:bg-sky-50/30 cursor-pointer transition group">
               <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-full bg-white flex items-center justify-center border border-slate-200 shadow-sm group-hover:border-sky-300 group-hover:text-sky-500 transition">
@@ -466,7 +449,6 @@
 
             <!-- CIA Grids -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- C -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-eye-slash text-slate-400"></i> การรักษาความลับ (C)</label>
                 <select id="edit_c" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -475,7 +457,6 @@
                   <option value="3">HIGH (ความลับองค์กร/PDPA / ผลกระทบรุนแรง)</option>
                 </select>
               </div>
-              <!-- I -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-file-signature text-slate-400"></i> ความถูกต้องสมบูรณ์ (I)</label>
                 <select id="edit_i" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -484,7 +465,6 @@
                   <option value="3">HIGH (ธุรกรรมเสียหาย / ผลกระทบรุนแรง)</option>
                 </select>
               </div>
-              <!-- A -->
               <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col">
                 <label class="text-[10px] font-bold mb-2.5 block text-slate-600 uppercase tracking-wide flex items-center gap-1.5"><i class="fa-solid fa-server text-slate-400"></i> ความพร้อมใช้งาน (A)</label>
                 <select id="edit_a" onchange="calcImpact()" class="w-full border border-slate-300 bg-white text-slate-800 p-2.5 rounded-xl text-[11px] font-medium outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm mt-auto transition">
@@ -497,7 +477,6 @@
           </section>
         </div>
 
-        <!-- Footer Buttons -->
         <div class="flex justify-end gap-3 px-5 py-4 border-t border-slate-200 bg-white shrink-0">
           <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition shadow-sm">ยกเลิก</button>
           <button type="submit" id="btnSaveModal" class="px-6 py-2.5 bg-theme hover:opacity-90 text-white font-bold rounded-xl shadow-sm transition flex items-center gap-1.5"><i class="fa-solid fa-save"></i> บันทึกข้อมูล</button>
@@ -549,7 +528,7 @@
     let userName = "";
     let userIsAdmin = false;
     let allAssets = [];
-    let swConfig = [];
+    let softwareConfig = []; // จัดเก็บ Config จาก Sheet Software_Config
     let sessionTimerId = null;
 
     let currentPage = 1;
@@ -602,7 +581,6 @@
         return;
       }
       startSessionWatch(exp);
-      initEditModal(); 
       await loadDataFromCloud();
     });
 
@@ -630,7 +608,7 @@
 
       if (res && res.success && Array.isArray(res.assets)) {
         allAssets = res.assets;
-        if (res.swConfig) swConfig = res.swConfig;
+        softwareConfig = res.config || [];
 
         if (res.user) {
           userAgency = res.user.agency || "";
@@ -640,8 +618,8 @@
           $('profileName').textContent = userName;
           $('displayAgency').textContent = userAgency + (res.user.isAdmin ? " (ผู้ดูแล)" : "");
         }
-        
-        buildDynamicSwForm();
+
+        populateSoftwareDropdowns();
         renderMainTable();
         updateCardDashboard();
         applyFilterAndPagination(true);
@@ -668,69 +646,115 @@
 
     function openLogoutModal() { $('logoutModal').classList.remove('hidden'); }
     function closeLogoutModal() { $('logoutModal').classList.add('hidden'); }
-    function closeAnnouncement() { $('announcementPopup').classList.add('hidden'); }
     function closeSuccessPopup() { $('successPopup').classList.add('hidden'); }
-    function closeModal() { $('infoModal').classList.add('hidden'); }
 
-    // --- Dynamic Vuln Checking Engine ---
+    // ==========================================
+    // DYNAMIC SOFTWARE LOGIC (From Config)
+    // ==========================================
     
-    function parseVersion(verStr) {
-      if (!verStr) return [];
-      let cleanStr = String(verStr).toUpperCase().replace('EOF', '').replace(/[^0-9.]/g, '');
-      return cleanStr.split('.').filter(Boolean).map(Number);
-    }
-    
-    function compareVersions(v1, op, v2) {
-      const len = Math.max(v1.length, v2.length);
-      for (let i = 0; i < len; i++) {
-        const num1 = v1[i] || 0;
-        const num2 = v2[i] || 0;
-        if (num1 < num2) return (op === '<' || op === '<=');
-        if (num1 > num2) return (op === '>' || op === '>=');
+    // สร้างตัวเลือก Dropdown หลัก (ซอฟต์แวร์) จาก Config ที่อ่านมา
+    function populateSoftwareDropdowns() {
+      const mapIdToCategory = {
+        'edit_os': 'OS',
+        'edit_swWs': 'Web Server',
+        'edit_swApp': 'Software',
+        'edit_swFe': 'Frontend',
+        'edit_swBe': 'Backend',
+        'edit_swDb': 'Database'
+      };
+      
+      for (const [id, cat] of Object.entries(mapIdToCategory)) {
+        const sel = $(id);
+        if(!sel) continue;
+        const items = softwareConfig.filter(c => c.category.toUpperCase() === cat.toUpperCase());
+        let html = '<option value="">-- ไม่ระบุ --</option>';
+        items.forEach(item => {
+          html += `<option value="${escapeHtml(item.software)}">${escapeHtml(item.software)}</option>`;
+        });
+        html += '<option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>';
+        sel.innerHTML = html;
       }
-      return (op === '<=' || op === '>=' || op === '==');
+    }
+
+    // อัปเดตตัวเลือก Datalist ย่อย (เวอร์ชัน) ตามซอฟต์แวร์ที่เลือก
+    function updateVersionDatalist(baseId, swName) {
+       const dl = $(`list_${baseId}_ver`);
+       if(!dl) return;
+       dl.innerHTML = "";
+       if(!swName || swName === 'อื่นๆ') return;
+       
+       const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
+       if(conf && conf.options) {
+         conf.options.forEach(opt => {
+           const option = document.createElement('option');
+           option.value = opt;
+           dl.appendChild(option);
+         });
+       }
+    }
+
+    function handleSoftwareSelect(sel, baseId) {
+        handleSelectChange(sel, `edit_${baseId}_other`);
+        const val = sel.value === 'อื่นๆ' ? $(`edit_${baseId}_other`).value : sel.value;
+        updateVersionDatalist(baseId, val);
+        if(baseId === 'os') handleOsColor(sel);
+    }
+
+    // เช็คความเสี่ยงแบบ Dynamic โดยอ่านกฎคณิตศาสตร์จากคอลัมน์ D
+    function compareVersions(v1, v2, op) {
+        const p1 = v1.split('.').map(Number);
+        const p2 = v2.split('.').map(Number);
+        const len = Math.max(p1.length, p2.length);
+        for(let i=0; i<len; i++) {
+            const n1 = p1[i] || 0;
+            const n2 = p2[i] || 0;
+            if(n1 > n2) return op.includes('>');
+            if(n1 < n2) return op.includes('<');
+        }
+        return op.includes('=');
     }
 
     function checkVulnerability(swName, swVer) {
-      const nameUpper = String(swName || '').trim().toUpperCase();
-      const verUpper = String(swVer || '').trim().toUpperCase();
-      if (!nameUpper) return { isVuln: false };
+       if(!swName) return { isVuln: false };
+       const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
+       if(!conf || !conf.rules) return { isVuln: false };
 
-      const configEntry = swConfig.find(c => c.software.toUpperCase() === nameUpper);
-      if (!configEntry) return { isVuln: false }; 
-
-      const rulesStr = configEntry.rules || "";
-      const rules = rulesStr.split(',').map(r => r.trim());
-      const safeVer = configEntry.safeVer || "อัปเดตเวอร์ชันล่าสุด";
-
-      let isVuln = false;
-      let reason = "";
-
-      for (let rule of rules) {
-        if (rule === "ALL" || rule === "VULN") {
-           isVuln = true; reason = "ต้องตรวจสอบความปลอดภัยเสมอ"; break;
-        }
-        if (rule === "EOF" && verUpper.includes("EOF")) {
-           isVuln = true; reason = "เวอร์ชันหมดระยะสนับสนุน (EOF)"; break;
-        }
-        
-        const match = rule.match(/^(<=|<|>=|>|==)\s*([0-9.]+)$/);
-        if (match) {
-           const op = match[1];
-           const targetVer = parseVersion(match[2]);
-           const currentVer = parseVersion(swVer);
-           
-           if (currentVer.length > 0 && compareVersions(currentVer, op, targetVer)) {
-              isVuln = true; 
-              reason = `เวอร์ชันเก่ากว่าเกณฑ์ปลอดภัย (${safeVer})`;
-              break;
-           }
-        }
-      }
-
-      return { isVuln, safeVer, reason };
+       const rules = conf.rules.split(',').map(s => s.trim().toUpperCase());
+       const verUpper = (swVer || '').toUpperCase().trim();
+       
+       let isVuln = false;
+       for(const rule of rules) {
+         if(rule === 'ALL' || rule === 'VULN') {
+            isVuln = true;
+            break;
+         }
+         if(rule === 'EOF' && verUpper.includes('EOF')) {
+            isVuln = true;
+            break;
+         }
+         if((rule.startsWith('<') || rule.startsWith('='))) {
+            const match = rule.match(/^(<=|<|>=|>|==|=)\s*([\d\.]+)/);
+            if(match) {
+               const op = match[1];
+               const targetVer = match[2];
+               
+               if(!verUpper) {
+                  isVuln = true; 
+                  break;
+               }
+               
+               const cleanVer = verUpper.replace(/[^\d\.]/g, '');
+               if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
+                  isVuln = true;
+                  break;
+               }
+            }
+         }
+       }
+       return { isVuln: isVuln, safeVersion: conf.safeVersion };
     }
 
+    // ==========================================
 
     function updateCardDashboard() {
       const activeAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
@@ -747,18 +771,12 @@
 
         let isVuln = false;
         
-        const swChecks = [
-           checkVulnerability(item.os, item.osVer),
-           checkVulnerability(item.swWs, item.swWsVer),
-           checkVulnerability(item.swApp, item.swAppVer),
-           checkVulnerability(item.swFe, item.swFeVer),
-           checkVulnerability(item.swBe, item.swBeVer),
-           checkVulnerability(item.swDb, item.swDbVer)
-        ];
-        
-        if (swChecks.some(c => c.isVuln)) {
-            isVuln = true;
-        }
+        if (item.os && checkVulnerability(item.os, item.osVer).isVuln) isVuln = true;
+        if (!isVuln && checkVulnerability(item.swBe, item.swBeVer).isVuln) isVuln = true;
+        if (!isVuln && checkVulnerability(item.swWs, item.swWsVer).isVuln) isVuln = true;
+        if (!isVuln && checkVulnerability(item.swApp, item.swAppVer).isVuln) isVuln = true;
+        if (!isVuln && checkVulnerability(item.swFe, item.swFeVer).isVuln) isVuln = true;
+        if (!isVuln && checkVulnerability(item.swDb, item.swDbVer).isVuln) isVuln = true;
 
         if (isVuln) upgradeCount++;
         if (item.isSaved) assessedCount++;
@@ -827,125 +845,7 @@
       typeHtml += '<option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>';
       $('edit_type').innerHTML = typeHtml;
     }
-    
-    // --- Dynamic Form Builder ---
-    
-    const SW_CATEGORIES = [
-      { id: 'os', label: 'OS (ระบบปฏิบัติการ)' },
-      { id: 'swWs', label: 'Web Server' },
-      { id: 'swApp', label: 'Application' },
-      { id: 'swFe', label: 'Frontend' },
-      { id: 'swBe', label: 'Backend' },
-      { id: 'swDb', label: 'Database' }
-    ];
-
-    function buildDynamicSwForm() {
-      const container = $('swConfigContainer');
-      if (!container) return;
-      
-      let html = '';
-      
-      SW_CATEGORIES.forEach(cat => {
-         // Filter config list for this category loosely
-         let optionsHtml = '<option value="">-- ไม่ระบุ --</option>';
-         
-         const filteredSw = swConfig.filter(s => {
-             const c = s.category.toUpperCase();
-             if (cat.id === 'os' && c === 'OS') return true;
-             if (cat.id === 'swWs' && c === 'WEB SERVER') return true;
-             if (cat.id === 'swDb' && c === 'DATABASE') return true;
-             if (cat.id === 'swFe' && c === 'FRONTEND') return true;
-             if (cat.id === 'swBe' && c === 'BACKEND') return true;
-             if (cat.id === 'swApp' && c === 'SOFTWARE') return true;
-             return false;
-         });
-         
-         filteredSw.forEach(sw => {
-             optionsHtml += `<option value="${escapeHtml(sw.software)}">${escapeHtml(sw.software)}</option>`;
-         });
-         optionsHtml += '<option value="อื่นๆ">อื่นๆ (โปรดระบุ)</option>';
-         
-         html += `
-          <div class="flex flex-col gap-1.5">
-            <label class="font-bold text-slate-500 text-[10px] uppercase">${escapeHtml(cat.label)}</label>
-            <select id="edit_${cat.id}" onchange="handleSwChange('${cat.id}')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-              ${optionsHtml}
-            </select>
-            <input type="text" id="edit_${cat.id}_other" class="hidden w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="ระบุ ${escapeHtml(cat.label)}">
-            
-            <div id="verContainer_${cat.id}" class="hidden w-full">
-                <select id="edit_${cat.id}_ver_select" onchange="handleVerChange('${cat.id}')" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs">
-                </select>
-            </div>
-            
-            <input type="text" id="edit_${cat.id}_ver" class="w-full border border-slate-300 bg-slate-50 p-2.5 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm text-xs placeholder:text-slate-400" placeholder="Version">
-          </div>
-         `;
-      });
-      
-      container.innerHTML = html;
-    }
-    
-    window.handleSwChange = function(baseId) {
-        const sel = $(`edit_${baseId}`);
-        const other = $(`edit_${baseId}_other`);
-        const verContainer = $(`verContainer_${baseId}`);
-        const verSelect = $(`edit_${baseId}_ver_select`);
-        const verInput = $(`edit_${baseId}_ver`);
-        
-        if (sel.value === 'อื่นๆ') {
-            other.classList.remove('hidden');
-            verContainer.classList.add('hidden');
-            verInput.classList.remove('hidden');
-            verInput.value = '';
-        } else if (sel.value !== '') {
-            other.classList.add('hidden');
-            other.value = '';
-            
-            const swEntry = swConfig.find(s => s.software === sel.value);
-            if (swEntry && swEntry.options) {
-                const opts = swEntry.options.split(',').map(o => o.trim()).filter(Boolean);
-                if (opts.length > 0 && opts[0] !== 'N/A') {
-                    verContainer.classList.remove('hidden');
-                    verInput.classList.add('hidden');
-                    verInput.value = '';
-                    
-                    let html = '<option value="">-- ระบุเวอร์ชัน --</option>';
-                    opts.forEach(o => {
-                        html += `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`;
-                    });
-                    html += '<option value="พิมพ์เอง">พิมพ์เวอร์ชันเอง...</option>';
-                    verSelect.innerHTML = html;
-                } else {
-                    verContainer.classList.add('hidden');
-                    verInput.classList.remove('hidden');
-                }
-            } else {
-                verContainer.classList.add('hidden');
-                verInput.classList.remove('hidden');
-            }
-            
-        } else {
-            other.classList.add('hidden');
-            verContainer.classList.add('hidden');
-            verInput.classList.remove('hidden');
-            verInput.value = '';
-        }
-    };
-    
-    window.handleVerChange = function(baseId) {
-        const verSelect = $(`edit_${baseId}_ver_select`);
-        const verInput = $(`edit_${baseId}_ver`);
-        
-        if (verSelect.value === 'พิมพ์เอง') {
-            verInput.classList.remove('hidden');
-            verInput.value = '';
-            verInput.focus();
-        } else {
-            verInput.classList.add('hidden');
-            verInput.value = verSelect.value; 
-        }
-    };
+    document.addEventListener('DOMContentLoaded', initEditModal);
 
     function getCloudBadgeHtml(typeRaw) {
       const t = String(typeRaw || '').trim();
@@ -975,19 +875,27 @@
       }
     }
 
+    function handleOsColor(el) {
+      if (el.value.toUpperCase().includes('EOF')) {
+        el.classList.add('text-rose-600', 'font-bold', 'bg-rose-50');
+        el.classList.remove('bg-white', 'text-slate-800');
+      } else {
+        el.classList.remove('text-rose-600', 'font-bold', 'bg-rose-50');
+        el.classList.add('bg-white', 'text-slate-800');
+      }
+    }
+
     function renderMainTable() {
       const filteredAssets = allAssets.filter(item => item.status !== 'ไม่ใช้งาน');
 
-      const buildSwBadge = (name, ver) => {
+      const combineSw = (name, ver) => {
           if (!name) return "";
-          const vulnCheck = checkVulnerability(name, ver);
+          const vulnData = checkVulnerability(name, ver); 
           const swText = escapeHtml(name) + (ver ? ' ' + escapeHtml(ver) : '');
           
-          if (vulnCheck.isVuln) {
-             return `<div class="tooltip-container">
-                        <span class="text-rose-600 font-bold cursor-help"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-0.5"></i>${swText}</span>
-                        <span class="tooltip-text">ควรอัปเกรด: ${escapeHtml(vulnCheck.reason)}<br>คำแนะนำ: ${escapeHtml(vulnCheck.safeVer)}</span>
-                     </div>`;
+          if (vulnData.isVuln) {
+             const tip = vulnData.safeVersion ? `⚠️ ควรอัปเกรด (เวอร์ชันปลอดภัย: ${escapeHtml(vulnData.safeVersion)})` : `⚠️ ควรอัปเกรด/ตรวจสอบ (ความเสี่ยงช่องโหว่ หรือ EOL)`;
+             return `<span class="text-rose-600 font-bold cursor-help" title="${tip}"><i class="fa-solid fa-triangle-exclamation text-[10px] mr-0.5"></i>${swText}</span>`;
           }
           return `<span class="text-slate-600">${swText}</span>`;
       };
@@ -1008,11 +916,11 @@
 
         let osHtml = `<span class="text-slate-300">-</span>`;
         let fullOs = item.os ? escapeHtml(item.os) + (item.osVer ? ' ' + escapeHtml(item.osVer) : '') : "";
-        const osCheck = checkVulnerability(item.os, item.osVer);
         
         if (fullOs) {
           const osUpper = fullOs.toUpperCase();
-          const osTextClass = osCheck.isVuln ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
+          const vulnData = checkVulnerability(item.os, item.osVer);
+          const osTextClass = vulnData.isVuln ? 'text-rose-600 font-bold' : 'text-slate-700 font-medium';
           
           let iconClass = "fa-solid fa-compact-disc text-slate-400";
           if (osUpper.includes("UBUNTU")) iconClass = "fa-brands fa-ubuntu text-orange-500";
@@ -1026,34 +934,26 @@
           else if (osUpper.includes("DEBIAN")) iconClass = "fa-brands fa-linux text-rose-600";
           else if (osUpper.includes("LINUX")) iconClass = "fa-brands fa-linux text-slate-700";
           
-          if (osCheck.isVuln) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
+          if (vulnData.isVuln) iconClass = iconClass.replace(/text-[a-z]+-[0-9]+/, 'text-rose-600');
 
-          if(osCheck.isVuln) {
-             osHtml = `
-              <div class="tooltip-container">
-                <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px] cursor-help">
-                  <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
-                  <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
-                </div>
-                <span class="tooltip-text">ควรอัปเกรด: ${escapeHtml(osCheck.reason)}<br>คำแนะนำ: ${escapeHtml(osCheck.safeVer)}</span>
-              </div>
-            `;
-          } else {
-             osHtml = `
-              <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px]">
-                <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
-                <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
-              </div>
-            `;
-          }
+          const tip = vulnData.isVuln 
+                ? (vulnData.safeVersion ? `⚠️ ควรอัปเกรด (เวอร์ชันปลอดภัย: ${escapeHtml(vulnData.safeVersion)})` : `⚠️ ควรอัปเกรด (EOF)`)
+                : escapeHtml(fullOs);
+
+          osHtml = `
+            <div class="flex flex-col items-center justify-center mx-auto w-full max-w-[90px] cursor-help" title="${tip}">
+              <i class="${iconClass} text-lg mb-1 drop-shadow-sm transition-colors"></i>
+              <span class="truncate w-full text-[10px] ${osTextClass}">${fullOs}</span>
+            </div>
+          `;
         }
 
         const swParts = [];
-        if (item.swWs) swParts.push(buildSwBadge(item.swWs, item.swWsVer));
-        if (item.swApp) swParts.push(buildSwBadge(item.swApp, item.swAppVer));
-        if (item.swFe) swParts.push(buildSwBadge(item.swFe, item.swFeVer));
-        if (item.swBe) swParts.push(buildSwBadge(item.swBe, item.swBeVer));
-        if (item.swDb) swParts.push(buildSwBadge(item.swDb, item.swDbVer));
+        if (item.swWs) swParts.push(combineSw(item.swWs, item.swWsVer));
+        if (item.swApp) swParts.push(combineSw(item.swApp, item.swAppVer));
+        if (item.swFe) swParts.push(combineSw(item.swFe, item.swFeVer));
+        if (item.swBe) swParts.push(combineSw(item.swBe, item.swBeVer));
+        if (item.swDb) swParts.push(combineSw(item.swDb, item.swDbVer));
         
         let swStack = swParts.length > 0 
           ? `<div class="w-full max-w-[160px] mx-auto text-[11px]" style="line-height: 1.6;">${swParts.join(' <span class="text-slate-300 mx-0.5">|</span> ')}</div>`
@@ -1217,48 +1117,26 @@
       badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold border ' + map[impact][1];
     }
 
-    const setComboDyn = (baseId, valName, valVer) => {
-        const sel = $(`edit_${baseId}`);
-        const other = $(`edit_${baseId}_other`);
-        const verSelect = $(`edit_${baseId}_ver_select`);
-        const verInput = $(`edit_${baseId}_ver`);
-        const verContainer = $(`verContainer_${baseId}`);
+    const setComboSep = (baseId, valName, valVer) => {
+        const sel = document.getElementById(`edit_${baseId}`);
+        const other = document.getElementById(`edit_${baseId}_other`);
+        const ver = document.getElementById(`edit_${baseId}_ver`);
         
-        if (!valName) {
-            sel.value = '';
-            if(other) other.classList.add('hidden');
-            if(verContainer) verContainer.classList.add('hidden');
-            if(verInput) { verInput.classList.remove('hidden'); verInput.value = ''; }
-            return;
-        }
-
-        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName).toLowerCase());
-        
-        if (exists && valName !== 'อื่นๆ') {
+        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName || '').toLowerCase());
+        if (exists && valName !== 'อื่นๆ' && valName !== '') {
             sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === String(valName).toLowerCase()).value;
-            other.classList.add('hidden');
-            handleSwChange(baseId); // Populates versions
-            
-            if (valVer) {
-               // Try to select it in the dropdown if it matches
-               let vExists = Array.from(verSelect.options).some(opt => opt.value.toLowerCase() === String(valVer).toLowerCase());
-               if(vExists && valVer !== 'พิมพ์เอง' && valVer !== '') {
-                   verSelect.value = Array.from(verSelect.options).find(opt => opt.value.toLowerCase() === String(valVer).toLowerCase()).value;
-                   handleVerChange(baseId);
-               } else {
-                   verSelect.value = 'พิมพ์เอง';
-                   handleVerChange(baseId);
-                   verInput.value = valVer;
-               }
-            }
-        } else {
+            if (other) { other.value = ''; other.classList.add('hidden'); }
+        } else if (valName) {
             sel.value = 'อื่นๆ';
-            other.classList.remove('hidden');
-            other.value = valName;
-            verContainer.classList.add('hidden');
-            verInput.classList.remove('hidden');
-            verInput.value = valVer || '';
+            if (other) { other.value = valName; other.classList.remove('hidden'); }
+        } else {
+            sel.value = '';
+            if (other) { other.value = ''; other.classList.add('hidden'); }
         }
+        
+        updateVersionDatalist(baseId, sel.value === 'อื่นๆ' && other ? other.value : sel.value);
+        if (ver) ver.value = valVer || '';
+        if (baseId === 'os') handleOsColor(sel);
     };
 
     function setForm(a) {
@@ -1266,17 +1144,8 @@
       $('edit_owners').value = a.owners || "";
       $('edit_status').value = a.status || 'ใช้งาน';
 
-      const typeSel = $('edit_type');
-      let typeExists = Array.from(typeSel.options).some(opt => opt.value === (a.typeFilter || "").trim());
-      if(typeExists && a.typeFilter !== 'อื่นๆ' && a.typeFilter) {
-          typeSel.value = a.typeFilter;
-          $('edit_type_other').classList.add('hidden');
-      } else if (a.typeFilter) {
-          typeSel.value = 'อื่นๆ';
-          $('edit_type_other').value = a.typeFilter;
-          $('edit_type_other').classList.remove('hidden');
-      }
-
+      setComboSep('type', a.typeFilter || "");
+      
       $('edit_name').value = a.name || "";
       $('edit_domain').value = a.domain || "";
       $('edit_ip').value = a.ip || "";
@@ -1296,12 +1165,12 @@
       $('edit_sysType').value = a.sysType || SYS_TYPES[0][0];
       $('edit_note').value = a.note || "";
       
-      setComboDyn('os', a.os, a.osVer);
-      setComboDyn('swWs', a.swWs, a.swWsVer);
-      setComboDyn('swApp', a.swApp, a.swAppVer);
-      setComboDyn('swFe', a.swFe, a.swFeVer);
-      setComboDyn('swBe', a.swBe, a.swBeVer);
-      setComboDyn('swDb', a.swDb, a.swDbVer);
+      setComboSep('os', a.os, a.osVer);
+      setComboSep('swWs', a.swWs, a.swWsVer);
+      setComboSep('swApp', a.swApp, a.swAppVer);
+      setComboSep('swFe', a.swFe, a.swFeVer);
+      setComboSep('swBe', a.swBe, a.swBeVer);
+      setComboSep('swDb', a.swDb, a.swDbVer);
       
       $('edit_pdpa').checked = a.pdpa === true;
       $('edit_c').value = a.c || 1;
