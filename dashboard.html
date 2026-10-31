@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>DMS Cloud Registry - ภาพรวมระบบสำหรับผู้ดูแล</title>
+  <link rel="icon" type="image/x-icon" href="img/ico_logo@2x.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
+    :root { --theme-primary: #122e5a; }
+    .bg-theme { background-color: var(--theme-primary) !important; }
+    .text-theme { color: var(--theme-primary) !important; }
+    
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen pb-10 text-slate-800">
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay"
+    class="fixed inset-0 bg-slate-50/90 z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#122e5a] mb-4"></i>
+    <h2 class="text-lg font-bold text-slate-800">กำลังประมวลผลข้อมูลภาพรวม...</h2>
+  </div>
+
+  <!-- Header / Navbar -->
+  <div class="bg-theme text-white py-4 px-6 shadow-lg flex justify-between items-center sticky top-0 z-40 transition-colors">
+    <div class="flex items-center gap-3">
+      <div>
+        <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-sky-400"></i> DMS Cloud Registry
+        </h1>
+        <span class="text-white/80 text-[11px] font-light tracking-wide drop-shadow-md">Central Domain & Vulnerability Overview</span>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="hidden md:flex items-center gap-3 bg-black/20 rounded-full px-4 py-2 text-xs">
+        <div class="flex items-center">
+          <i class="fa-regular fa-clock mr-1.5 text-white/70"></i>
+          <span id="clockTime" class="font-bold text-white tracking-wide">--:--</span>
+        </div>
+        <span class="text-slate-400">|</span>
+        <div class="flex items-center text-white/80">
+          <span id="clockDate">--</span>
+        </div>
+      </div>
+      <button onclick="toggleFullscreen()" class="flex items-center text-xs font-medium bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition text-white">
+        <i class="fa-solid fa-expand mr-1.5"></i> เต็มจอ
+      </button>
+      <a href="index.html" class="flex items-center text-xs font-medium bg-sky-600 hover:bg-sky-500 px-3.5 py-1.5 rounded-full transition text-white shadow-sm">
+        <i class="fa-solid fa-table-list mr-1.5"></i> จัดการระบบ
+      </a>
+    </div>
+  </div>
+
+  <div class="max-w-full mx-auto space-y-6 p-4 md:p-8">
+
+    <!-- FILTER BAR -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center gap-3 relative z-30">
+      <div class="flex items-center gap-2 mr-1">
+        <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 text-xs">
+          <i class="fa-solid fa-filter"></i>
+        </span>
+        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">ตัวกรองข้อมูล:</span>
+      </div>
+
+      <!-- Dropdown: หน่วยงาน -->
+      <div class="relative">
+        <button id="btnAgencyDropdown" onclick="toggleDropdown('agencyDropdownMenu')" 
+          class="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-2.5 transition shadow-sm">
+          <i class="fa-solid fa-building text-indigo-500"></i>
+          <span id="labelAgencyFilter">หน่วยงานทั้งหมด</span>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        </button>
+
+        <div id="agencyDropdownMenu" class="hidden absolute left-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-3 z-40">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100 text-xs">
+            <span class="font-bold text-slate-800">เลือกหน่วยงาน</span>
+            <div class="space-x-2 text-[11px]">
+              <button onclick="selectAllFilters('agency', true)" class="text-sky-600 hover:underline font-semibold">ทั้งหมด</button>
+              <span class="text-slate-300">|</span>
+              <button onclick="selectAllFilters('agency', false)" class="text-slate-400 hover:underline font-semibold">ล้าง</button>
+            </div>
+          </div>
+          <div class="my-2">
+            <input type="text" onkeyup="filterCheckboxes(this, 'agencyCheckboxList')" placeholder="ค้นหาหน่วยงาน..." 
+              class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-500">
+          </div>
+          <div id="agencyCheckboxList" class="max-h-56 overflow-y-auto custom-scrollbar space-y-1 pr-1 text-xs">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dropdown: ซอฟต์แวร์ -->
+      <div class="relative">
+        <button id="btnSoftwareDropdown" onclick="toggleDropdown('softwareDropdownMenu')" 
+          class="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 flex items-center gap-2.5 transition shadow-sm">
+          <i class="fa-solid fa-layer-group text-emerald-500"></i>
+          <span id="labelSoftwareFilter">ซอฟต์แวร์ทั้งหมด</span>
+          <i class="fa-solid fa-chevron-down text-[10px] text-slate-400"></i>
+        </button>
+
+        <div id="softwareDropdownMenu" class="hidden absolute left-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-3 z-40">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-100 text-xs">
+            <span class="font-bold text-slate-800">เลือกซอฟต์แวร์แยกหมวดหมู่</span>
+            <div class="space-x-2 text-[11px]">
+              <button onclick="selectAllFilters('software', true)" class="text-sky-600 hover:underline font-semibold">ทั้งหมด</button>
+              <span class="text-slate-300">|</span>
+              <button onclick="selectAllFilters('software', false)" class="text-slate-400 hover:underline font-semibold">ล้าง</button>
+            </div>
+          </div>
+          <div class="my-2">
+            <input type="text" onkeyup="filterGroupedCheckboxes(this, 'softwareCheckboxList')" placeholder="ค้นหาซอฟต์แวร์ หรือหมวดหมู่..." 
+              class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:ring-1 focus:ring-sky-500">
+          </div>
+          <div id="softwareCheckboxList" class="max-h-72 overflow-y-auto custom-scrollbar space-y-3 pr-1 text-xs">
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Filter Button -->
+      <div class="ml-auto flex items-center gap-2">
+        <span id="filterSummaryText" class="text-xs text-slate-400 font-medium hidden md:inline">แสดงข้อมูลทั้งหมด</span>
+        <button onclick="resetAllFilters()" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-2 transition flex items-center gap-1.5 bg-slate-50 hover:bg-rose-50 border border-slate-200 rounded-xl">
+          <i class="fa-solid fa-arrow-rotate-left"></i> รีเซ็ตตัวกรอง
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: ระบบทั้งหมด -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบที่ใช้งานทั้งหมด (Active)</p>
+            <h3 id="cardTotal" class="text-3xl font-black text-slate-800 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-server"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500">
+          <span>รวมทุกโครงสร้างพื้นฐาน</span>
+          <span class="font-bold text-slate-700">100%</span>
+        </div>
+      </div>
+
+      <!-- Card 2: เสี่ยงสูง / EOL -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">PHP / Node EOL (เสี่ยงสูง)</p>
+            <h3 id="cardEol" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-clock-rotate-left mr-1"></i> ต้องเร่งอัปเดต</span>
+          <span id="cardEolPct" class="text-rose-600 font-bold">0%</span>
+        </div>
+      </div>
+
+      <!-- Card 3: อัปเกรดแล้ว -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-emerald-600 uppercase tracking-wider">PHP / Node (อัปเกรดแล้ว)</p>
+            <h3 id="cardSafe" class="text-3xl font-black text-emerald-600 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-shield-check"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">ปิดช่องโหว่เรียบร้อย</span>
+          <span id="cardSafePct" class="text-emerald-600 font-bold">0%</span>
+        </div>
+      </div>
+
+      <!-- Card 4: อื่น ๆ / ปกติ -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+        <div class="flex justify-between items-start">
+          <div>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั่วไป (ปกติ)</p>
+            <h3 id="cardNormal" class="text-3xl font-black text-slate-700 mt-1">0</h3>
+          </div>
+          <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-lg">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-full">ไม่พบความเสี่ยง</span>
+          <span id="cardNormalPct" class="text-slate-600 font-bold">0%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN 3-COLUMN SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+      <!-- Column 1: โครงสร้างพื้นฐาน -->
+      <div class="lg:col-span-4 flex flex-col">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col justify-between h-[440px]">
+          <div>
+            <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-3">
+              <h2 class="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-teal-600"></i> สัดส่วนโครงสร้างพื้นฐาน
+              </h2>
+              <span class="text-xs text-slate-400 font-medium">Infrastructures</span>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 py-2">
+              <div class="relative w-36 h-36 flex-shrink-0 flex items-center justify-center">
+                <div id="infraPieChart" class="w-full h-full rounded-full transition-transform hover:scale-105 duration-300"
+                  style="background: conic-gradient(#0d9488 0% 80%, #64748b 80% 96.5%, #f59e0b 96.5% 100%);">
+                </div>
+                <div class="absolute inset-4 bg-white rounded-full flex flex-col items-center justify-center shadow-inner pointer-events-none">
+                  <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">ทั้งหมด</span>
+                  <span id="infraTotalCount" class="text-lg font-black text-slate-800">0</span>
+                </div>
+              </div>
+
+              <div id="infraLegendList" class="flex-1 space-y-2 pl-2 text-xs max-h-40 overflow-y-auto custom-scrollbar">
+              </div>
+            </div>
+          </div>
+
+          <!-- สถานะความเสี่ยงภาพรวม -->
+          <div class="pt-4 border-t border-slate-100">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ตามตัวกรอง)</span>
+              <span id="segSummaryText" class="text-[11px] font-semibold text-slate-500">--</span>
+            </div>
+            <div id="overallSegBar" class="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex gap-0.5">
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 font-medium mt-2">
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 2: ความคืบหน้ารายหน่วยงาน -->
+      <div class="lg:col-span-4 flex flex-col">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col justify-between h-[440px]">
+          <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-3 flex-shrink-0">
+            <h2 class="text-sm md:text-base font-bold text-slate-800 flex items-center gap-2">
+              <i class="fa-solid fa-building text-indigo-600"></i> สัดส่วนการใช้งานรายหน่วยงาน
+            </h2>
+            <span class="text-xs text-slate-400 font-medium">Top Agencies</span>
+          </div>
+          
+          <div class="flex justify-end gap-3 text-[11px] font-semibold mb-2 text-slate-500 flex-shrink-0">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+          </div>
+
+          <div id="agencyList" class="divide-y divide-slate-100 flex-1 overflow-y-auto custom-scrollbar pr-1 text-xs">
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 3: โดเมนที่ต้องเร่งอัปเดต -->
+      <div class="lg:col-span-4 flex flex-col">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6 flex flex-col justify-between h-[440px]">
+          <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-3 flex-shrink-0">
+            <h2 class="text-sm md:text-base font-bold text-rose-600 flex items-center gap-2">
+              <i class="fa-solid fa-shield-virus"></i> โดเมนที่ต้องเร่งอัปเดต
+            </h2>
+            <button onclick="exportDomainCsv()" class="inline-flex items-center px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-xl border border-rose-200 transition shadow-sm">
+              <i class="fa-solid fa-file-csv mr-1.5"></i> CSV
+            </button>
+          </div>
+
+          <!-- ช่องค้นหาในตาราง -->
+          <div class="relative w-full mb-2 flex-shrink-0">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input type="text" id="domainSearchInput" onkeyup="filterDomainTable(true)" placeholder="ค้นหาโดเมน หรือเวอร์ชัน..."
+              class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500 focus:bg-white text-xs shadow-sm">
+          </div>
+
+          <!-- ตาราง Scrollable -->
+          <div class="custom-scrollbar overflow-x-auto overflow-y-auto flex-1 rounded-xl border border-slate-200 mb-2 shadow-sm">
+            <table class="w-full text-xs border-collapse">
+              <thead class="sticky top-0 z-20 shadow-sm bg-theme text-white text-[11px]">
+                <tr>
+                  <th class="py-2 px-3 text-left">โดเมน</th>
+                  <th class="py-2 px-3 text-center">เวอร์ชัน</th>
+                  <th class="py-2 px-3 text-center w-20">สถานะ</th>
+                </tr>
+              </thead>
+              <tbody id="domainTableBody" class="divide-y divide-slate-100 bg-white">
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Footer -->
+          <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100 flex-shrink-0">
+            <span id="domainPageInfo" class="font-medium text-[11px]">แสดง 0 จาก 0</span>
+            <div class="flex items-center gap-1.5">
+              <button id="btnPrevDomain" onclick="changeDomainPage(-1)" class="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition text-xs">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button id="btnNextDomain" onclick="changeDomainPage(1)" class="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg font-bold text-slate-700 hover:bg-slate-200 disabled:opacity-40 transition text-xs">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Software Version Vulnerability Guidance -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 md:p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-2">
+          <i class="fa-solid fa-code-compare text-sky-600"></i> รายละเอียดเวอร์ชันที่ได้รับผลกระทบ และอัปเกรดล่าสุด
+        </h3>
+        <span id="guidanceStatusBadge" class="text-[11px] font-semibold text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-full">
+          แสดงตามตัวกรอง
+        </span>
+      </div>
+      <div id="versionsGrid" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs">
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwvH1cILtGrd2Ap12P0Ykyc9_lXtUmgEb-KjHHuG94ZKLTbHJLY16Z15GL5m5HXqgQa/exec";
+    const $ = id => document.getElementById(id);
+
+    let allAssets = [];
+    let softwareConfig = [];
+    let domainRows = [];
+    let currentDomainPage = 1;
+    const domainPageSize = 8;
+
+    let selectedAgencies = new Set();
+    let selectedSoftware = new Set();
+    let totalAgencyCount = 0;
+    let totalSoftwareCount = 0;
+
+    function escapeHtml(v) {
+      return String(v === null || v === undefined ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function getToken() { return sessionStorage.getItem('access_token') || ""; }
+
+    function forceLogin() {
+      sessionStorage.clear();
+      window.location.href = "auth.html";
+    }
+
+    async function callBackend(action, payload = {}) {
+      try {
+        payload.token = getToken();
+        const response = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: action, payload: payload })
+        });
+        const res = await response.json();
+        if (!res.success && res.code === 'UNAUTHENTICATED') {
+          forceLogin();
+          return { success: false };
+        }
+        return res.data || { success: false };
+      } catch (err) {
+        return { success: false, networkError: true };
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      $('clockTime').textContent = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      $('clockDate').textContent = now.toLocaleDateString('th-TH', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function toggleDropdown(menuId) {
+      const menu = $(menuId);
+      const isHidden = menu.classList.contains('hidden');
+      $('agencyDropdownMenu').classList.add('hidden');
+      $('softwareDropdownMenu').classList.add('hidden');
+      if (isHidden) menu.classList.remove('hidden');
+    }
+
+    window.addEventListener('click', function(e) {
+      if (!e.target.closest('#btnAgencyDropdown') && !e.target.closest('#agencyDropdownMenu') &&
+          !e.target.closest('#btnSoftwareDropdown') && !e.target.closest('#softwareDropdownMenu')) {
+        $('agencyDropdownMenu')?.classList.add('hidden');
+        $('softwareDropdownMenu')?.classList.add('hidden');
+      }
+    });
+
+    function compareVersions(v1, v2, op) {
+      const p1 = v1.split('.').map(Number);
+      const p2 = v2.split('.').map(Number);
+      const len = Math.max(p1.length, p2.length);
+      for(let i=0; i<len; i++) {
+        const n1 = p1[i] || 0;
+        const n2 = p2[i] || 0;
+        if(n1 > n2) return op.includes('>');
+        if(n1 < n2) return op.includes('<');
+      }
+      return op.includes('=');
+    }
+
+    function checkVulnerability(swName, swVer) {
+      if(!swName) return { isVuln: false };
+      const conf = softwareConfig.find(c => c.software.toLowerCase() === swName.toLowerCase());
+      if(!conf || !conf.rules) return { isVuln: false };
+
+      const rules = conf.rules.split(',').map(s => s.trim().toUpperCase());
+      const verUpper = (swVer || '').toUpperCase().trim();
+      
+      let isVuln = false;
+      for(const rule of rules) {
+        if(rule === 'ALL' || rule === 'VULN') {
+          isVuln = true;
+          break;
+        }
+        if(rule === 'EOF' && verUpper.includes('EOF')) {
+          isVuln = true;
+          break;
+        }
+        const match = rule.match(/^(?:([\d\.]+)\s+)?(<=|<|>=|>|==|=)\s*([\d\.]+)/);
+        if(match) {
+          const branchPrefix = match[1];
+          const op = match[2];
+          const targetVer = match[3];
+
+          if(!verUpper) {
+            isVuln = true;
+            break;
+          }
+          const cleanVer = verUpper.replace(/[^\d\.]/g, '');
+          if (branchPrefix && !cleanVer.startsWith(branchPrefix)) {
+            continue;
+          }
+          if(cleanVer && compareVersions(cleanVer, targetVer, op)) {
+            isVuln = true;
+            break;
+          }
+        }
+      }
+      return { isVuln: isVuln, safeVersion: conf.safeVersion };
+    }
+
+    document.addEventListener("DOMContentLoaded", async function () {
+      const overlay = $('loadingOverlay');
+      if (overlay) overlay.classList.remove('hidden', 'opacity-0');
+
+      if (!getToken()) {
+        forceLogin();
+        return;
+      }
+
+      const res = await callBackend("getAllRiskCloudData");
+      if (res && res.success) {
+        // Admin Guard: ตรวจสอบสิทธิ์ Admin อย่างเข้มงวด
+        if (!res.user || !res.user.isAdmin) {
+          alert("หน้านี้สงวนสิทธิ์เฉพาะผู้ดูแลระบบ (Admin) เท่านั้น");
+          window.location.href = "index.html";
+          return;
+        }
+
+        allAssets = res.assets.filter(item => item.status !== 'ไม่ใช้งาน');
+        softwareConfig = res.config || [];
+        
+        initFilterDropdowns();
+        applyFiltersAndRender();
+      } else {
+        alert("ไม่สามารถดึงข้อมูลสำหรับ Admin ได้ หรือเซสชันหมดอายุ");
+        forceLogin();
+      }
+
+      if (overlay) {
+        overlay.classList.add('opacity-0');
+        setTimeout(() => { overlay.classList.add('hidden'); }, 300);
+      }
+    });
+
+    function initFilterDropdowns() {
+      const agencyCounts = {};
+      const swCategories = {
+        'Backend Runtime & Framework': {},
+        'Database': {},
+        'Web Server': {},
+        'Frontend Framework / Library': {},
+        'Operating System (OS)': {},
+        'Application Software': {}
+      };
+
+      allAssets.forEach(asset => {
+        const ag = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        agencyCounts[ag] = (agencyCounts[ag] || 0) + 1;
+
+        if (asset.swBe) {
+          const s = asset.swBe.trim();
+          swCategories['Backend Runtime & Framework'][s] = (swCategories['Backend Runtime & Framework'][s] || 0) + 1;
+        }
+        if (asset.swDb) {
+          const s = asset.swDb.trim();
+          swCategories['Database'][s] = (swCategories['Database'][s] || 0) + 1;
+        }
+        if (asset.swWs) {
+          const s = asset.swWs.trim();
+          swCategories['Web Server'][s] = (swCategories['Web Server'][s] || 0) + 1;
+        }
+        if (asset.swFe) {
+          const s = asset.swFe.trim();
+          swCategories['Frontend Framework / Library'][s] = (swCategories['Frontend Framework / Library'][s] || 0) + 1;
+        }
+        if (asset.os) {
+          const s = asset.os.trim();
+          swCategories['Operating System (OS)'][s] = (swCategories['Operating System (OS)'][s] || 0) + 1;
+        }
+        if (asset.swApp) {
+          const s = asset.swApp.trim();
+          swCategories['Application Software'][s] = (swCategories['Application Software'][s] || 0) + 1;
+        }
+      });
+
+      const sortedAgencies = Object.entries(agencyCounts).sort((a,b) => b[1] - a[1]);
+      totalAgencyCount = sortedAgencies.length;
+      selectedAgencies = new Set(Object.keys(agencyCounts));
+
+      $('agencyCheckboxList').innerHTML = sortedAgencies.map(([name, count]) => `
+        <label class="flex items-center justify-between p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition select-none">
+          <div class="flex items-center gap-2 truncate pr-2">
+            <input type="checkbox" value="${escapeHtml(name)}" onchange="onFilterChange('agency')" checked 
+              class="agency-checkbox rounded text-sky-600 focus:ring-sky-500 w-3.5 h-3.5">
+            <span class="truncate text-slate-700">${escapeHtml(name)}</span>
+          </div>
+          <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold">${count}</span>
+        </label>
+      `).join('');
+
+      const allUniqueSoftware = new Set();
+      let groupedHtml = '';
+
+      const categoryIcons = {
+        'Backend Runtime & Framework': 'fa-solid fa-code text-indigo-500',
+        'Database': 'fa-solid fa-database text-amber-500',
+        'Web Server': 'fa-solid fa-globe text-emerald-500',
+        'Frontend Framework / Library': 'fa-solid fa-desktop text-sky-500',
+        'Operating System (OS)': 'fa-solid fa-server text-purple-500',
+        'Application Software': 'fa-solid fa-box text-rose-500'
+      };
+
+      Object.entries(swCategories).forEach(([categoryName, items]) => {
+        const sortedItems = Object.entries(items).sort((a,b) => b[1] - a[1]);
+        if (sortedItems.length === 0) return;
+
+        sortedItems.forEach(([swName]) => allUniqueSoftware.add(swName));
+
+        groupedHtml += `
+          <div class="software-group">
+            <div class="flex items-center justify-between py-1 px-1.5 bg-slate-100/80 rounded-md mb-1.5">
+              <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
+                <i class="${categoryIcons[categoryName] || 'fa-solid fa-layer-group'} text-[10px]"></i> ${categoryName}
+              </span>
+              <span class="text-[10px] text-slate-400 font-semibold">${sortedItems.length} ตัว</span>
+            </div>
+            <div class="space-y-1 pl-1">
+              ${sortedItems.map(([name, count]) => `
+                <label class="flex items-center justify-between p-1.5 hover:bg-slate-50 rounded-lg cursor-pointer transition select-none">
+                  <div class="flex items-center gap-2 truncate pr-2">
+                    <input type="checkbox" value="${escapeHtml(name)}" onchange="onFilterChange('software')" checked 
+                      class="software-checkbox rounded text-emerald-600 focus:ring-emerald-500 w-3.5 h-3.5">
+                    <span class="truncate text-slate-700">${escapeHtml(name)}</span>
+                  </div>
+                  <span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono font-bold">${count}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      totalSoftwareCount = allUniqueSoftware.size;
+      selectedSoftware = new Set(allUniqueSoftware);
+      $('softwareCheckboxList').innerHTML = groupedHtml || `<p class="text-slate-400 text-center py-2">ไม่มีข้อมูลซอฟต์แวร์</p>`;
+
+      updateFilterLabels();
+    }
+
+    function onFilterChange(type) {
+      if (type === 'agency') {
+        const checked = Array.from(document.querySelectorAll('.agency-checkbox:checked')).map(cb => cb.value);
+        selectedAgencies = new Set(checked);
+      } else if (type === 'software') {
+        const checked = Array.from(document.querySelectorAll('.software-checkbox:checked')).map(cb => cb.value);
+        selectedSoftware = new Set(checked);
+      }
+      updateFilterLabels();
+      applyFiltersAndRender();
+    }
+
+    function updateFilterLabels() {
+      const agCount = selectedAgencies.size;
+      $('labelAgencyFilter').textContent = agCount === totalAgencyCount ? 'หน่วยงานทั้งหมด' : `หน่วยงาน (${agCount})`;
+
+      const swCount = selectedSoftware.size;
+      $('labelSoftwareFilter').textContent = swCount === totalSoftwareCount ? 'ซอฟต์แวร์ทั้งหมด' : `ซอฟต์แวร์ (${swCount})`;
+
+      const isAllSelected = (agCount === totalAgencyCount) && (swCount === totalSoftwareCount);
+      $('filterSummaryText').textContent = isAllSelected ? 'แสดงข้อมูลทั้งหมด' : `กำลังกรอง (${agCount} หน่วยงาน, ${swCount} ซอฟต์แวร์)`;
+    }
+
+    function filterCheckboxes(input, containerId) {
+      const q = input.value.toLowerCase().trim();
+      const labels = $(containerId).querySelectorAll('label');
+      labels.forEach(lbl => {
+        const text = lbl.innerText.toLowerCase();
+        lbl.style.display = text.includes(q) ? 'flex' : 'none';
+      });
+    }
+
+    function filterGroupedCheckboxes(input, containerId) {
+      const q = input.value.toLowerCase().trim();
+      const groups = $(containerId).querySelectorAll('.software-group');
+      groups.forEach(group => {
+        const labels = group.querySelectorAll('label');
+        let visibleCount = 0;
+        labels.forEach(lbl => {
+          const text = lbl.innerText.toLowerCase();
+          const match = text.includes(q);
+          lbl.style.display = match ? 'flex' : 'none';
+          if (match) visibleCount++;
+        });
+        group.style.display = visibleCount > 0 ? 'block' : 'none';
+      });
+    }
+
+    function selectAllFilters(type, select) {
+      const checkboxes = document.querySelectorAll(`.${type}-checkbox`);
+      checkboxes.forEach(cb => { cb.checked = select; });
+      onFilterChange(type);
+    }
+
+    function resetAllFilters() {
+      selectAllFilters('agency', true);
+      selectAllFilters('software', true);
+    }
+
+    function applyFiltersAndRender() {
+      const filtered = allAssets.filter(asset => {
+        const ag = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        const matchAgency = selectedAgencies.has(ag);
+
+        const assetSws = [asset.swBe, asset.swWs, asset.swDb, asset.swApp, asset.swFe, asset.os]
+          .filter(Boolean)
+          .map(s => s.trim());
+        
+        const matchSoftware = (assetSws.length === 0) || assetSws.some(sw => selectedSoftware.has(sw));
+
+        return matchAgency && matchSoftware;
+      });
+
+      processAndRenderRealData(filtered);
+      renderFilteredGuidanceRules();
+    }
+
+    function processAndRenderRealData(assets) {
+      const totalSystems = assets.length;
+      let eolCount = 0;
+      let safeCount = 0;
+      let normalCount = 0;
+
+      const infraMap = {};
+      const agencyMap = {};
+      const urgentDomains = [];
+
+      assets.forEach(asset => {
+        const vulnOS = checkVulnerability(asset.os, asset.osVer);
+        const vulnBE = checkVulnerability(asset.swBe, asset.swBeVer);
+        const vulnWS = checkVulnerability(asset.swWs, asset.swWsVer);
+        const vulnAPP = checkVulnerability(asset.swApp, asset.swAppVer);
+        const vulnFE = checkVulnerability(asset.swFe, asset.swFeVer);
+        const vulnDB = checkVulnerability(asset.swDb, asset.swDbVer);
+
+        // ดึงเฉพาะซอฟต์แวร์ที่มีความเสี่ยงจริง ๆ เท่านั้น
+        const vulnList = [];
+        if (vulnOS.isVuln && asset.os) vulnList.push(`${asset.os} ${asset.osVer || '(ไม่ระบุ ver)'}`.trim());
+        if (vulnBE.isVuln && asset.swBe) vulnList.push(`${asset.swBe} ${asset.swBeVer || '(ไม่ระบุ ver)'}`.trim());
+        if (vulnWS.isVuln && asset.swWs) vulnList.push(`${asset.swWs} ${asset.swWsVer || '(ไม่ระบุ ver)'}`.trim());
+        if (vulnAPP.isVuln && asset.swApp) vulnList.push(`${asset.swApp} ${asset.swAppVer || '(ไม่ระบุ ver)'}`.trim());
+        if (vulnFE.isVuln && asset.swFe) vulnList.push(`${asset.swFe} ${asset.swFeVer || '(ไม่ระบุ ver)'}`.trim());
+        if (vulnDB.isVuln && asset.swDb) vulnList.push(`${asset.swDb} ${asset.swDbVer || '(ไม่ระบุ ver)'}`.trim());
+
+        const isVuln = vulnList.length > 0;
+
+        const beName = (asset.swBe || '').toUpperCase();
+        const hasPhpOrNode = beName.includes('PHP') || beName.includes('NODE');
+
+        let statusCategory = 'normal';
+        if (isVuln) {
+          statusCategory = 'eol';
+          eolCount++;
+          urgentDomains.push({
+            domain: asset.domain || asset.name || 'ไม่ระบุโดเมน',
+            ver: vulnList.join(', '),
+            isCritical: vulnList.some(v => v.includes('5.') || v.includes('7.') || v.toUpperCase().includes('EOF'))
+          });
+        } else if (hasPhpOrNode) {
+          statusCategory = 'safe';
+          safeCount++;
+        } else {
+          statusCategory = 'normal';
+          normalCount++;
+        }
+
+        const type = (asset.typeFilter || 'อื่น ๆ').trim();
+        infraMap[type] = (infraMap[type] || 0) + 1;
+
+        const agencyName = (asset.agency || 'ไม่ระบุหน่วยงาน').trim();
+        if (!agencyMap[agencyName]) {
+          agencyMap[agencyName] = { count: 0, eol: 0, safe: 0, none: 0 };
+        }
+        agencyMap[agencyName].count++;
+        if (statusCategory === 'eol') agencyMap[agencyName].eol++;
+        else if (statusCategory === 'safe') agencyMap[agencyName].safe++;
+        else agencyMap[agencyName].none++;
+      });
+
+      const tot = totalSystems || 1;
+      $('cardTotal').textContent = totalSystems.toLocaleString('th-TH');
+      $('cardEol').textContent = eolCount.toLocaleString('th-TH');
+      $('cardSafe').textContent = safeCount.toLocaleString('th-TH');
+      $('cardNormal').textContent = normalCount.toLocaleString('th-TH');
+
+      $('cardEolPct').textContent = totalSystems === 0 ? '0%' : ((eolCount / tot) * 100).toFixed(1) + '%';
+      $('cardSafePct').textContent = totalSystems === 0 ? '0%' : ((safeCount / tot) * 100).toFixed(1) + '%';
+      $('cardNormalPct').textContent = totalSystems === 0 ? '0%' : ((normalCount / tot) * 100).toFixed(1) + '%';
+
+      if (totalSystems === 0) {
+        $('segSummaryText').textContent = '0% · 0% · 0%';
+        $('overallSegBar').innerHTML = `<div class="w-full bg-slate-200 h-full"></div>`;
+      } else {
+        $('segSummaryText').textContent = `${((eolCount/tot)*100).toFixed(1)}% · ${((safeCount/tot)*100).toFixed(1)}% · ${((normalCount/tot)*100).toFixed(1)}%`;
+        $('overallSegBar').innerHTML = `
+          <div style="flex: ${eolCount || 0.0001};" class="bg-rose-500 h-full transition-all" title="เสี่ยงสูง ${eolCount}"></div>
+          <div style="flex: ${safeCount || 0.0001};" class="bg-emerald-500 h-full transition-all" title="ปลอดภัย ${safeCount}"></div>
+          <div style="flex: ${normalCount || 0.0001};" class="bg-slate-300 h-full transition-all" title="ปกติ ${normalCount}"></div>
+        `;
+      }
+
+      const infraColors = {
+        'GDCC': '#0d9488',
+        'Private Cloud': '#64748b',
+        'On-Premise': '#f59e0b',
+        'Huawei': '#e11d48',
+        'AWS': '#f97316',
+        'NIPA': '#06b6d4',
+        'GPC': '#6366f1',
+        'INET': '#8b5cf6'
+      };
+
+      const sortedInfra = Object.entries(infraMap).sort((a,b) => b[1] - a[1]);
+      const infraTotal = sortedInfra.reduce((sum, item) => sum + item[1], 0);
+      $('infraTotalCount').textContent = infraTotal.toLocaleString('th-TH');
+
+      if (sortedInfra.length === 0) {
+        $('infraPieChart').style.background = '#e2e8f0';
+        $('infraLegendList').innerHTML = `<p class="text-slate-400 text-center py-6">ไม่พบข้อมูลโครงสร้างพื้นฐาน</p>`;
+      } else {
+        let gradientStops = [];
+        let currentPct = 0;
+
+        $('infraLegendList').innerHTML = sortedInfra.map(([name, count]) => {
+          const pct = ((count / (infraTotal || 1)) * 100).toFixed(1);
+          const color = infraColors[name] || '#3b82f6';
+          const startPct = currentPct;
+          currentPct += parseFloat(pct);
+          gradientStops.push(`${color} ${startPct.toFixed(1)}% ${currentPct.toFixed(1)}%`);
+
+          return `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-100/80 hover:bg-slate-100/80 transition">
+              <div class="flex items-center gap-2 truncate pr-2">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${color};"></span>
+                <div class="truncate">
+                  <p class="font-bold text-slate-800 leading-tight truncate text-[11px]" title="${escapeHtml(name)}">${escapeHtml(name)}</p>
+                  <p class="text-[10px] text-slate-400 font-medium">${pct}%</p>
+                </div>
+              </div>
+              <span class="font-mono font-bold text-slate-700 text-xs">${count.toLocaleString('th-TH')}</span>
+            </div>
+          `;
+        }).join('');
+
+        $('infraPieChart').style.background = `conic-gradient(${gradientStops.join(', ')})`;
+      }
+
+      const sortedAgencies = Object.entries(agencyMap).sort((a,b) => b[1].count - a[1].count);
+      if (sortedAgencies.length === 0) {
+        $('agencyList').innerHTML = `<p class="text-slate-400 text-center py-8">ไม่พบข้อมูลตามเงื่อนไขตัวกรอง</p>`;
+      } else {
+        $('agencyList').innerHTML = sortedAgencies.map(([name, ag], idx) => {
+          const total = ag.count;
+          const e = ag.eol, s = ag.safe, n = ag.none;
+          const tipText = `เสี่ยงสูง ${e} · ปลอดภัย ${s} · ปกติ ${n} (รวม ${total})`;
+
+          let barSegments = '';
+          if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="เสี่ยงสูง ${e}"></div>`;
+          if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="ปลอดภัย ${s}"></div>`;
+          if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="ปกติ ${n}"></div>`;
+
+          return `
+            <div class="py-2.5">
+              <div class="flex justify-between items-center mb-1.5">
+                <span class="font-semibold text-slate-700 flex items-center gap-1.5 truncate max-w-[210px]" title="${escapeHtml(name)}">
+                  <span class="text-slate-400 font-mono text-[11px]">${idx + 1}.</span> ${escapeHtml(name)}
+                </span>
+                <div class="relative group cursor-pointer" title="${tipText}">
+                  <span class="text-[11px] font-bold text-slate-600 bg-slate-100 group-hover:bg-slate-200 px-2 py-0.5 rounded-lg border border-slate-200/60 transition">
+                    รวม <span class="text-slate-800">${total}</span>
+                  </span>
+                  <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition absolute right-0 bottom-full mb-1.5 z-30 bg-slate-800 text-white text-[10px] px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
+                    <span class="text-rose-400">เสี่ยง ${e}</span> ·
+                    <span class="text-emerald-400">ปลอดภัย ${s}</span> ·
+                    <span class="text-slate-300">ปกติ ${n}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex gap-0.5 cursor-pointer hover:h-2.5 transition-all" title="${tipText}">
+                ${barSegments}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      domainRows = urgentDomains;
+      filterDomainTable(true);
+    }
+
+    function renderFilteredGuidanceRules() {
+      if (softwareConfig.length === 0) {
+        $('versionsGrid').innerHTML = `<p class="col-span-full text-center text-slate-400 py-4">ไม่พบข้อมูลเกณฑ์เวอร์ชัน</p>`;
+        return;
+      }
+
+      const filteredConfigs = softwareConfig.filter(c => {
+        if (!c.software) return false;
+        const configSw = c.software.trim().toLowerCase();
+        return Array.from(selectedSoftware).some(sw => sw.toLowerCase() === configSw);
+      });
+
+      if (filteredConfigs.length === 0) {
+        $('versionsGrid').innerHTML = `
+          <div class="col-span-full text-center py-6 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-400">
+            <i class="fa-solid fa-filter-circle-xmark text-xl mb-1 text-slate-300"></i>
+            <p>ไม่พบเกณฑ์ความเสี่ยงสำหรับซอฟต์แวร์ที่เลือกในตัวกรอง</p>
+          </div>
+        `;
+        return;
+      }
+
+      $('versionsGrid').innerHTML = filteredConfigs.map(c => `
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 text-center flex flex-col justify-between hover:border-slate-300 hover:shadow-xs transition">
+          <span class="font-bold text-slate-800 text-xs">${escapeHtml(c.software)}</span>
+          <span class="text-[10px] text-rose-500 mt-1 truncate" title="${escapeHtml(c.rules)}">กฎ: ${escapeHtml(c.rules)}</span>
+          <span class="text-[10px] text-emerald-600 font-semibold mt-1 truncate" title="${escapeHtml(c.safeVersion || '-')}">→ ${escapeHtml(c.safeVersion || 'เวอร์ชันล่าสุด')}</span>
+        </div>
+      `).join('');
+    }
+
+    function filterDomainTable(resetPage = false) {
+      if (resetPage) currentDomainPage = 1;
+      const q = $('domainSearchInput').value.toLowerCase().trim();
+      const filtered = domainRows.filter(r => r.domain.toLowerCase().includes(q) || r.ver.toLowerCase().includes(q));
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / domainPageSize));
+      if (currentDomainPage > totalPages) currentDomainPage = totalPages;
+      if (currentDomainPage < 1) currentDomainPage = 1;
+
+      const start = (currentDomainPage - 1) * domainPageSize;
+      const end = Math.min(start + domainPageSize, total);
+      const displayRows = filtered.slice(start, end);
+
+      $('domainTableBody').innerHTML = displayRows.map(r => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="py-2 px-3 font-medium text-slate-800 truncate max-w-[140px]" title="${escapeHtml(r.domain)}">
+            ${escapeHtml(r.domain)}
+          </td>
+          <td class="py-2 px-3 text-center text-rose-600 font-bold font-mono">
+            ${escapeHtml(r.ver)}
+          </td>
+          <td class="py-2 px-3 text-center">
+            <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full ${r.isCritical ? 'bg-rose-100 text-rose-700 border border-rose-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}">
+              ${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}
+            </span>
+          </td>
+        </tr>
+      `).join('') || `<tr><td colspan="3" class="text-center py-6 text-slate-400 font-medium">ไม่พบรายการโดเมนที่เข้าข่าย</td></tr>`;
+
+      $('domainPageInfo').textContent = `แสดง ${total === 0 ? 0 : start + 1}–${end} จาก ${total} · หน้า ${currentDomainPage}/${totalPages}`;
+      $('btnPrevDomain').disabled = currentDomainPage <= 1;
+      $('btnNextDomain').disabled = currentDomainPage >= totalPages;
+    }
+
+    function changeDomainPage(dir) {
+      currentDomainPage += dir;
+      filterDomainTable();
+    }
+
+    function exportDomainCsv() {
+      const q = $('domainSearchInput').value.toLowerCase().trim();
+      const filtered = domainRows.filter(r => r.domain.toLowerCase().includes(q) || r.ver.toLowerCase().includes(q));
+      if (filtered.length === 0) {
+        alert("ไม่มีข้อมูลที่จะส่งออก");
+        return;
+      }
+      let csv = '\uFEFFโดเมน,ซอฟต์แวร์/เวอร์ชัน,สถานะ\n' + filtered.map(r => `"${r.domain}","${r.ver}","${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}"`).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `DMS_Urgent_Update_Domains_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
