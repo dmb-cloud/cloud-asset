@@ -977,9 +977,13 @@
           <td class="py-2 px-3 text-left text-rose-600 font-bold font-mono">
             ${escapeHtml(r.ver)}
           </td>
-          <td class="py-2 px-3 text-center">
-
-          </td>
+${/* `
+    <td class="py-2 px-3 text-center">
+      <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full ${r.isCritical ? 'bg-rose-100 text-rose-700 border border-rose-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}">
+        ${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}
+      </span>
+    </td>
+    ` */ ''}
         </tr>
       `).join('') || `<tr><td colspan="3" class="text-center py-6 text-slate-400 font-medium">ไม่พบรายการโดเมนที่เข้าข่าย</td></tr>`;
 
