@@ -175,7 +175,7 @@
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">ซอฟต์แวร์ EOL (เสี่ยงสูง)</p>
+            <p class="text-[11px] font-bold text-rose-500 uppercase tracking-wider">ซอฟต์แวร์ที่ควรอัพเดท (EOL)</p>
             <h3 id="cardEol" class="text-3xl font-black text-rose-600 mt-1">0</h3>
           </div>
           <div class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-lg">
@@ -183,7 +183,7 @@
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
-          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-clock-rotate-left mr-1"></i> ต้องเร่งอัปเดต</span>
+          <span class="text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full"><i class="fa-solid fa-clock-rotate-left mr-1"></i> ต้องเร่งอัพเดท</span>
           <span id="cardEolPct" class="text-rose-600 font-bold">0%</span>
         </div>
       </div>
@@ -200,7 +200,7 @@
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
-          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">ปิดช่องโหว่เรียบร้อย</span>
+          <span class="text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">เวอร์ชันปลอดภัย</span>
           <span id="cardSafePct" class="text-emerald-600 font-bold">0%</span>
         </div>
       </div>
@@ -209,7 +209,7 @@
       <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition">
         <div class="flex justify-between items-start">
           <div>
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ระบบทั่วไป (ปกติ)</p>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">ไม่ได้รับผลกระทบ (None)</p>
             <h3 id="cardNormal" class="text-3xl font-black text-slate-700 mt-1">0</h3>
           </div>
           <div class="w-10 h-10 bg-slate-100 text-slate-600 rounded-xl flex items-center justify-center text-lg">
@@ -257,15 +257,15 @@
           <!-- สถานะความเสี่ยงภาพรวม -->
           <div class="pt-4 border-t border-slate-100">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ตามตัวกรอง)</span>
+              <span class="text-xs font-bold text-slate-700">สถานะความเสี่ยง (ทั้งหมด)</span>
               <span id="segSummaryText" class="text-[11px] font-semibold text-slate-500">--</span>
             </div>
             <div id="overallSegBar" class="h-3 w-full rounded-full bg-slate-100 overflow-hidden flex gap-0.5">
             </div>
             <div class="flex justify-between text-[10px] text-slate-500 font-medium mt-2">
-              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
-              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
-              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> EOL</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> Safe</span>
+              <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> None</span>
             </div>
           </div>
         </div>
@@ -282,9 +282,9 @@
           </div>
           
           <div class="flex justify-end gap-3 text-[11px] font-semibold mb-2 text-slate-500 flex-shrink-0">
-            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> เสี่ยงสูง</span>
-            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> ปลอดภัย</span>
-            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> ปกติ</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-rose-500 text-[8px]"></i> EOL</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-emerald-500 text-[8px]"></i> Safe</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-slate-400 text-[8px]"></i> None</span>
           </div>
 
           <div id="agencyList" class="divide-y divide-slate-100 flex-1 overflow-y-auto custom-scrollbar pr-1 text-xs">
@@ -320,6 +320,7 @@
                 <tr>
                   <th class="py-2 px-3 text-left">โดเมน</th>
                   <th class="py-2 px-3 text-center">เวอร์ชันที่มีปัญหา</th>
+                  <!-- ซ่อนหัวคอลัมน์สถานะ -->
                   <th class="py-2 px-3 text-center w-20">สถานะ</th>
                 </tr>
               </thead>
@@ -746,31 +747,32 @@
 
       assets.forEach(asset => {
         // ตรวจสอบความเสี่ยงเฉพาะซอฟต์แวร์ที่ถูกติ๊กเลือกในตัวกรองเท่านั้น
+          //  if (vulnOS.isVuln) vulnList.push(`${asset.os} ${asset.osVer || '(EOF)'}`.trim());
         const vulnList = [];
 
         if (asset.os && isSoftwareSelected(asset.os)) {
           const vulnOS = checkVulnerability(asset.os, asset.osVer);
-          if (vulnOS.isVuln) vulnList.push(`${asset.os} ${asset.osVer || '(EOF)'}`.trim());
+          if (vulnOS.isVuln) vulnList.push(`${asset.os} ${asset.osVer}`.trim());
         }
         if (asset.swBe && isSoftwareSelected(asset.swBe)) {
           const vulnBE = checkVulnerability(asset.swBe, asset.swBeVer);
-          if (vulnBE.isVuln) vulnList.push(`${asset.swBe} ${asset.swBeVer || '(เสี่ยง)'}`.trim());
+          if (vulnBE.isVuln) vulnList.push(`${asset.swBe} ${asset.swBeVer}`.trim());
         }
         if (asset.swWs && isSoftwareSelected(asset.swWs)) {
           const vulnWS = checkVulnerability(asset.swWs, asset.swWsVer);
-          if (vulnWS.isVuln) vulnList.push(`${asset.swWs} ${asset.swWsVer || '(เสี่ยง)'}`.trim());
+          if (vulnWS.isVuln) vulnList.push(`${asset.swWs} ${asset.swWsVer}`.trim());
         }
         if (asset.swApp && isSoftwareSelected(asset.swApp)) {
           const vulnAPP = checkVulnerability(asset.swApp, asset.swAppVer);
-          if (vulnAPP.isVuln) vulnList.push(`${asset.swApp} ${asset.swAppVer || '(เสี่ยง)'}`.trim());
+          if (vulnAPP.isVuln) vulnList.push(`${asset.swApp} ${asset.swAppVer}`.trim());
         }
         if (asset.swFe && isSoftwareSelected(asset.swFe)) {
           const vulnFE = checkVulnerability(asset.swFe, asset.swFeVer);
-          if (vulnFE.isVuln) vulnList.push(`${asset.swFe} ${asset.swFeVer || '(เสี่ยง)'}`.trim());
+          if (vulnFE.isVuln) vulnList.push(`${asset.swFe} ${asset.swFeVer}`.trim());
         }
         if (asset.swDb && isSoftwareSelected(asset.swDb)) {
           const vulnDB = checkVulnerability(asset.swDb, asset.swDbVer);
-          if (vulnDB.isVuln) vulnList.push(`${asset.swDb} ${asset.swDbVer || '(เสี่ยง)'}`.trim());
+          if (vulnDB.isVuln) vulnList.push(`${asset.swDb} ${asset.swDbVer}`.trim());
         }
 
         const isVuln = vulnList.length > 0;
@@ -827,9 +829,9 @@
       } else {
         $('segSummaryText').textContent = `${((eolCount/tot)*100).toFixed(1)}% · ${((safeCount/tot)*100).toFixed(1)}% · ${((normalCount/tot)*100).toFixed(1)}%`;
         $('overallSegBar').innerHTML = `
-          <div style="flex: ${eolCount || 0.0001};" class="bg-rose-500 h-full transition-all" title="เสี่ยงสูง ${eolCount}"></div>
-          <div style="flex: ${safeCount || 0.0001};" class="bg-emerald-500 h-full transition-all" title="ปลอดภัย ${safeCount}"></div>
-          <div style="flex: ${normalCount || 0.0001};" class="bg-slate-300 h-full transition-all" title="ปกติ ${normalCount}"></div>
+          <div style="flex: ${eolCount || 0.0001};" class="bg-rose-500 h-full transition-all" title="EOL ${eolCount}"></div>
+          <div style="flex: ${safeCount || 0.0001};" class="bg-emerald-500 h-full transition-all" title="Safe ${safeCount}"></div>
+          <div style="flex: ${normalCount || 0.0001};" class="bg-slate-300 h-full transition-all" title="None ${normalCount}"></div>
         `;
       }
 
@@ -886,12 +888,12 @@
         $('agencyList').innerHTML = sortedAgencies.map(([name, ag], idx) => {
           const total = ag.count;
           const e = ag.eol, s = ag.safe, n = ag.none;
-          const tipText = `เสี่ยงสูง ${e} · ปลอดภัย ${s} · ปกติ ${n} (รวม ${total})`;
+          const tipText = `EOL ${e} · Safe ${s} · None ${n} (Total ${total})`;
 
           let barSegments = '';
-          if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="เสี่ยงสูง ${e}"></div>`;
-          if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="ปลอดภัย ${s}"></div>`;
-          if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="ปกติ ${n}"></div>`;
+          if (e > 0) barSegments += `<div style="flex:${e};" class="bg-rose-500 h-full transition hover:opacity-80" title="EOL ${e}"></div>`;
+          if (s > 0) barSegments += `<div style="flex:${s};" class="bg-emerald-500 h-full transition hover:opacity-80" title="Safe ${s}"></div>`;
+          if (n > 0) barSegments += `<div style="flex:${n};" class="bg-slate-300 h-full transition hover:opacity-80" title="None ${n}"></div>`;
 
           return `
             <div class="py-2.5">
@@ -904,9 +906,9 @@
                     รวม <span class="text-slate-800">${total}</span>
                   </span>
                   <div class="opacity-0 group-hover:opacity-100 pointer-events-none transition absolute right-0 bottom-full mb-1.5 z-30 bg-slate-800 text-white text-[10px] px-2.5 py-1 rounded-lg shadow-lg whitespace-nowrap flex items-center gap-2">
-                    <span class="text-rose-400">เสี่ยง ${e}</span> ·
-                    <span class="text-emerald-400">ปลอดภัย ${s}</span> ·
-                    <span class="text-slate-300">ปกติ ${n}</span>
+                    <span class="text-rose-400">EOL ${e}</span> ·
+                    <span class="text-emerald-400">Safe ${s}</span> ·
+                    <span class="text-slate-300">None ${n}</span>
                   </div>
                 </div>
               </div>
@@ -976,9 +978,9 @@
             ${escapeHtml(r.ver)}
           </td>
           <td class="py-2 px-3 text-center">
-            <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full ${r.isCritical ? 'bg-rose-100 text-rose-700 border border-rose-300' : 'bg-amber-100 text-amber-700 border border-amber-300'}">
-              ${r.isCritical ? 'วิกฤต' : 'ควรอัปเดต'}
-            </span>
+        <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 text-rose-700 border border-rose-300">
+          อัปเดต
+        </span>
           </td>
         </tr>
       `).join('') || `<tr><td colspan="3" class="text-center py-6 text-slate-400 font-medium">ไม่พบรายการโดเมนที่เข้าข่าย</td></tr>`;
