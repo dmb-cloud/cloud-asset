@@ -319,9 +319,9 @@
               <thead class="sticky top-0 z-20 shadow-sm bg-theme text-white text-[11px]">
                 <tr>
                   <th class="py-2 px-3 text-left">โดเมน</th>
-                  <th class="py-2 px-3 text-center">เวอร์ชันที่มีปัญหา</th>
-                  <!-- ซ่อนหัวคอลัมน์สถานะ -->
-                  <th class="py-2 px-3 text-center w-20">สถานะ</th>
+                  <th class="py-2 px-3 text-center">เวอร์ชันที่ควรอัพเดท</th>
+                  <!-- ซ่อนหัวคอลัมน์สถานะ 
+                  <th class="py-2 px-3 text-center w-20">สถานะ</th>-->
                 </tr>
               </thead>
               <tbody id="domainTableBody" class="divide-y divide-slate-100 bg-white">
@@ -978,9 +978,7 @@
             ${escapeHtml(r.ver)}
           </td>
           <td class="py-2 px-3 text-center">
-        <span class="inline-flex px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-100 text-rose-700 border border-rose-300">
-          อัปเดต
-        </span>
+
           </td>
         </tr>
       `).join('') || `<tr><td colspan="3" class="text-center py-6 text-slate-400 font-medium">ไม่พบรายการโดเมนที่เข้าข่าย</td></tr>`;
