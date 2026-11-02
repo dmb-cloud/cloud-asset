@@ -1159,13 +1159,17 @@
         const other = document.getElementById(`edit_${baseId}_other`);
         const ver = document.getElementById(`edit_${baseId}_ver`);
         
-        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === String(valName || '').toLowerCase());
-        if (exists && valName !== 'อื่นๆ' && valName !== '') {
-            sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === String(valName).toLowerCase()).value;
+
+        const safeValName = valName === undefined || valName === null ? '' : String(valName);
+        
+        let exists = Array.from(sel.options).some(opt => opt.value.toLowerCase() === safeValName.toLowerCase());
+        
+        if (exists && safeValName !== 'อื่นๆ' && safeValName !== '') {
+            sel.value = Array.from(sel.options).find(opt => opt.value.toLowerCase() === safeValName.toLowerCase()).value;
             if (other) { other.value = ''; other.classList.add('hidden'); }
-        } else if (valName) {
+        } else if (safeValName !== '') {
             sel.value = 'อื่นๆ';
-            if (other) { other.value = valName; other.classList.remove('hidden'); }
+            if (other) { other.value = safeValName; other.classList.remove('hidden'); }
         } else {
             sel.value = '';
             if (other) { other.value = ''; other.classList.add('hidden'); }
